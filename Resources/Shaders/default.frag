@@ -1,0 +1,14 @@
+#version 330 core
+/*
+    Input: [vec2] texture coords from vertex shader
+    Output: [vec4] color of text render by textColor
+*/
+
+in vec2 fTexCoord;
+out vec4 color;
+
+uniform sampler2D uTexture;
+
+void main(){
+    color =  texture(uTexture, fTexCoord);
+}
