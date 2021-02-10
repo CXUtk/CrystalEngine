@@ -28,12 +28,14 @@ FIND_PACKAGE (OpenGL REQUIRED)
 
 add_subdirectory ("deps/glad")
 add_subdirectory ("deps/lodepng")
+add_subdirectory ("deps/imgui")
 
 
 #target_link_directories (CMakeTest PRIVATE ${PROJECT_SOURCE_DIR}/deps/GLFW/lib)
 target_link_libraries (CrystalEngine PRIVATE "${PROJECT_SOURCE_DIR}/deps/GLFW/lib/glfw3.lib")
 target_link_libraries (CrystalEngine PRIVATE glad)
 target_link_libraries (CrystalEngine PRIVATE lodepng)
+target_link_libraries (CrystalEngine PRIVATE imgui)
 
 add_custom_command(TARGET CrystalEngine PRE_BUILD
                    COMMAND ${CMAKE_COMMAND} -E copy_directory

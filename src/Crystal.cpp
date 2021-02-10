@@ -2,12 +2,22 @@
 #include <thread>
 #include <lodepng/lodepng.h>
 
+
+#include "imgui/imgui.h"
+#include "imgui/imgui_impl_glfw.h"
+#include "imgui/imgui_impl_win32.h"
+
+
 Crystal& Crystal::GetInstance() {
     static Crystal instance(800, 600);
     return instance;
 }
 
 Crystal::~Crystal() {
+    ImGui_ImplGlfw_Shutdown();
+    ImGui::DestroyContext();
+    glfwDestroyWindow(_window);
+    glfwTerminate();
 }
 
 
@@ -24,12 +34,15 @@ void Crystal::Run() {
         else {
             printf("Saved!\n");
         }
-    });
+        });
 
     oldTime = glfwGetTime();
     while (!glfwWindowShouldClose(_window)) {
         glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
+        ImGui_ImplGlfw_NewFrame();
+        ImGui::NewFrame();
 
         update();
         draw();
@@ -77,6 +90,19 @@ void Crystal::init() {
     glEnable(GL_LINE_SMOOTH);
     glHint(GL_LINE_SMOOTH_HINT, GL_NICEST);
 
+
+    IMGUI_CHECKVERSION();
+    ImGui::CreateContext();
+    ImGuiIO& io = ImGui::GetIO(); (void)io;
+    //io.ConfigFlags |= ImGuiConfigFlags_NavEnableKeyboard;     // Enable Keyboard Controls
+    //io.ConfigFlags |= ImGuiConfigFlags_NavEnableGamepad;      // Enable Gamepad Controls
+
+    // Setup Dear ImGui style
+    ImGui::StyleColorsDark();
+    //ImGui::StyleColorsClassic();
+
+    // Setup Platform/Renderer backends
+    ImGui_ImplGlfw_InitForOpenGL(_window, true);
 
     _shaderManager = std::make_shared<ShaderManager>();
     _scene = std::make_shared<Scene>();

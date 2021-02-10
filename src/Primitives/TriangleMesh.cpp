@@ -1,6 +1,6 @@
-#include "TriangleMesh.h"
+﻿#include "TriangleMesh.h"
 
-TriangleMesh::TriangleMesh(const std::vector<std::shared_ptr<Triangle>> triangles):_triangles(triangles) {
+TriangleMesh::TriangleMesh(const std::vector<std::shared_ptr<Triangle>> triangles) :_triangles(triangles) {
 }
 
 TriangleMesh::~TriangleMesh() {
