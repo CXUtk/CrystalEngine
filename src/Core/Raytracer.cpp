@@ -3,7 +3,7 @@
 
 Raytracer::Raytracer(int width, int height) : _width(width), _height(height) {
     _camera = std::shared_ptr<Camera>(new Camera(
-        glm::vec3(0, 1, -5),
+        glm::vec3(0, 5, -5),
         glm::vec3(0, 1, 0),
         glm::vec3(0, 1, 0),
         glm::pi<float>() / 3,
@@ -44,7 +44,7 @@ void Raytracer::Trace(std::shared_ptr<Scene> scene) {
             printf("Tracing: %.2f %%\n", progress / static_cast<float>(_height) * 100.f);
         }
     }
-    
+
 
 }
 
