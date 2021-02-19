@@ -11,7 +11,7 @@ file (GLOB_RECURSE HEADER_FILES "${PROJECT_SOURCE_DIR}/src/*.h")
 
 
 # 将源代码添加到此项目的可执行文件。
-add_executable (CrystalEngine ${SRC_FILES} ${HEADER_FILES} "src/Primitives/Cylinder.h")
+add_executable (CrystalEngine ${SRC_FILES} ${HEADER_FILES})
 
 set_target_properties (CrystalEngine PROPERTIES
                       CXX_STANDARD 17
@@ -23,19 +23,31 @@ target_include_directories (CrystalEngine PUBLIC "${PROJECT_SOURCE_DIR}/deps")
 
 include_directories (${PROJECT_SOURCE_DIR}/src)
 include_directories (${PROJECT_SOURCE_DIR}/deps)
+include_directories (${PROJECT_SOURCE_DIR}/deps/GLFW/include)
 
-FIND_PACKAGE (OpenGL REQUIRED)
+if (UNIX)
+    FIND_PACKAGE (glfw3)
+    if (glfw3_FOUND)
+        target_link_libraries(CrystalEngine PRIVATE glfw)
+    else()
+        add_subdirectory("${PROJECT_SOURCE_DIR}/deps/GLFW")
+        target_link_libraries(CrystalEngine PRIVATE glfw)
+    endif()
+    target_link_libraries (CrystalEngine PRIVATE dl X11 pthread)
+else()
+    add_subdirectory("${PROJECT_SOURCE_DIR}/deps/GLFW")
+    target_link_libraries(CrystalEngine PRIVATE glfw)
+endif()
+
+find_package(OpenGL REQUIRED)
+target_link_libraries(CrystalEngine PRIVATE OpenGL::GL)
+
 
 add_subdirectory ("deps/glad")
 add_subdirectory ("deps/lodepng")
 add_subdirectory ("deps/imgui")
 
-
-#target_link_directories (CMakeTest PRIVATE ${PROJECT_SOURCE_DIR}/deps/GLFW/lib)
-target_link_libraries (CrystalEngine PRIVATE "${PROJECT_SOURCE_DIR}/deps/GLFW/lib/glfw3.lib")
-target_link_libraries (CrystalEngine PRIVATE glad)
-target_link_libraries (CrystalEngine PRIVATE lodepng)
-target_link_libraries (CrystalEngine PRIVATE imgui)
+target_link_libraries (CrystalEngine PRIVATE glad lodepng imgui)
 
 add_custom_command(TARGET CrystalEngine PRE_BUILD
                    COMMAND ${CMAKE_COMMAND} -E copy_directory
