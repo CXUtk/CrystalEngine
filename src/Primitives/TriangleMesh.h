@@ -11,10 +11,8 @@ public:
 
     BoundingBox GetBoundingBox() const override;
     bool Intersect(const Ray& ray, HitRecord* info) const override;
-    void ApplyTransform(glm::mat4 transform) override;
-    glm::vec3 GetNormal(glm::vec3 hitpos, glm::vec3 rayDir) const override;
 
-    static std::shared_ptr<TriangleMesh> CreateQuad(std::shared_ptr<Material> material);
+    static std::shared_ptr<TriangleMesh> CreateQuad(std::shared_ptr<Material> material, glm::mat4 transform);
 
 
 private:

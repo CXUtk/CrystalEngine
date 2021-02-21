@@ -1,4 +1,4 @@
-#include "WhittedIntegrator.h"
+﻿#include "WhittedIntegrator.h"
 
 WhittedIntegrator::WhittedIntegrator(std::shared_ptr<Camera> camera, std::shared_ptr<Sampler> sampler) : SamplerIntegrator(camera, sampler) {
 }
@@ -52,8 +52,10 @@ glm::vec3 WhittedIntegrator::evaluate(const Ray ray, std::shared_ptr<const Scene
 
             auto dir = glm::normalize(end - hit.GetHitPos());
             HitRecord hit2;
-            if (!scene->Intersect(Ray(hit.GetHitPos() + dir * 0.0001f, dir), &hit2)) {
-                L += irraiance * material->BSDF(hit, wOut, dir) * std::max(0.f, glm::dot(N, dir));
+            float distance = glm::length(end - hit.GetHitPos());
+            L += material->Le(hit, wOut);
+            if (!scene->Intersect(Ray(hit.GetHitPos() + dir * 0.0001f, dir), &hit2) || hit2.GetDistance() > distance) {
+                L += irraiance * material->Li(hit, wOut, dir) * std::max(0.f, glm::dot(N, dir));
             }
         }
     }

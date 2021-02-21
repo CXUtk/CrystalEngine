@@ -1,6 +1,14 @@
 ﻿#include "Cylinder.h"
+#include <glm/gtc/matrix_transform.hpp>
 
-Cylinder::Cylinder(glm::vec3 center, float radius, float height) :_center(center), _radius(radius), _height(height) {
+Cylinder::Cylinder(glm::vec3 center, float radius, float height, glm::vec3 rotation) : _center(center), _radius(radius), _height(height) {
+    glm::mat4 rotMatrix = glm::identity<glm::mat4>();
+    rotMatrix = glm::rotate(rotMatrix, rotation.x, glm::vec3(1, 0, 0));
+    rotMatrix = glm::rotate(rotMatrix, rotation.y, glm::vec3(0, 1, 0));
+    rotMatrix = glm::rotate(rotMatrix, rotation.z, glm::vec3(0, 0, 1));
+
+    _local2World = glm::mat3(rotMatrix);
+    _world2Local = glm::transpose(_local2World);
 }
 
 Cylinder::~Cylinder() {
@@ -11,11 +19,15 @@ BoundingBox Cylinder::GetBoundingBox() const {
         glm::vec3(_radius, _height / 2, _radius) + _center);
 }
 
+
+
 bool Cylinder::Intersect(const Ray& ray, HitRecord* info) const {
-    auto rayStart = ray.start - _center;
-    auto a = (double)ray.dir.x * ray.dir.x + (double)ray.dir.z * ray.dir.z;
-    auto b = 2.0 * ((double)ray.dir.x * rayStart.x + (double)ray.dir.z * rayStart.z);
-    auto c = ((double)rayStart.x * rayStart.x + (double)rayStart.z * rayStart.z) - (double)_radius * _radius;
+    glm::vec3 P = _world2Local * (ray.start - _center);
+    glm::vec3 d = _world2Local * ray.dir;
+
+    auto a = (double)d.x * d.x + (double)d.z * d.z;
+    auto b = 2.0 * ((double)d.x * P.x + (double)d.z * P.z);
+    auto c = ((double)P.x * P.x + (double)P.z * P.z) - (double)_radius * _radius;
     auto discrim = b * b - 4 * a * c;
     if (discrim < 0) return false;
     auto rootd = std::sqrt(discrim);
@@ -25,25 +37,31 @@ bool Cylinder::Intersect(const Ray& ray, HitRecord* info) const {
     float t0 = q / a, t1 = c / q;
     if (t0 > t1) std::swap(t0, t1);
     if (t0 > 0) {
-        float z = (rayStart + t0 * ray.dir).y;
-        if (z <= _height / 2 && z >= -_height / 2) {
-            info->QuickSetInfo(ray, t0, this);
+        auto hitpos = P + t0 * d;
+        float y = hitpos.y;
+        if (y < _height / 2 && y > -_height / 2) {
+            setHitInfo(d, t0, hitpos, info);
             return true;
         }
     }
     if (t1 > 0) {
-        float z = (rayStart + t1 * ray.dir).y;
-        if (z <= _height / 2 && z >= -_height / 2) {
-            info->QuickSetInfo(ray, t1, this);
+        auto hitpos = P + t1 * d;
+        float y = hitpos.y;
+        if (y < _height / 2 && y > -_height / 2) {
+            setHitInfo(d, t1, hitpos, info);
             return true;
         }
     }
     return false;
 }
 
-void Cylinder::ApplyTransform(glm::mat4 transform) {
-}
+void Cylinder::setHitInfo(glm::vec3 dir, float t, glm::vec3 localHitPos, HitRecord* info) const {
+    auto N = glm::normalize(glm::vec3(localHitPos.x, 0, localHitPos.z));
+    auto front_face = glm::dot(dir, N) < 0;
+    N = front_face ? N : -N;
 
-glm::vec3 Cylinder::GetNormal(glm::vec3 hitpos, glm::vec3 rayDir) const {
-    return glm::vec3();
+    auto realHitPos = _local2World * localHitPos + _center;
+    auto theta = std::atan2(-localHitPos.z, localHitPos.x) / glm::pi<float>() + 1.0f;
+    auto h = localHitPos.y / _height + 0.5f;
+    info->SetHitInfo(t, realHitPos, _local2World * N, glm::vec3(theta, h, 0), front_face, this);
 }

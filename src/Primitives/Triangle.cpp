@@ -27,17 +27,20 @@ bool Triangle::Intersect(const Ray& ray, HitRecord* info) const {
     if (isnan(res.x) || isnan(res.y) || isnan(res.z)) return false;
     if (res.x < 0 || res.x > 1 || res.y < 0 || res.y > 1 || res.x + res.y > 1 || res.z < 0) return false;
 
-    info->QuickSetInfo(ray, res.z, this);
-    info->SetLocalHitInfo(glm::vec3(1-res.x-res.y, res.x, res.y));
+    auto N = glm::normalize(glm::cross(_vertices[1] - _vertices[0], _vertices[2] - _vertices[0]));
+    auto front_face = glm::dot(ray.dir, N) < 0;
+    N = front_face ? N : -N;
+
+    info->SetHitInfo(res.z, ray.start + ray.dir * res.z, N, glm::vec3(1 - res.x - res.y, res.x, res.y), front_face, this);
     return true;
 }
 
-void Triangle::ApplyTransform(glm::mat4 transform) {
-    for (int i = 0; i < 3; i++) {
-        _vertices[i] = transform * glm::vec4(_vertices[i], 1);
-    }
-}
-
-glm::vec3 Triangle::GetNormal(glm::vec3 hitpos, glm::vec3 rayDir) const {
-    return glm::normalize(glm::cross(_vertices[1] - _vertices[0], _vertices[2] - _vertices[0]));
-}
+//void Triangle::ApplyTransform(glm::mat4 transform) {
+//    for (int i = 0; i < 3; i++) {
+//        _vertices[i] = transform * glm::vec4(_vertices[i], 1);
+//    }
+//}
+//
+//glm::vec3 Triangle::GetRealHitPosAndNormal(glm::vec3 hitpos, glm::vec3 rayDir) const {
+//    return 
+//}

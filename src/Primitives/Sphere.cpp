@@ -1,7 +1,14 @@
 ﻿#include "Sphere.h"
 #include <glm/gtc/matrix_transform.hpp>
 
-Sphere::Sphere(glm::vec3 center, float radius) :_center(center), _radius(radius) {
+Sphere::Sphere(glm::vec3 center, float radius, glm::vec3 rotation) :_center(center), _radius(radius) {
+    glm::mat4 rotMatrix = glm::identity<glm::mat4>();
+    rotMatrix = glm::rotate(rotMatrix, rotation.x, glm::vec3(1, 0, 0));
+    rotMatrix = glm::rotate(rotMatrix, rotation.y, glm::vec3(0, 1, 0));
+    rotMatrix = glm::rotate(rotMatrix, rotation.z, glm::vec3(0, 0, 1));
+
+    _local2World = glm::mat3(rotMatrix);
+    _world2Local = glm::transpose(_local2World);
 }
 
 Sphere::~Sphere() {
@@ -12,8 +19,8 @@ BoundingBox Sphere::GetBoundingBox() const {
 }
 
 bool Sphere::Intersect(const Ray& ray, HitRecord* info) const {
-    glm::vec3 P = ray.start - _center;
-    glm::vec3 d = ray.dir;
+    glm::vec3 P = _world2Local * (ray.start - _center);
+    glm::vec3 d = _world2Local * ray.dir;
     float a = glm::dot(d, d);
     float b = 2 * glm::dot(d, P);
     float c = glm::dot(P, P) - _radius * _radius;
@@ -26,14 +33,17 @@ bool Sphere::Intersect(const Ray& ray, HitRecord* info) const {
     float t = t1;
     if (t1 < 0) t = t2;
     if (t < 0) return false;
-    info->QuickSetInfo(ray, t, this);
+
+    // Calculate local hit info, normal, front face, etc..
+    auto dummyHitPos = P + d * t;
+    auto N = glm::normalize(dummyHitPos);
+    auto theta = std::atan2(-dummyHitPos.z, dummyHitPos.x) / glm::pi<float>() + 1.0f;
+    auto phi = std::acos(dummyHitPos.y / _radius);
+
+    auto front_face = glm::dot(d, N) < 0;
+    N = front_face ? N : -N;
+
+    auto realHitPos = _local2World * dummyHitPos + _center;
+    info->SetHitInfo(t, realHitPos, _local2World * N, glm::vec3(theta, phi, 0.f), front_face, this);
     return true;
-}
-
-void Sphere::ApplyTransform(glm::mat4 transform) {
-    _center = (transform * glm::vec4(_center, 1));
-}
-
-glm::vec3 Sphere::GetNormal(glm::vec3 hitpos, glm::vec3 rayDir) const {
-    return glm::normalize(hitpos - _center);
 }

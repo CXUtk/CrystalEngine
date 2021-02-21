@@ -28,23 +28,17 @@ bool TriangleMesh::Intersect(const Ray& ray, HitRecord* info) const {
     return hit;
 }
 
-void TriangleMesh::ApplyTransform(glm::mat4 transform) {
-    for (auto tri : _triangles) {
-        tri->ApplyTransform(transform);
-    }
-}
-
-glm::vec3 TriangleMesh::GetNormal(glm::vec3 hitpos, glm::vec3 rayDir) const {
-    return glm::vec3();
-}
-
-std::shared_ptr<TriangleMesh> TriangleMesh::CreateQuad(std::shared_ptr<Material> material) {
+std::shared_ptr<TriangleMesh> TriangleMesh::CreateQuad(std::shared_ptr<Material> material, glm::mat4 transform) {
     static glm::vec3 quadVertices[4] = {
         glm::vec3(-0.5, 0, 0.5),
         glm::vec3(-0.5, 0, -0.5),
         glm::vec3(0.5, 0, -0.5),
         glm::vec3(0.5, 0, 0.5),
     };
+
+    for (int i = 0; i < 4; i++) {
+        quadVertices[i] = glm::vec3(transform * glm::vec4(quadVertices[i], 1.0f));
+    }
     std::vector<std::shared_ptr<Triangle>> list;
     std::shared_ptr<Triangle> tr1 = std::shared_ptr<Triangle>(new Triangle(quadVertices[0], quadVertices[1], quadVertices[2]));
     std::shared_ptr<Triangle> tr2 = std::shared_ptr<Triangle>(new Triangle(quadVertices[0], quadVertices[2], quadVertices[3]));

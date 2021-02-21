@@ -9,7 +9,7 @@ public:
     HitRecord();
     ~HitRecord();
 
-    void QuickSetInfo(const Ray& ray, float t, const Object* obj);
+    void SetHitInfo(float t, glm::vec3 hitPos, glm::vec3 normal, glm::vec3 localInfo, bool frontFace, const Object* obj);
 
     void SetLocalHitInfo(glm::vec3 info) { _localHitInfo = info; }
 
@@ -28,6 +28,4 @@ private:
     glm::vec3 _hitPos;
     glm::vec3 _localHitInfo;
     glm::vec3 _normal;
-
-    void set_face_normal(const Ray& r, const glm::vec3& outward_normal);
 };
