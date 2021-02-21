@@ -4,10 +4,10 @@ Random::Random(unsigned int seed) {
     mt.seed(seed);
 }
 
-int Random::nextInt(int a, int b) {
+int Random::NextInt(int a, int b) {
     return a + mt() % (b - a);
 }
 
-float Random::nextFloat() {
+float Random::NextFloat() {
     return mt() / static_cast<float>(mt.max());
 }

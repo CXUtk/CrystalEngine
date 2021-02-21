@@ -37,3 +37,7 @@ void Triangle::ApplyTransform(glm::mat4 transform) {
         _vertices[i] = transform * glm::vec4(_vertices[i], 1);
     }
 }
+
+glm::vec3 Triangle::GetNormal(glm::vec3 hitpos, glm::vec3 rayDir) const {
+    return glm::normalize(glm::cross(_vertices[1] - _vertices[0], _vertices[2] - _vertices[0]));
+}

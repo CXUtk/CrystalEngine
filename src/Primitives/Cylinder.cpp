@@ -43,3 +43,7 @@ bool Cylinder::Intersect(const Ray& ray, HitRecord* info) const {
 
 void Cylinder::ApplyTransform(glm::mat4 transform) {
 }
+
+glm::vec3 Cylinder::GetNormal(glm::vec3 hitpos, glm::vec3 rayDir) const {
+    return glm::vec3();
+}

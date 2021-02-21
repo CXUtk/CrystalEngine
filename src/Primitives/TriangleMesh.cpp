@@ -34,6 +34,10 @@ void TriangleMesh::ApplyTransform(glm::mat4 transform) {
     }
 }
 
+glm::vec3 TriangleMesh::GetNormal(glm::vec3 hitpos, glm::vec3 rayDir) const {
+    return glm::vec3();
+}
+
 std::shared_ptr<TriangleMesh> TriangleMesh::CreateQuad(std::shared_ptr<Material> material) {
     static glm::vec3 quadVertices[4] = {
         glm::vec3(-0.5, 0, 0.5),

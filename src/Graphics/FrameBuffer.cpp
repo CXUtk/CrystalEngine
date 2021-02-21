@@ -28,7 +28,7 @@ void FrameBuffer::Lock() {
     _mutexLock.lock();
 }
 
-void FrameBuffer::unlock() {
+void FrameBuffer::Unlock() {
     _mutexLock.unlock();
 }
 

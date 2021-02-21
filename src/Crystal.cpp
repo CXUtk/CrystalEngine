@@ -45,11 +45,8 @@ void Crystal::Run() {
         ImGui_ImplOpenGL3_NewFrame();
         ImGui_ImplGlfw_NewFrame();
         ImGui::NewFrame();
-        bool show = true;
-        ImGui::ShowDemoWindow(&show);
-
-
-
+        // bool show = true;
+        // ImGui::ShowDemoWindow(&show);
         ImGui::Render();
 
         glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
@@ -128,7 +125,7 @@ void Crystal::update() {
     auto framebuffer = _rayTracer->GetFrameBuffer();
     framebuffer->Lock();
     _screenRenderer->copyTexture(framebuffer->GetData(), _width, _height);
-    framebuffer->unlock();
+    framebuffer->Unlock();
 }
 
 void Crystal::draw() {

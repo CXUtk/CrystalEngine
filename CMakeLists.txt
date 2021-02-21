@@ -18,9 +18,6 @@ set_target_properties (CrystalEngine PROPERTIES
                       CXX_EXTENSIONS OFF
                       )
   
-
-target_include_directories (CrystalEngine PUBLIC "${PROJECT_SOURCE_DIR}/deps")
-
 include_directories (${PROJECT_SOURCE_DIR}/src)
 include_directories (${PROJECT_SOURCE_DIR}/deps)
 include_directories (${PROJECT_SOURCE_DIR}/deps/GLFW/include)

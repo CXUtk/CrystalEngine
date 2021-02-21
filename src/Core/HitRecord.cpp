@@ -17,7 +17,7 @@ void HitRecord::QuickSetInfo(const Ray& ray, float t, const Object* obj) {
     _hitPos = hitpos;
     _distance = t;
     _hitObject = obj;
-    // set_face_normal(ray, obj->getNormal(hitpos, ray.dir));
+    set_face_normal(ray, obj->GetNormal(hitpos, ray.dir));
 }
 
 void HitRecord::set_face_normal(const Ray& r, const glm::vec3& outward_normal) {

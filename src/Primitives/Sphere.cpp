@@ -33,3 +33,7 @@ bool Sphere::Intersect(const Ray& ray, HitRecord* info) const {
 void Sphere::ApplyTransform(glm::mat4 transform) {
     _center = (transform * glm::vec4(_center, 1));
 }
+
+glm::vec3 Sphere::GetNormal(glm::vec3 hitpos, glm::vec3 rayDir) const {
+    return glm::normalize(hitpos - _center);
+}
