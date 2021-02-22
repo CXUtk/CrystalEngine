@@ -1,4 +1,4 @@
-#include "PointLight.h"
+﻿#include "PointLight.h"
 
 PointLight::PointLight(glm::vec3 pos, glm::vec3 color, float power) : _pos(pos), _color(color), _power(power) {
 

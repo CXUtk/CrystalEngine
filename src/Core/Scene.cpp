@@ -6,12 +6,16 @@
 #include "Materials/Default.h"
 #include <Materials/Phong.h>
 #include <Materials/Phong_Blinn.h>
+#include <Materials/Strauss.h>
 #include <glm/gtx/transform.hpp>
 #include <Lights/PointLight.h>
+#include <Materials/Cook_Torrance.h>
 
 Scene::Scene() {
     std::shared_ptr<Material> floor = std::make_shared<Phong>(glm::vec3(0.5f), 64, glm::vec3(1));
-    std::shared_ptr<Material> ball = std::make_shared<Phong_Blinn>(glm::vec3(0.8, 0.5, 0.2f), 128, glm::vec3(1));
+
+    std::shared_ptr<Material> ball = std::make_shared<Cook_Torrance>(glm::vec3(0.8, 0.5, 0.2f), 0.2f);
+
     auto sp1 = std::shared_ptr<Sphere>(new Sphere(glm::vec3(0, 1, -1), 1, glm::vec3(1.f, 0, 0)));
     auto sp2 = std::shared_ptr<Sphere>(new Sphere(glm::vec3(-2, -0.5, 2), 1, glm::vec3(0, 0, 0.5f)));
     sp1->SetMaterial(ball);
@@ -33,13 +37,14 @@ Scene::Scene() {
     auto quad = TriangleMesh::CreateQuad(floor, transform);
     _sceneObjects.push_back(quad);
 
-    auto cylinder = std::shared_ptr<Cylinder>(new Cylinder(glm::vec3(5, 0, 5), 1, 1, glm::vec3(-0.5f, 0.f, 0.5f)));
-    cylinder->SetMaterial(ball);
-    _sceneObjects.push_back(cylinder);
+    //auto cylinder = std::shared_ptr<Cylinder>(new Cylinder(glm::vec3(0, 1, 0), 1, 1, glm::vec3(-0.5f, 0.f, 0.5f)));
+    //cylinder->SetMaterial(ball);
+    //_sceneObjects.push_back(cylinder);
 
 
     AddLight(std::make_shared<PointLight>(glm::vec3(7, 15, -15), glm::vec3(1), 600));
-
+    AddLight(std::make_shared<PointLight>(glm::vec3(-7, 15, -15), glm::vec3(1), 600));
+    //AddLight(std::make_shared<PointLight>(glm::vec3(0, 0, 0), glm::vec3(1), 20));
 }
 
 Scene::~Scene() {
