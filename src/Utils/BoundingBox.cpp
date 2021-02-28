@@ -10,7 +10,7 @@ BoundingBox::BoundingBox(const glm::vec3& minPos, const glm::vec3& maxPos) : _mi
 BoundingBox::~BoundingBox() {
 }
 
-bool BoundingBox::rayIntersect(const Ray& ray, float& tMin, float& tMax) const {
+bool BoundingBox::RayIntersects(const Ray& ray, float& tMin, float& tMax) const {
     glm::vec3 start = ray.start, dir = ray.dir;
     for (int i = 0; i < 3; i++) {
         auto invD = 1.0f / dir[i];
@@ -24,25 +24,25 @@ bool BoundingBox::rayIntersect(const Ray& ray, float& tMin, float& tMax) const {
     return true;
 }
 
-bool BoundingBox::intersects(const BoundingBox& box) const {
+bool BoundingBox::Intersects(const BoundingBox& box) const {
     for (int i = 0; i < 3; i++)
-        if (std::max(_minPos[i], box.getMinPos()[i]) > std::min(_maxPos[i], box.getMaxPos()[i])) return false;
+        if (std::max(_minPos[i], box.GetMinPos()[i]) > std::min(_maxPos[i], box.GetMaxPos()[i])) return false;
     return true;
 }
 
-BoundingBox BoundingBox::unionWith(const BoundingBox& box) const {
+BoundingBox BoundingBox::Union(const BoundingBox& box) const {
     glm::vec3 minn(std::min(_minPos.x, box._minPos.x), std::min(_minPos.y, box._minPos.y), std::min(_minPos.z, box._minPos.z));
     glm::vec3 maxx(std::max(_maxPos.x, box._maxPos.x), std::max(_maxPos.y, box._maxPos.y), std::max(_maxPos.z, box._maxPos.z));
     return BoundingBox(minn, maxx);
 }
 
-BoundingBox BoundingBox::unionWith(const glm::vec3& pos) const {
+BoundingBox BoundingBox::Union(const glm::vec3& pos) const {
     glm::vec3 minn(std::min(_minPos.x, pos.x), std::min(_minPos.y, pos.y), std::min(_minPos.z, pos.z));
     glm::vec3 maxx(std::max(_maxPos.x, pos.x), std::max(_maxPos.y, pos.y), std::max(_maxPos.z, pos.z));
     return BoundingBox(minn, maxx);
 }
 
-BoundingBox BoundingBox::intersectWith(const BoundingBox& box) const {
+BoundingBox BoundingBox::IntersectWith(const BoundingBox& box) const {
     glm::vec3 minn(std::max(_minPos.x, box._minPos.x), std::max(_minPos.y, box._minPos.y), std::max(_minPos.z, box._minPos.z));
     glm::vec3 maxx(std::min(_maxPos.x, box._maxPos.x), std::min(_maxPos.y, box._maxPos.y), std::min(_maxPos.z, box._maxPos.z));
     return BoundingBox(minn, maxx);

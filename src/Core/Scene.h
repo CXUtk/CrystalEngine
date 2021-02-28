@@ -5,6 +5,7 @@
 #include <Utils/Ray.h>
 #include <Primitives/Object.h>
 #include <Lights/Light.h>
+#include <Accelerator/Accelerator.h>
 
 class Scene {
 public:
@@ -21,4 +22,6 @@ public:
 private:
     std::vector<std::shared_ptr<Object>> _sceneObjects;
     std::vector<std::shared_ptr<Light>> _lights;
+
+    std::unique_ptr<Accelerator> _accelerator;
 };

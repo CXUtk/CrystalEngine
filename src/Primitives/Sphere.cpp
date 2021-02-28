@@ -44,6 +44,6 @@ bool Sphere::Intersect(const Ray& ray, HitRecord* info) const {
     N = front_face ? N : -N;
 
     auto realHitPos = _local2World * dummyHitPos + _center;
-    info->SetHitInfo(t, realHitPos, _local2World * N, glm::vec3(theta, phi, 0.f), front_face, this);
+    info->SetHitInfo(t, realHitPos, _local2World * N, glm::vec2(theta, phi), front_face, this, glm::vec3(0), glm::vec3(0));
     return true;
 }

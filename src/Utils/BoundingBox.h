@@ -10,20 +10,20 @@ public:
     BoundingBox(const glm::vec3& minPos, const glm::vec3& maxPos);
     ~BoundingBox();
 
-    glm::vec3 getMinPos()const { return _minPos; }
-    glm::vec3 getMaxPos()const { return _maxPos; }
+    glm::vec3 GetMinPos() const { return _minPos; }
+    glm::vec3 GetMaxPos() const { return _maxPos; }
 
-    bool rayIntersect(const Ray& ray, float& tMin, float& tMax) const;
+    bool RayIntersects(const Ray& ray, float& tMin, float& tMax) const;
 
-    bool intersects(const BoundingBox& box) const;
+    bool Intersects(const BoundingBox& box) const;
 
-    glm::vec3 getCenter() const { return (_minPos + _maxPos) / 2.f; }
+    glm::vec3 GetCenter() const { return (_minPos + _maxPos) / 2.f; }
 
-    BoundingBox unionWith(const BoundingBox& box) const;
+    BoundingBox Union(const BoundingBox& box) const;
 
-    BoundingBox unionWith(const glm::vec3& pos) const;
+    BoundingBox Union(const glm::vec3& pos) const;
 
-    BoundingBox intersectWith(const BoundingBox& box) const;
+    BoundingBox IntersectWith(const BoundingBox& box) const;
 
     int MaxExtent() const;
 

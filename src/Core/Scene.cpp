@@ -45,6 +45,9 @@ Scene::Scene() {
     AddLight(std::make_shared<PointLight>(glm::vec3(7, 15, -15), glm::vec3(1), 600));
     AddLight(std::make_shared<PointLight>(glm::vec3(-7, 15, -15), glm::vec3(1), 600));
     //AddLight(std::make_shared<PointLight>(glm::vec3(0, 0, 0), glm::vec3(1), 20));
+
+    _accelerator = Accelerator::GetAccelerator("KDTree");
+    _accelerator->Build(_sceneObjects);
 }
 
 Scene::~Scene() {
@@ -52,15 +55,7 @@ Scene::~Scene() {
 }
 
 bool Scene::Intersect(const Ray& ray, HitRecord* hitRecord) const {
-    for (auto obj : _sceneObjects) {
-        HitRecord tmp;
-        if (obj->Intersect(ray, &tmp)) {
-            if (tmp.GetDistance() < hitRecord->GetDistance()) {
-                memcpy(hitRecord, &tmp, sizeof(HitRecord));
-            }
-        }
-    }
-    return hitRecord->GetHitObject() != nullptr;
+    return _accelerator->Intersect(ray, hitRecord);
 }
 
 void Scene::AddObject(std::shared_ptr<Object> object) {

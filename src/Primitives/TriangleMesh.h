@@ -1,12 +1,13 @@
-#pragma once
+﻿#pragma once
 #include "Object.h"
 #include "Triangle.h"
+#include <Accelerator/Accelerator.h>
 #include <vector>
 
 class TriangleMesh : public Object {
 public:
     TriangleMesh() = default;
-    TriangleMesh(const std::vector<std::shared_ptr<Triangle>> triangles);
+    TriangleMesh(const std::vector<std::shared_ptr<Triangle>> triangles, glm::mat4 transform);
     ~TriangleMesh() override;
 
     BoundingBox GetBoundingBox() const override;
@@ -18,4 +19,7 @@ public:
 private:
     std::vector<std::shared_ptr<Triangle>> _triangles;
     BoundingBox _boundingBox;
+
+
+    void transform(glm::mat4 transform);
 };
