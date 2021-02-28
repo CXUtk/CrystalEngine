@@ -11,7 +11,7 @@ TriangleMesh::~TriangleMesh() {
 BoundingBox TriangleMesh::GetBoundingBox() const {
     BoundingBox box;
     for (auto& tri : _triangles) {
-        box.Union(tri->GetBoundingBox());
+        box = box.Union(tri->GetBoundingBox());
     }
     return box;
 }

@@ -37,6 +37,8 @@ Scene::Scene() {
     auto quad = TriangleMesh::CreateQuad(floor, transform);
     _sceneObjects.push_back(quad);
 
+    auto res = quad->GetBoundingBox();
+
     //auto cylinder = std::shared_ptr<Cylinder>(new Cylinder(glm::vec3(0, 1, 0), 1, 1, glm::vec3(-0.5f, 0.f, 0.5f)));
     //cylinder->SetMaterial(ball);
     //_sceneObjects.push_back(cylinder);
