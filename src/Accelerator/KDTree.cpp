@@ -16,7 +16,7 @@ struct Edge {
 };
 
 KDTree::KDTree() : Accelerator() {
-    _nodes[0] = KDTreeNode();
+    _nodes.push_back(KDTreeNode());
     _root = 0, _tot = 0;
     _objects.clear();
 }
@@ -26,7 +26,8 @@ KDTree::~KDTree() {
 
 void KDTree::Build(const std::vector<std::shared_ptr<Object>>& objects) {
     masterBox = BoundingBox();
-    for (auto ptr : objects) {
+    _nodes.reserve(objects.size() * 2);
+    for (const auto& ptr : objects) {
         _objects.push_back(ptr.get());
         masterBox = masterBox.Union(ptr->GetBoundingBox());
     }
@@ -47,7 +48,7 @@ bool KDTree::Intersect(const Ray& ray, HitRecord* info) const {
 
 int KDTree::newNode(const std::vector<Object*>& objs, const BoundingBox& box, int split, float splitPos) {
     ++_tot;
-    _nodes[_tot] = KDTreeNode(objs, split, splitPos);
+    _nodes.push_back(KDTreeNode(objs, split, splitPos));
     return _tot;
 }
 
@@ -67,7 +68,7 @@ void KDTree::_build(int& p, const BoundingBox& outerBox, std::vector<Object*>& o
         glm::vec3 diff = outerBox.GetMaxPos() - outerBox.GetMinPos();
         for (int d = 0; d < 3; d++) {
             std::vector<Edge> edges;
-            for (auto obj : objs) {
+            for (auto& obj : objs) {
                 edges.push_back(Edge(false, obj->GetBoundingBox().GetMinPos()[d]));
                 edges.push_back(Edge(true, obj->GetBoundingBox().GetMaxPos()[d]));
             }
@@ -118,7 +119,8 @@ void KDTree::_build(int& p, const BoundingBox& outerBox, std::vector<Object*>& o
     BoundingBox boxright(rightM, outerBox.GetMaxPos());
 
     std::vector<Object*> leftTri, rightTri;
-    for (auto obj : objs) {
+    for (auto&
+        obj : objs) {
         if (obj->GetBoundingBox().GetMinPos()[split] < splitPos) {
             leftTri.push_back(obj);
         }
@@ -137,9 +139,9 @@ bool KDTree::ray_test(int p, const Ray& ray, HitRecord* info, float tMin, float 
     if (!p || tMin > tMax) return false;
     //if (!outerBox.rayIntersect(ray, tMin, tMax)) return false;
     if (tMin >= info->GetDistance()) return false;
-    if (self.splitAxis == -1) {
+    if (_nodes[p].splitAxis == -1) {
         bool hit = false;
-        for (auto obj : self.objs) {
+        for (auto& obj : _nodes[p].objs) {
             HitRecord tmp;
             if (obj->Intersect(ray, &tmp)) {
                 if (tmp.GetDistance() < info->GetDistance()) {

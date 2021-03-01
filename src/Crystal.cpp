@@ -3,9 +3,9 @@
 #include <lodepng/lodepng.h>
 
 
-#include "imgui/imgui.h"
-#include "imgui/imgui_impl_glfw.h"
-#include "imgui/imgui_impl_opengl3.h"
+//#include "imgui/imgui.h"
+//#include "imgui/imgui_impl_glfw.h"
+//#include "imgui/imgui_impl_opengl3.h"
 
 
 Crystal& Crystal::GetInstance() {
@@ -14,9 +14,9 @@ Crystal& Crystal::GetInstance() {
 }
 
 Crystal::~Crystal() {
-    ImGui_ImplGlfw_Shutdown();
-    ImGui_ImplOpenGL3_Shutdown();
-    ImGui::DestroyContext();
+    //ImGui_ImplGlfw_Shutdown();
+    //ImGui_ImplOpenGL3_Shutdown();
+    //ImGui::DestroyContext();
 
     glfwDestroyWindow(_window);
     glfwTerminate();
@@ -38,22 +38,23 @@ void Crystal::Run() {
         }
         });
 
+
     oldTime = glfwGetTime();
     while (!glfwWindowShouldClose(_window)) {
 
 
-        ImGui_ImplOpenGL3_NewFrame();
-        ImGui_ImplGlfw_NewFrame();
-        ImGui::NewFrame();
-        // bool show = true;
-        // ImGui::ShowDemoWindow(&show);
-        ImGui::Render();
+        //ImGui_ImplOpenGL3_NewFrame();
+        //ImGui_ImplGlfw_NewFrame();
+        //ImGui::NewFrame();
+        //// bool show = true;
+        //// ImGui::ShowDemoWindow(&show);
+        //ImGui::Render();
 
         glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
         update();
         draw();
-        ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
+        //ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
 
         glfwSwapBuffers(_window);
         while (glfwGetTime() - oldTime < 1.0 / 60.0) {
@@ -99,19 +100,19 @@ void Crystal::init() {
     glHint(GL_LINE_SMOOTH_HINT, GL_NICEST);
 
 
-    IMGUI_CHECKVERSION();
-    ImGui::CreateContext();
-    ImGuiIO& io = ImGui::GetIO(); (void)io;
-    //io.ConfigFlags |= ImGuiConfigFlags_NavEnableKeyboard;     // Enable Keyboard Controls
-    //io.ConfigFlags |= ImGuiConfigFlags_NavEnableGamepad;      // Enable Gamepad Controls
+    //IMGUI_CHECKVERSION();
+    //ImGui::CreateContext();
+    //ImGuiIO& io = ImGui::GetIO(); (void)io;
+    ////io.ConfigFlags |= ImGuiConfigFlags_NavEnableKeyboard;     // Enable Keyboard Controls
+    ////io.ConfigFlags |= ImGuiConfigFlags_NavEnableGamepad;      // Enable Gamepad Controls
 
-    // Setup Dear ImGui style
-    ImGui::StyleColorsDark();
-    //ImGui::StyleColorsClassic();
+    //// Setup Dear ImGui style
+    //ImGui::StyleColorsDark();
+    ////ImGui::StyleColorsClassic();
 
-    // Setup Platform/Renderer backends
-    ImGui_ImplGlfw_InitForOpenGL(_window, true);
-    ImGui_ImplOpenGL3_Init("#version 330 core");
+    //// Setup Platform/Renderer backends
+    //ImGui_ImplGlfw_InitForOpenGL(_window, true);
+    //ImGui_ImplOpenGL3_Init("#version 330 core");
 
 
 

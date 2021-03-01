@@ -1,4 +1,4 @@
-#include "Triangle.h"
+﻿#include "Triangle.h"
 
 constexpr bool FLAT_SHADING = false;
 
@@ -21,8 +21,12 @@ BoundingBox Triangle::GetBoundingBox() const {
     for (int i = 1; i < 3; i++) {
         minn.x = std::min(minn.x, _vertices[i].Position.x);
         minn.y = std::min(minn.y, _vertices[i].Position.y);
-        maxx.x = std::max(minn.x, _vertices[i].Position.x);
-        maxx.y = std::max(minn.y, _vertices[i].Position.y);
+        minn.z = std::min(minn.z, _vertices[i].Position.z);
+
+        maxx.x = std::max(maxx.x, _vertices[i].Position.x);
+        maxx.y = std::max(maxx.y, _vertices[i].Position.y);
+        maxx.z = std::max(maxx.z, _vertices[i].Position.z);
+
     }
     return BoundingBox(minn, maxx);
 }

@@ -56,18 +56,31 @@ bool readInt(const char* S, int& idx, int& num) {
 }
 
 
-std::shared_ptr<TriangleMesh> ObjLoader::GetMesh() const {
+std::shared_ptr<TriangleMesh> ObjLoader::GetMesh(std::shared_ptr<Material> material) const {
 
-    std::vector<VertexData> vertices;
     std::vector<std::shared_ptr<Triangle>> triangles;
-    for (auto& v : Vertices) {
-        VertexData vdata{ v, glm::vec3(0), glm::vec2(0) };
-        vertices.push_back(vdata);
-    }
     for (auto& t : Triangles) {
+        VertexData v[3];
+        v[0].Position = Vertices[t.VertexID[0]];
+        v[1].Position = Vertices[t.VertexID[1]];
+        v[2].Position = Vertices[t.VertexID[2]];
+
+        if (Normals.size()) {
+            v[0].Normal = Normals[t.NormalID[0]];
+            v[1].Normal = Normals[t.NormalID[1]];
+            v[2].Normal = Normals[t.NormalID[2]];
+        }
+
+        if (TexCoords.size()) {
+            v[0].TexCoords = TexCoords[t.TexID[0]];
+            v[1].TexCoords = TexCoords[t.TexID[1]];
+            v[2].TexCoords = TexCoords[t.TexID[2]];
+        }
+
         std::shared_ptr<Triangle> tri = std::shared_ptr<Triangle>(
-            new Triangle(vertices[t.VertexID[0]], vertices[t.VertexID[1]], vertices[t.VertexID[2]])
-        );
+            new Triangle(v[0], v[1], v[2])
+            );
+        tri->SetMaterial(material);
         triangles.push_back(tri);
     }
     return std::make_shared<TriangleMesh>(triangles, glm::identity<glm::mat4>());

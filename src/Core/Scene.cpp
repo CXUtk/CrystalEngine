@@ -7,9 +7,11 @@
 #include <Materials/Phong.h>
 #include <Materials/Phong_Blinn.h>
 #include <Materials/Strauss.h>
+#include <Materials/Cook_Torrance.h>
 #include <glm/gtx/transform.hpp>
 #include <Lights/PointLight.h>
-#include <Materials/Cook_Torrance.h>
+#include <Utils/ObjLoader.h>
+
 
 Scene::Scene() {
     std::shared_ptr<Material> floor = std::make_shared<Phong>(glm::vec3(0.5f), 64, glm::vec3(1));
@@ -21,8 +23,8 @@ Scene::Scene() {
     sp1->SetMaterial(ball);
     sp2->SetMaterial(ball);
 
-    _sceneObjects.push_back(sp1);
-    _sceneObjects.push_back(sp2);
+    //_sceneObjects.push_back(sp1);
+    //_sceneObjects.push_back(sp2);
 
     glm::vec3 quadVertices[4] = {
         glm::vec3(-25, -2, 45),
@@ -37,8 +39,10 @@ Scene::Scene() {
     auto quad = TriangleMesh::CreateQuad(floor, transform);
     _sceneObjects.push_back(quad);
 
-    auto res = quad->GetBoundingBox();
-
+    ObjLoader loader;
+    loader.load("Resources/Scenes/bunny.obj");
+    auto bunny = loader.GetMesh(ball);
+    _sceneObjects.push_back(bunny);
     //auto cylinder = std::shared_ptr<Cylinder>(new Cylinder(glm::vec3(0, 1, 0), 1, 1, glm::vec3(-0.5f, 0.f, 0.5f)));
     //cylinder->SetMaterial(ball);
     //_sceneObjects.push_back(cylinder);
@@ -48,7 +52,7 @@ Scene::Scene() {
     AddLight(std::make_shared<PointLight>(glm::vec3(-7, 15, -15), glm::vec3(1), 600));
     //AddLight(std::make_shared<PointLight>(glm::vec3(0, 0, 0), glm::vec3(1), 20));
 
-    _accelerator = Accelerator::GetAccelerator("KDTree");
+    _accelerator = Accelerator::GetAccelerator("Brute");
     _accelerator->Build(_sceneObjects);
 }
 

@@ -3,6 +3,9 @@
 
 TriangleMesh::TriangleMesh(const std::vector<std::shared_ptr<Triangle>> triangles, glm::mat4 matrix) : _triangles(triangles) {
     transform(matrix);
+    _acceleator = Accelerator::GetAccelerator("KDTree");
+    std::vector<std::shared_ptr<Object>> objects(_triangles.begin(), _triangles.end());
+    _acceleator->Build(objects);
 }
 
 TriangleMesh::~TriangleMesh() {
@@ -17,17 +20,18 @@ BoundingBox TriangleMesh::GetBoundingBox() const {
 }
 
 bool TriangleMesh::Intersect(const Ray& ray, HitRecord* info) const {
-    bool hit = false;
-    for (auto& tri : _triangles) {
-        HitRecord tmp;
-        if (tri->Intersect(ray, &tmp)) {
-            hit = true;
-            if (tmp.GetDistance() < info->GetDistance()) {
-                memcpy(info, &tmp, sizeof(HitRecord));
-            }
-        }
-    }
-    return hit;
+    return _acceleator->Intersect(ray, info);
+    //bool hit = false;
+    //for (auto& tri : _triangles) {
+    //    HitRecord tmp;
+    //    if (tri->Intersect(ray, &tmp)) {
+    //        hit = true;
+    //        if (tmp.GetDistance() < info->GetDistance()) {
+    //            memcpy(info, &tmp, sizeof(HitRecord));
+    //        }
+    //    }
+    //}
+    //return hit;
 }
 
 std::shared_ptr<TriangleMesh> TriangleMesh::CreateQuad(std::shared_ptr<Material> material, glm::mat4 transform) {

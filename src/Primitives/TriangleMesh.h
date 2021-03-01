@@ -6,7 +6,6 @@
 
 class TriangleMesh : public Object {
 public:
-    TriangleMesh() = default;
     TriangleMesh(const std::vector<std::shared_ptr<Triangle>> triangles, glm::mat4 transform);
     ~TriangleMesh() override;
 
@@ -19,7 +18,7 @@ public:
 private:
     std::vector<std::shared_ptr<Triangle>> _triangles;
     BoundingBox _boundingBox;
-
+    std::unique_ptr<Accelerator> _acceleator;
 
     void transform(glm::mat4 transform);
 };

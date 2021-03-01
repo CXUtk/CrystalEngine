@@ -16,10 +16,10 @@ struct TriangleFaceIndex {
     TriangleFaceIndex() {}
     TriangleFaceIndex(const std::vector<std::tuple<int, int, int>>& vs) {
         int i = 0;
-        for (auto [a, b, c] : vs) {
+        for (auto& [a, b, c] : vs) {
             VertexID[i] = a;
-            NormalID[i] = b;
-            TexID[i] = c;
+            TexID[i] = b;
+            NormalID[i] = c;
             i++;
         }
     }
@@ -41,7 +41,7 @@ public:
     std::vector<glm::vec3> Normals;
     std::vector<TriangleFaceIndex> Triangles;
 
-    std::shared_ptr<TriangleMesh> GetMesh() const;
+    std::shared_ptr<TriangleMesh> GetMesh(std::shared_ptr<Material> material) const;
     //std::vector<DrawTriangle> GetDrawTriangles() const;
 private:
     static constexpr int MAX_BUFFER = 100005;

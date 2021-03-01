@@ -4,7 +4,6 @@
 #include <Primitives/Object.h>
 #include <vector>
 
-
 struct KDTreeNode {
     std::vector<Object*> objs;
     int ch[2], splitAxis;
@@ -33,13 +32,13 @@ private:
         SAH,
         EQUAL,
     };
-    static constexpr int MAX_DEPTH = 25;
-    static constexpr int MAX_NODES = 1 << 22;
+    static constexpr int MAX_DEPTH = 20;
+    static constexpr int MAX_NODES = 1 << 15;
     static constexpr SplitMethod SPLIT_METHOD = SplitMethod::SAH;
 
 
     int _tot, _root;
-    KDTreeNode _nodes[MAX_NODES];
+    std::vector<KDTreeNode> _nodes;
     std::vector<Object*> _objects;
     BoundingBox masterBox;
 
