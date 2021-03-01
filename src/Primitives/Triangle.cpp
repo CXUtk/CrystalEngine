@@ -11,6 +11,7 @@ glm::vec2 bary_interp(glm::vec3 bary, glm::vec2 A, glm::vec2 B, glm::vec2 C) {
 
 Triangle::Triangle(const VertexData& a, const VertexData& b, const VertexData& c) {
     _vertices[0] = a, _vertices[1] = b, _vertices[2] = c;
+    calculateDerivative();
 }
 
 Triangle::~Triangle() {
@@ -52,7 +53,7 @@ bool Triangle::Intersect(const Ray& ray, HitRecord* info) const {
     auto front_face = glm::dot(ray.dir, N) < 0;
     N = front_face ? N : -N;
 
-    info->SetHitInfo(res.z, ray.start + ray.dir * res.z, N, UV, front_face, this, glm::vec3(0), glm::vec3(0));
+    info->SetHitInfo(res.z, ray.start + ray.dir * res.z, N, UV, front_face, this, _dpdu, _dpdv);
     return true;
 }
 
@@ -60,6 +61,25 @@ void Triangle::ApplyTransform(glm::mat4 transform, glm::mat4 normalTransfrom) {
     for (int i = 0; i < 3; i++) {
         _vertices[i].Position = glm::vec3(transform * glm::vec4(_vertices[i].Position, 1.0f));
         _vertices[i].Normal = glm::vec3(normalTransfrom * glm::vec4(_vertices[i].Normal, 0.0f));
+    }
+    calculateDerivative();
+}
+
+void Triangle::calculateDerivative() {
+    glm::mat2 A(
+        glm::vec2(_vertices[0].TexCoords.x - _vertices[2].TexCoords.x, _vertices[0].TexCoords.y - _vertices[2].TexCoords.y),
+        glm::vec2(_vertices[1].TexCoords.x - _vertices[2].TexCoords.x, _vertices[1].TexCoords.y - _vertices[2].TexCoords.y)
+    );
+    A = glm::inverse(A);
+    if (glm::isnan(A[0]) != glm::bvec2(0)) {
+        _dpdu = _dpdv = glm::vec3(0);
+    }
+    else {
+        auto a = _vertices[0].Position - _vertices[2].Position;
+        auto b = _vertices[1].Position - _vertices[2].Position;
+        auto res = A * glm::mat3x2(glm::vec2(a.x, b.x), glm::vec2(a.y, b.y), glm::vec2(a.z, b.z));
+        _dpdu = glm::vec3(res[0][0], res[1][0], res[2][0]);
+        _dpdv = glm::vec3(res[0][1], res[1][1], res[2][1]);
     }
 }
 

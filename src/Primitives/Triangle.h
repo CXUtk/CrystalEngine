@@ -1,4 +1,4 @@
-#pragma once
+﻿#pragma once
 #include "Object.h"
 #include "Primitives.h"
 class Triangle : public Object {
@@ -15,4 +15,7 @@ public:
 
 private:
     VertexData _vertices[3];
+    glm::vec3 _dpdu, _dpdv;
+
+    void calculateDerivative();
 };
