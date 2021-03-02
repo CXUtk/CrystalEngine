@@ -1,5 +1,6 @@
 ﻿#include "Raytracer.h"
 #include <Integrator/WhittedIntegrator.h>
+#include <Integrator/PathTracingIntegrator.h>
 #include <Sampler/DefaultSampler.h>
 
 Raytracer::Raytracer(int width, int height) : _width(width), _height(height) {
@@ -16,8 +17,8 @@ Raytracer::Raytracer(int width, int height) : _width(width), _height(height) {
     _frameBuffer = std::shared_ptr<FrameBuffer>(new FrameBuffer(width, height));
     _frameBuffer->Clear();
 
-    auto sampler = std::make_shared<DefaultSampler>(8);
-    _integrator = std::shared_ptr<Integrator>(new WhittedIntegrator(_camera, sampler));
+    auto sampler = std::make_shared<DefaultSampler>(256);
+    _integrator = std::shared_ptr<Integrator>(new PathTracingIntegrator(_camera, sampler));
 }
 
 void Raytracer::Trace(std::shared_ptr<Scene> scene) {

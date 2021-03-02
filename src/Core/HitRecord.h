@@ -20,6 +20,8 @@ public:
     glm::vec3 GetHitPos() const { return _hitPos; }
     glm::vec3 GetNormal() const { return _normal; }
     glm::vec2 GetUV() const { return _uv; }
+    glm::vec3 GetDpDu() const { return _dpdu; }
+    glm::vec3 GetDpDv() const { return _dpdv; }
 
 private:
     const Object* _hitObject;

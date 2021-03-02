@@ -6,7 +6,7 @@ Phong_Blinn::Phong_Blinn(glm::vec3 baseColor, float expK, glm::vec3 coeff) : _ba
 Phong_Blinn::~Phong_Blinn() {
 }
 
-glm::vec3 Phong_Blinn::Li(const HitRecord& hitRecord, glm::vec3 wOut, glm::vec3 wIn) {
+glm::vec3 Phong_Blinn::BSDF(const HitRecord& hitRecord, glm::vec3 wOut, glm::vec3 wIn) {
     auto uv = hitRecord.GetUV();
 
     //bool a = std::fmod(uv.x * 5, 1.0f) < 0.5f;

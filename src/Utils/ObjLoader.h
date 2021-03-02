@@ -41,7 +41,7 @@ public:
     std::vector<glm::vec3> Normals;
     std::vector<TriangleFaceIndex> Triangles;
 
-    std::shared_ptr<TriangleMesh> GetMesh(std::shared_ptr<Material> material) const;
+    std::shared_ptr<TriangleMesh> GetMesh(std::shared_ptr<Material> material, glm::mat4 transform) const;
     //std::vector<DrawTriangle> GetDrawTriangles() const;
 private:
     static constexpr int MAX_BUFFER = 100005;

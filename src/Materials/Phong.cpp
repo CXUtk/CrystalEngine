@@ -6,7 +6,7 @@ Phong::Phong(glm::vec3 baseColor, float expK, glm::vec3 coeff) : _baseColor(base
 Phong::~Phong() {
 }
 
-glm::vec3 Phong::Li(const HitRecord& hitRecord, glm::vec3 wOut, glm::vec3 wIn) {
+glm::vec3 Phong::BSDF(const HitRecord& hitRecord, glm::vec3 wOut, glm::vec3 wIn) {
     glm::vec3 ambient = _baseColor * 0.3f;
     glm::vec3 diffuse = _baseColor * 0.7f;
     glm::vec3 V = wOut;

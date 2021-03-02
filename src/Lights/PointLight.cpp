@@ -11,5 +11,5 @@ glm::vec3 PointLight::SampleLi(const HitRecord& hit, glm::vec3& endpoint) {
     endpoint = _pos;
     auto v = endpoint - hit.GetHitPos();
     float distSQ = glm::dot(v, v);
-    return _color;
+    return _color * _power / distSQ;
 }

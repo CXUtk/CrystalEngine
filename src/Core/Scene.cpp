@@ -10,20 +10,24 @@
 #include <Materials/Cook_Torrance.h>
 #include <glm/gtx/transform.hpp>
 #include <Lights/PointLight.h>
+#include <Materials/Lighted.h>
 #include <Utils/ObjLoader.h>
 
 
 Scene::Scene() {
-    std::shared_ptr<Material> floor = std::make_shared<Phong>(glm::vec3(0.5f), 64, glm::vec3(1));
+    std::shared_ptr<Material> floor = std::make_shared<Default>(glm::vec3(0.5f), glm::vec2(10, 10));
+    std::shared_ptr<Material> ballA = std::make_shared<Default>(glm::vec3(1, 0, 0), glm::vec2(2, 1));
+    std::shared_ptr<Material> ballB = std::make_shared<Default>(glm::vec3(1, 1, 0));
+    std::shared_ptr<Material> lights = std::make_shared<Lighted>(glm::vec3(1, 1, 1));
 
     std::shared_ptr<Material> ball = std::make_shared<Cook_Torrance>(glm::vec3(0.8, 0.5, 0.2f), 0.2f);
 
-    auto sp1 = std::shared_ptr<Sphere>(new Sphere(glm::vec3(0, 1, -1), 1, glm::vec3(1.f, 0, 0)));
+    auto sp1 = std::shared_ptr<Sphere>(new Sphere(glm::vec3(0, 1, 0), 1, glm::vec3(1.f, 0, 0)));
     auto sp2 = std::shared_ptr<Sphere>(new Sphere(glm::vec3(-2, -0.5, 2), 1, glm::vec3(0, 0, 0.5f)));
-    sp1->SetMaterial(ball);
-    sp2->SetMaterial(ball);
+    sp1->SetMaterial(lights);
+    // sp2->SetMaterial(floor);
 
-    //_sceneObjects.push_back(sp1);
+    _sceneObjects.push_back(sp1);
     //_sceneObjects.push_back(sp2);
 
     glm::vec3 quadVertices[4] = {
@@ -40,19 +44,19 @@ Scene::Scene() {
     _sceneObjects.push_back(quad);
 
     ObjLoader loader;
-    loader.load("Resources/Scenes/bunny.obj");
-    auto bunny = loader.GetMesh(ball);
-    _sceneObjects.push_back(bunny);
-    //auto cylinder = std::shared_ptr<Cylinder>(new Cylinder(glm::vec3(0, 1, 0), 1, 1, glm::vec3(-0.5f, 0.f, 0.5f)));
-    //cylinder->SetMaterial(ball);
-    //_sceneObjects.push_back(cylinder);
+    loader.load("Resources/Scenes/teapot2.obj");
+    auto bunny = loader.GetMesh(floor, glm::identity<glm::mat4>());
+    //_sceneObjects.push_back(bunny);
+    auto cylinder = std::shared_ptr<Cylinder>(new Cylinder(glm::vec3(2, -1.f, 0), 1, 1, glm::vec3(0.f, 0.f, 0.f)));
+    cylinder->SetMaterial(ballB);
+    // _sceneObjects.push_back(cylinder);
 
 
     AddLight(std::make_shared<PointLight>(glm::vec3(7, 15, -15), glm::vec3(1), 600));
     AddLight(std::make_shared<PointLight>(glm::vec3(-7, 15, -15), glm::vec3(1), 600));
     //AddLight(std::make_shared<PointLight>(glm::vec3(0, 0, 0), glm::vec3(1), 20));
 
-    _accelerator = Accelerator::GetAccelerator("Brute");
+    _accelerator = Accelerator::GetAccelerator("KDTree");
     _accelerator->Build(_sceneObjects);
 }
 

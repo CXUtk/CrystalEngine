@@ -56,7 +56,7 @@ bool readInt(const char* S, int& idx, int& num) {
 }
 
 
-std::shared_ptr<TriangleMesh> ObjLoader::GetMesh(std::shared_ptr<Material> material) const {
+std::shared_ptr<TriangleMesh> ObjLoader::GetMesh(std::shared_ptr<Material> material, glm::mat4 transform) const {
 
     std::vector<std::shared_ptr<Triangle>> triangles;
     for (auto& t : Triangles) {
@@ -83,7 +83,7 @@ std::shared_ptr<TriangleMesh> ObjLoader::GetMesh(std::shared_ptr<Material> mater
         tri->SetMaterial(material);
         triangles.push_back(tri);
     }
-    return std::make_shared<TriangleMesh>(triangles, glm::identity<glm::mat4>());
+    return std::make_shared<TriangleMesh>(triangles, transform);
 }
 
 //std::vector<DrawTriangle> ObjLoader::GetDrawTriangles() const {

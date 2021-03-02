@@ -1,14 +1,13 @@
 ﻿#pragma once
 #include "Material.h"
 
-class Default : public Material {
+class Lighted : public Material {
 public:
-    Default(glm::vec3 color);
-    Default(glm::vec3 color, glm::vec2 uvExt);
-    ~Default() override;
+    Lighted(glm::vec3 color);
+    ~Lighted() override;
 
     glm::vec3 BSDF(const HitRecord& hitRecord, glm::vec3 wOut, glm::vec3 wIn) override;
+    glm::vec3 Le(const HitRecord& hitRecord, glm::vec3 wOut) override;
 private:
     glm::vec3 _color;
-    glm::vec2 _uvExtend;
 };

@@ -19,7 +19,7 @@ _roughness(roughness) {
 Cook_Torrance::~Cook_Torrance() {
 }
 
-glm::vec3 Cook_Torrance::Li(const HitRecord& hitRecord, glm::vec3 wOut, glm::vec3 wIn) {
+glm::vec3 Cook_Torrance::BSDF(const HitRecord& hitRecord, glm::vec3 wOut, glm::vec3 wIn) {
     glm::vec3 V = wOut;
     glm::vec3 L = wIn;
     glm::vec3 N = hitRecord.GetNormal();

@@ -1,6 +1,6 @@
 ﻿#pragma once
 #include <random>
-
+#include <glm/glm.hpp>
 class Random {
 public:
     Random(unsigned int seed);
@@ -13,6 +13,9 @@ public:
 
     // Returns a random floating point number between [0, 1)
     float NextFloat();
+
+    glm::vec3 NextUnitVector();
+    glm::vec3 NextUnitHemiSphere();
 
 
 private:

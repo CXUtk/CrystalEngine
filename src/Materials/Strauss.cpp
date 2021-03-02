@@ -30,7 +30,7 @@ _smoothness(smoothness), _metalness(metalness), _transparency(transparency) {
 Strauss::~Strauss() {
 }
 
-glm::vec3 Strauss::Li(const HitRecord& hitRecord, glm::vec3 wOut, glm::vec3 wIn) {
+glm::vec3 Strauss::BSDF(const HitRecord& hitRecord, glm::vec3 wOut, glm::vec3 wIn) {
     glm::vec3 V = -wOut;
     glm::vec3 L = -wIn;
     glm::vec3 N = hitRecord.GetNormal();

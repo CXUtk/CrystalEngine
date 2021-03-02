@@ -13,6 +13,7 @@ public:
     ~Scene();
 
     bool Intersect(const Ray& ray, HitRecord* hitRecord) const;
+    //bool IntersectLight(const Ray& ray, HitRecord* hitRecord) const;
 
     void AddObject(std::shared_ptr<Object> object);
     void AddLight(std::shared_ptr<Light> light);

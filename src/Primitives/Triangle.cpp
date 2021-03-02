@@ -1,6 +1,6 @@
 ﻿#include "Triangle.h"
 
-constexpr bool FLAT_SHADING = false;
+constexpr bool FLAT_SHADING = true;
 
 glm::vec3 bary_interp(glm::vec3 bary, glm::vec3 A, glm::vec3 B, glm::vec3 C) {
     return bary.x * A + bary.y * B + bary.z * C;
