@@ -1,5 +1,5 @@
 ﻿#include "Default.h"
-
+#include <glm/gtx/transform.hpp>
 Default::Default(glm::vec3 color) :_color(color), _uvExtend(1, 1) {
 }
 
@@ -14,7 +14,7 @@ glm::vec3 Default::BSDF(const HitRecord& hitRecord, glm::vec3 wOut, glm::vec3 wI
     bool a = fmod(uv.x, 0.5f) < 0.25f;
     bool b = fmod(uv.y, 0.5f) < 0.25f;
     if (a ^ b) {
-        return glm::vec3(1);
+        return glm::vec3(1) / glm::pi<float>();
     }
-    return _color;
+    return _color / glm::pi<float>();
 }

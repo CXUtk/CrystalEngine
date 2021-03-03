@@ -44,38 +44,44 @@ void PathTracingIntegrator::Render(std::shared_ptr<const Scene> scene, std::shar
 }
 
 glm::vec3 PathTracingIntegrator::evaluate(const Ray ray, std::shared_ptr<const Scene> scene) {
-    glm::vec3 L(0);
+    glm::vec3 dirL(0), indirL(0);
     HitRecord hit;
 
     if (scene->Intersect(ray, &hit)) {
+
         glm::vec3 N = hit.GetNormal();
         glm::vec3 wOut = -ray.dir;
-        auto material = hit.GetHitObject()->GetMaterial();
-        L += material->Le(hit, wOut);
+        glm::vec3 hitPos = hit.GetHitPos();
 
-        if (_random.NextFloat() > 0.8f) return L;
+        auto material = hit.GetHitObject()->GetMaterial();
+
+        for (auto& light : scene->GetLights()) {
+            glm::vec3 lightP;
+            float pdf;
+            auto radiance = light->SampleLi(hit, lightP, pdf);
+
+            auto v = lightP - hitPos;
+            auto dir = glm::normalize(v);
+            HitRecord hit2;
+            if (!scene->Intersect(Ray(hitPos + N * 0.0001f, dir), &hit2) || hit2.GetDistance() > glm::length(v)) {
+                dirL += radiance * material->BSDF(hit, wOut, dir)  / pdf * std::max(0.f, glm::dot(N, dir));
+            }
+        }
+
+        if (_random.NextFloat() > 0.8f) return dirL + indirL;
         //glm::vec3 T = glm::normalize(hit.GetDpDu());
         //glm::vec3 B = glm::normalize(glm::cross(N, T));
         glm::vec3 dir = _random.NextUnitVector();
-        while (glm::dot(dir, N) < 0) {
+        while (glm::dot(dir, N) <= 0) {
             dir = _random.NextUnitVector();
         }
 
         auto bsdf = material->BSDF(hit, wOut, dir);
-        if (bsdf == glm::vec3(0)) return L;
+        if (bsdf == glm::vec3(0)) return dirL + indirL;
+
         auto Li = evaluate(Ray(hit.GetHitPos() + N * 0.0001f, dir), scene);
         auto cosine = std::max(0.f, glm::dot(N, dir));
-        L += Li * bsdf * cosine / 0.8f * glm::two_pi<float>();
-        /*for (auto& light : scene->GetLights()) {
-            glm::vec3 end;
-            auto irraiance = light->SampleLi(hit, end);
-            auto dir = glm::normalize(end - hit.GetHitPos());
-            HitRecord hit2;
-            float distance = glm::length(end - hit.GetHitPos());
-            if (!scene->Intersect(Ray(hit.GetHitPos() + dir * 0.0001f, dir), &hit2) || hit2.GetDistance() > distance) {
-                L += irraiance * material->Li(hit, wOut, dir) * std::max(0.f, glm::dot(N, dir));
-            }
-        }*/
+        indirL += Li * bsdf * cosine / 0.8f * glm::two_pi<float>();
     }
-    return L;
+    return dirL + indirL;
 }
