@@ -63,5 +63,7 @@ void Cylinder::setHitInfo(glm::vec3 dir, float t, glm::vec3 localHitPos, HitReco
     auto realHitPos = _local2World * localHitPos + _center;
     auto theta = std::atan2(-localHitPos.z, localHitPos.x) / glm::pi<float>() + 1.0f;
     auto h = localHitPos.y / _height + 0.5f;
-    info->SetHitInfo(t, realHitPos, _local2World * N, glm::vec2(theta, h), front_face, this, glm::vec3(0), glm::vec3(0));
+    info->SetHitInfo(t, realHitPos, _local2World * N, glm::vec2(theta, h), front_face, this,
+        _local2World * glm::vec3(-localHitPos.z, 0, localHitPos.x),
+        glm::vec3(0));
 }
