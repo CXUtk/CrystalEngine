@@ -8,8 +8,7 @@ Metal::Metal(glm::vec3 color, float smoothness) : _color(color), _smoothness(smo
 }
 Metal::~Metal() {
 }
-glm::vec3 Metal::BSDF(const HitRecord& hitRecord, glm::vec3 wOut, glm::vec3 wIn, bool& shouldBounce) {
-    shouldBounce = true;
+glm::vec3 Metal::BSDF(const HitRecord& hitRecord, glm::vec3 wOut, glm::vec3 wIn) {
     glm::vec3 V = wOut;
     glm::vec3 N = hitRecord.GetNormal();
     glm::vec3 L = wIn;
@@ -22,12 +21,10 @@ glm::vec3 Metal::BSDF(const HitRecord& hitRecord, glm::vec3 wOut, glm::vec3 wIn,
     //float k = std::max(0.f, glm::dot(H, N));
     //float part1 = std::exp(-(k * k) / (alpha * alpha));
     //float part2 = std::max(1e-6f, sqrt(cosi * cosr) * 4 * glm::pi<float>() * alpha * alpha);
-
-    return _color;
+    float k = std::max(0.f, glm::dot(H, V));
+    return (float)(k > 0.95f ? std::pow(k, 64) : 0) * _color;
 }
-
-glm::vec3 Metal::SampleDirection(const HitRecord& hitRecord, glm::vec3 wOut, float& pdf) {
-
+bool Metal::SampleDirection(const HitRecord& hitRecord, glm::vec3 wOut, float& pdf, glm::vec3& dir) {
     pdf = 1;
     auto R = glm::normalize(glm::reflect(-wOut, hitRecord.GetNormal()));
     auto N = hitRecord.GetNormal();
@@ -40,8 +37,10 @@ glm::vec3 Metal::SampleDirection(const HitRecord& hitRecord, glm::vec3 wOut, flo
 
     auto f = std::pow(random.NextFloat(), 1 / (_smoothness * _smoothness));
 
-    return glm::mix(O, R, f);
+    dir = R;
+    return true;
 }
+
 
 glm::vec3 Metal::Merge(const HitRecord& hitRecord, const glm::vec3& wOut, glm::vec3 Ldir, glm::vec3 LBSDF) {
     return LBSDF;

@@ -4,13 +4,14 @@
 
 class WhittedIntegrator : public SamplerIntegrator {
 public:
-    WhittedIntegrator(std::shared_ptr<Camera> camera, std::shared_ptr<Sampler> sampler);
+    WhittedIntegrator(std::shared_ptr<Camera> camera, std::shared_ptr<Sampler> sampler, int maxDepth);
     ~WhittedIntegrator() override;
 
-    virtual void Render(std::shared_ptr<const Scene> scene, std::shared_ptr<FrameBuffer> frameBuffer) override;
+    glm::vec3 Evaluate(const Ray& ray, std::shared_ptr<const Scene> scene) override;
 
 private:
     Random _random;
+    int _maxDepth;
 
-    glm::vec3 evaluate(const Ray ray, std::shared_ptr<const Scene> scene);
+    glm::vec3 evaluate(const Ray ray, std::shared_ptr<const Scene> scene, int depth);
 };

@@ -7,11 +7,10 @@ public:
     PathTracingIntegrator(std::shared_ptr<Camera> camera, std::shared_ptr<Sampler> sampler);
     ~PathTracingIntegrator() override;
 
-    virtual void Render(std::shared_ptr<const Scene> scene, std::shared_ptr<FrameBuffer> frameBuffer) override;
+    glm::vec3 Evaluate(const Ray& ray, std::shared_ptr<const Scene> scene) override;
 
 private:
     Random _random;
-    glm::vec3* _tmpColors;
 
     glm::vec3 evaluate(const Ray ray, std::shared_ptr<const Scene> scene);
     glm::vec3 sampleLight(const HitRecord& hit, glm::vec3 wOut, std::shared_ptr<const Scene> scene, std::shared_ptr<Material> material);
