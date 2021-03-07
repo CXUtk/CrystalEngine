@@ -26,6 +26,7 @@ public:
     ~KDTree();
     void Build(const std::vector<std::shared_ptr<Object>>& objects) override;
     bool Intersect(const Ray& ray, SurfaceInteraction* info) const override;
+    bool IntersectTest(const Ray& ray, float tMin = 0, float tMax = std::numeric_limits<float>::infinity()) const override;
 
 private:
     enum SplitMethod {
@@ -46,4 +47,5 @@ private:
     void push_up(int p);
     void _build(int& p, const BoundingBox& outerBox, std::vector<Object*>& objs, int depth);
     bool ray_test(int p, const Ray& ray, SurfaceInteraction* info, float tMin, float tMax) const;
+    bool ray_test_p(int p, const Ray& ray, float tMin, float tMax) const;
 };

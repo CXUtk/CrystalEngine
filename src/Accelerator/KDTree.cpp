@@ -43,6 +43,10 @@ bool KDTree::Intersect(const Ray& ray, SurfaceInteraction* info) const {
     return ret;
 }
 
+bool KDTree::IntersectTest(const Ray& ray, float tMin, float tMax) const {
+    return false;
+}
+
 
 
 
@@ -162,6 +166,33 @@ bool KDTree::ray_test(int p, const Ray& ray, SurfaceInteraction* info, float tMi
     }
     if (tSplit <= tMax) {
         hit |= ray_test(chi(p, !d), ray, info, std::max(tSplit, 0.0f), std::min(tMax, info->GetDistance()));
+    }
+    return hit;
+}
+
+bool KDTree::ray_test_p(int p, const Ray& ray, float tMin, float tMax) const {
+    if (!p || tMin > tMax) return false;
+    //if (!outerBox.rayIntersect(ray, tMin, tMax)) return false;
+    if (_nodes[p].splitAxis == -1) {
+        for (auto& obj : _nodes[p].objs) {
+            SurfaceInteraction tmp;
+            if (obj->IntersectTest(ray, tMin, tMax)) {
+                return true;
+            }
+        }
+        return false;
+    }
+    int split = self.splitAxis;
+    float splitPos = self.splitPos;
+    float tSplit = (splitPos - ray.start[split]) / ray.dir[split];
+    bool hit = false;
+    int d = ray.dir[split] < 0;
+    if (tSplit >= tMin) {
+        hit |= ray_test_p(chi(p, d), ray, tMin, std::min({ tSplit, tMax }));
+    }
+    if (hit) return true;
+    if (tSplit <= tMax) {
+        hit |= ray_test_p(chi(p, !d), ray, std::max(tSplit, 0.0f), tMax);
     }
     return hit;
 }

@@ -13,6 +13,7 @@ public:
     ~Scene();
 
     bool Intersect(const Ray& ray, SurfaceInteraction* SurfaceInteraction) const;
+    bool IntersectTest(const Ray& ray, float tMin = 0, float tMax = std::numeric_limits<float>::infinity()) const;
     bool IntersectWithLight(const Ray& ray, SurfaceInteraction* SurfaceInteraction) const;
 
     void AddObject(std::shared_ptr<Object> object);

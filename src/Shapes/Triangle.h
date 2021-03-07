@@ -4,7 +4,6 @@
 
 class Triangle : public Shape {
 public:
-    Triangle() = default;
     Triangle(const VertexData& a, const VertexData& b, const VertexData& c);
     ~Triangle() override;
 

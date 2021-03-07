@@ -82,7 +82,7 @@ std::shared_ptr<TriangleMesh> ObjLoader::GetMesh(std::shared_ptr<Material> mater
             );
         triangles.push_back(tri);
     }
-    return std::make_shared<TriangleMesh>(triangles, transform);
+    return std::make_shared<TriangleMesh>(triangles, transform, nullptr, nullptr);
 }
 
 //std::vector<DrawTriangle> ObjLoader::GetDrawTriangles() const {

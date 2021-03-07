@@ -3,7 +3,7 @@
 
 static constexpr float EPS = 1e-5f;
 
-WhittedIntegrator::WhittedIntegrator(std::shared_ptr<Camera> camera, std::shared_ptr<Sampler> sampler, int maxDepth) : 
+WhittedIntegrator::WhittedIntegrator(std::shared_ptr<Camera> camera, std::shared_ptr<Sampler> sampler, int maxDepth) :
     SamplerIntegrator(camera, sampler),
     _maxDepth(maxDepth) {
 }
@@ -69,7 +69,7 @@ glm::vec3 WhittedIntegrator::evaluate(const Ray ray, std::shared_ptr<const Scene
             auto dir = glm::normalize(end - hit.GetHitPos());
             SurfaceInteraction hit2;
             float distance = glm::length(end - hit.GetHitPos());
-            if (!scene->Intersect(Ray(hit.GetHitPos() + dir * EPS, dir), &hit2) || hit2.GetDistance() > distance) {
+            if (!scene->IntersectTest(Ray(hit.GetHitPos() + dir * EPS, dir), 0, distance)) {
                 L += raiance * material->BSDF(hit, wOut, dir) / pdf * std::max(0.f, glm::dot(N, dir));
             }
         }
@@ -77,6 +77,7 @@ glm::vec3 WhittedIntegrator::evaluate(const Ray ray, std::shared_ptr<const Scene
             auto radiance = evaluate(Ray(hitPos + N * EPS, dir), scene, depth + 1);
             L += radiance * material->BSDF(hit, wOut, dir) / pdf * std::max(0.f, glm::dot(N, dir));
         }
+        return L;
     }
-    return L;
+    return glm::vec3(0.5, 0.5, 1);
 }

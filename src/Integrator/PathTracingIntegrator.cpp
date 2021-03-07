@@ -26,6 +26,10 @@ glm::vec3 PathTracingIntegrator::Evaluate(const Ray& ray, std::shared_ptr<const 
 
 
 
+glm::vec3 PathTracingIntegrator::evaluate(const Ray ray, std::shared_ptr<const Scene> scene) {
+    return glm::vec3();
+}
+
 glm::vec3 PathTracingIntegrator::sampleLight(const SurfaceInteraction& hit, glm::vec3 wOut, std::shared_ptr<const Scene> scene, const Material* material) {
     glm::vec3 N = hit.GetNormal();
     glm::vec3 hitPos = hit.GetHitPos();

@@ -12,6 +12,7 @@ public:
 
     virtual void Build(const std::vector<std::shared_ptr<Object>>& objects) = 0;
     virtual bool Intersect(const Ray& ray, SurfaceInteraction* info) const = 0;
+    virtual bool IntersectTest(const Ray& ray, float tMin = 0, float tMax = std::numeric_limits<float>::infinity()) const = 0;
 
     static std::unique_ptr<Accelerator> GetAccelerator(const std::string& name);
 };
