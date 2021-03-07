@@ -18,7 +18,7 @@ BoundingBox Sphere::GetBoundingBox() const {
     return BoundingBox(_center - glm::vec3(abs(_radius)), _center + glm::vec3(abs(_radius)));
 }
 
-bool Sphere::Intersect(const Ray& ray, HitRecord* info) const {
+bool Sphere::Intersect(const Ray& ray, SurfaceInteraction* info) const {
     glm::vec3 P = _world2Local * (ray.start - _center);
     glm::vec3 d = _world2Local * ray.dir;
     float a = glm::dot(d, d);
@@ -49,3 +49,20 @@ bool Sphere::Intersect(const Ray& ray, HitRecord* info) const {
         _local2World * glm::vec3(0));
     return true;
 }
+
+bool Sphere::IntersectTest(const Ray& ray, float tMin, float tMax) const {
+    if (tMin > tMax) return false;
+
+    glm::vec3 P = _world2Local * (ray.start - _center);
+    glm::vec3 d = _world2Local * ray.dir;
+    float a = glm::dot(d, d);
+    float b = 2 * glm::dot(d, P);
+    float c = glm::dot(P, P) - _radius * _radius;
+    float discrim = b * b - 4 * a * c;
+    if (discrim < 0) return false;
+    discrim = sqrt(discrim);
+    float t1 = (-b + discrim) / (2 * a);
+    float t2 = (-b - discrim) / (2 * a);
+    return (t1 >= tMin && t1 <= tMax) || (t2 >= tMin && t2 <= tMax);
+}
+

@@ -8,8 +8,8 @@
 #include <memory>
 
 #include <glm/glm.hpp>
-#include <Primitives/Primitives.h>
-#include <Primitives/TriangleMesh.h>
+#include <Shapes/Primitives.h>
+#include <Shapes/TriangleMesh.h>
 
 struct TriangleFaceIndex {
     int VertexID[3], NormalID[3], TexID[3];

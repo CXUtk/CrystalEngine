@@ -60,7 +60,7 @@ std::shared_ptr<TriangleMesh> ObjLoader::GetMesh(std::shared_ptr<Material> mater
 
     std::vector<std::shared_ptr<Triangle>> triangles;
     for (auto& t : Triangles) {
-        VertexData v[3];
+        VertexData v[3]{};
         v[0].Position = Vertices[t.VertexID[0]];
         v[1].Position = Vertices[t.VertexID[1]];
         v[2].Position = Vertices[t.VertexID[2]];
@@ -80,7 +80,6 @@ std::shared_ptr<TriangleMesh> ObjLoader::GetMesh(std::shared_ptr<Material> mater
         std::shared_ptr<Triangle> tri = std::shared_ptr<Triangle>(
             new Triangle(v[0], v[1], v[2])
             );
-        tri->SetMaterial(material);
         triangles.push_back(tri);
     }
     return std::make_shared<TriangleMesh>(triangles, transform);

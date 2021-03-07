@@ -13,8 +13,8 @@ Default::Default(glm::vec3 color, glm::vec2 uvExt) : _color(color), _uvExtend(uv
 Default::~Default() {
 }
 
-glm::vec3 Default::BSDF(const HitRecord& hitRecord, glm::vec3 wOut, glm::vec3 wIn) {
-    auto uv = hitRecord.GetUV() * _uvExtend;
+glm::vec3 Default::BSDF(const SurfaceInteraction& isec, glm::vec3 wOut, glm::vec3 wIn) const {
+    auto uv = isec.GetUV() * _uvExtend;
     bool a = fmod(uv.x, 0.5f) < 0.25f;
     bool b = fmod(uv.y, 0.5f) < 0.25f;
     if (a ^ b) {
@@ -23,9 +23,9 @@ glm::vec3 Default::BSDF(const HitRecord& hitRecord, glm::vec3 wOut, glm::vec3 wI
     return _color;
 }
 
-bool Default::SampleDirection(const HitRecord& hitRecord, glm::vec3 wOut, float& pdf, glm::vec3& dir) {
-    auto N = hitRecord.GetNormal();
-    auto tangent = glm::normalize(hitRecord.GetDpDu());
+bool Default::SampleDirection(const SurfaceInteraction& isec, glm::vec3 wOut, float& pdf, glm::vec3& dir)const {
+    auto N = isec.GetNormal();
+    auto tangent = glm::normalize(isec.GetDpDu());
     auto bitangent = glm::normalize(glm::cross(N, tangent));
 
     auto v = random.NextUnitHemiSphere();
@@ -33,5 +33,8 @@ bool Default::SampleDirection(const HitRecord& hitRecord, glm::vec3 wOut, float&
     pdf = 0.5f / glm::pi<float>();
     dir = v.x* tangent + v.y * N + v.z * bitangent;
     return false;
+}
+
+void Default::ComputeScatteringFunctions(SurfaceInteraction* isec, bool fromCamera) const {
 }
 

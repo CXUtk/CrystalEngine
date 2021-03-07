@@ -1,9 +1,9 @@
 ﻿#pragma once
 #include <vector>
 #include <memory>
-#include <Core/HitRecord.h>
+#include <Core/SurfaceInteraction.h>
 #include <Utils/Ray.h>
-#include <Primitives/Object.h>
+#include <Core/Object.h>
 #include <Lights/Light.h>
 #include <Accelerator/Accelerator.h>
 
@@ -12,8 +12,8 @@ public:
     Scene();
     ~Scene();
 
-    bool Intersect(const Ray& ray, HitRecord* hitRecord) const;
-    bool IntersectWithLight(const Ray& ray, HitRecord* hitRecord) const;
+    bool Intersect(const Ray& ray, SurfaceInteraction* SurfaceInteraction) const;
+    bool IntersectWithLight(const Ray& ray, SurfaceInteraction* SurfaceInteraction) const;
 
     void AddObject(std::shared_ptr<Object> object);
     void AddLight(std::shared_ptr<Light> light);

@@ -35,7 +35,7 @@ void KDTree::Build(const std::vector<std::shared_ptr<Object>>& objects) {
     _build(_root, masterBox, _objects, 0);
 }
 
-bool KDTree::Intersect(const Ray& ray, HitRecord* info) const {
+bool KDTree::Intersect(const Ray& ray, SurfaceInteraction* info) const {
     bool ret = false;
     float tMin = 0, tMax = info->GetDistance();
     if (!masterBox.RayIntersects(ray, tMin, tMax)) return false;
@@ -135,14 +135,14 @@ void KDTree::_build(int& p, const BoundingBox& outerBox, std::vector<Object*>& o
     push_up(p);
 }
 
-bool KDTree::ray_test(int p, const Ray& ray, HitRecord* info, float tMin, float tMax) const {
+bool KDTree::ray_test(int p, const Ray& ray, SurfaceInteraction* info, float tMin, float tMax) const {
     if (!p || tMin > tMax) return false;
     //if (!outerBox.rayIntersect(ray, tMin, tMax)) return false;
     if (tMin >= info->GetDistance()) return false;
     if (_nodes[p].splitAxis == -1) {
         bool hit = false;
         for (auto& obj : _nodes[p].objs) {
-            HitRecord tmp;
+            SurfaceInteraction tmp;
             if (obj->Intersect(ray, &tmp)) {
                 if (tmp.GetDistance() < info->GetDistance()) {
                     *info = tmp;

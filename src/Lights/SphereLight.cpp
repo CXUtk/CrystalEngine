@@ -11,7 +11,7 @@ SphereLight::SphereLight(glm::vec3 pos, float r, glm::vec3 color, float power) :
 SphereLight::~SphereLight() {
 }
 
-glm::vec3 SphereLight::SampleLi(const HitRecord& hit, glm::vec3& endpoint, float& pdf) {
+glm::vec3 SphereLight::SampleLi(const SurfaceInteraction& hit, glm::vec3& endpoint, float& pdf) {
     auto N = random.NextUnitVector();
     endpoint = _pos + _radius * N;
     auto Np = hit.GetHitPos() - endpoint;

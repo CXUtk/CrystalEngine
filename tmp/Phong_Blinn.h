@@ -6,8 +6,8 @@ public:
     Phong_Blinn(glm::vec3 baseColor, float expK, glm::vec3 coeff);
     ~Phong_Blinn() override;
 
-    glm::vec3 BSDF(const HitRecord& hitRecord, glm::vec3 wOut, glm::vec3 wIn, bool& shouldBounce) override;
-    glm::vec3 Le(const HitRecord& hitRecord, glm::vec3 wOut) override;
+    glm::vec3 BSDF(const SurfaceInteraction& SurfaceInteraction, glm::vec3 wOut, glm::vec3 wIn, bool& shouldBounce) override;
+    glm::vec3 Le(const SurfaceInteraction& SurfaceInteraction, glm::vec3 wOut) override;
 private:
     glm::vec3 _baseColor;
     float _expK;

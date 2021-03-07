@@ -52,13 +52,13 @@ glm::vec3 WhittedIntegrator::evaluate(const Ray ray, std::shared_ptr<const Scene
     glm::vec3 L(0);
     if (depth == _maxDepth) return L;
 
-    HitRecord hit;
+    SurfaceInteraction hit;
     if (scene->Intersect(ray, &hit)) {
         glm::vec3 hitPos = hit.GetHitPos();
         glm::vec3 N = hit.GetNormal();
         glm::vec3 wOut = -ray.dir;
         auto material = hit.GetHitObject()->GetMaterial();
-        L += material->Le(hit, wOut);
+        // L += material->Le(hit, wOut);
 
         glm::vec3 dir;
         float pdf;
@@ -67,7 +67,7 @@ glm::vec3 WhittedIntegrator::evaluate(const Ray ray, std::shared_ptr<const Scene
             float pdf;
             auto raiance = light->SampleLi(hit, end, pdf);
             auto dir = glm::normalize(end - hit.GetHitPos());
-            HitRecord hit2;
+            SurfaceInteraction hit2;
             float distance = glm::length(end - hit.GetHitPos());
             if (!scene->Intersect(Ray(hit.GetHitPos() + dir * EPS, dir), &hit2) || hit2.GetDistance() > distance) {
                 L += raiance * material->BSDF(hit, wOut, dir) / pdf * std::max(0.f, glm::dot(N, dir));

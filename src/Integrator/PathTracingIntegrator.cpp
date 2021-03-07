@@ -10,23 +10,23 @@ PathTracingIntegrator::~PathTracingIntegrator() {
 
 glm::vec3 PathTracingIntegrator::Evaluate(const Ray& ray, std::shared_ptr<const Scene> scene) {
     glm::vec3 dirL(0), indirL(0);
-    HitRecord hit;
+    SurfaceInteraction hit;
 
     if (scene->Intersect(ray, &hit)) {
         auto material = hit.GetHitObject()->GetMaterial();
         dirL = sampleLight(hit, -ray.dir, scene, material);
 
-        if (_random.NextFloat() > pRR) return material->Merge(hit, -ray.dir, dirL, indirL);
+        if (_random.NextFloat() > pRR) return dirL;//return material->Merge(hit, -ray.dir, dirL, indirL);
 
         indirL += sampleIndirect(hit, -ray.dir, scene, material);
-        return material->Merge(hit, -ray.dir, dirL, indirL);
+        //return material->Merge(hit, -ray.dir, dirL, indirL);
     }
     return dirL + indirL;
 }
 
 
 
-glm::vec3 PathTracingIntegrator::sampleLight(const HitRecord& hit, glm::vec3 wOut, std::shared_ptr<const Scene> scene, std::shared_ptr<Material> material) {
+glm::vec3 PathTracingIntegrator::sampleLight(const SurfaceInteraction& hit, glm::vec3 wOut, std::shared_ptr<const Scene> scene, const Material* material) {
     glm::vec3 N = hit.GetNormal();
     glm::vec3 hitPos = hit.GetHitPos();
 
@@ -38,7 +38,7 @@ glm::vec3 PathTracingIntegrator::sampleLight(const HitRecord& hit, glm::vec3 wOu
 
         auto v = lightP - hitPos;
         auto dir = glm::normalize(v);
-        HitRecord hit2;
+        SurfaceInteraction hit2;
         bool shouldBounce = false;
         if (!scene->Intersect(Ray(hitPos + N * 0.0001f, dir), &hit2) || hit2.GetDistance() > glm::length(v)) {
             L += radiance * material->BSDF(hit, wOut, dir) / pdf * std::max(0.f, glm::dot(N, dir));
@@ -47,7 +47,7 @@ glm::vec3 PathTracingIntegrator::sampleLight(const HitRecord& hit, glm::vec3 wOu
     return L;
 }
 
-glm::vec3 PathTracingIntegrator::sampleIndirect(const HitRecord& hit, glm::vec3 wOut, std::shared_ptr<const Scene> scene, std::shared_ptr<Material> material) {
+glm::vec3 PathTracingIntegrator::sampleIndirect(const SurfaceInteraction& hit, glm::vec3 wOut, std::shared_ptr<const Scene> scene, const Material* material) {
     return glm::vec3(0);
     //glm::vec3 N = hit.GetNormal();
     //glm::vec3 hitPos = hit.GetHitPos();

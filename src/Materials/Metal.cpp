@@ -8,9 +8,9 @@ Metal::Metal(glm::vec3 color, float smoothness) : _color(color), _smoothness(smo
 }
 Metal::~Metal() {
 }
-glm::vec3 Metal::BSDF(const HitRecord& hitRecord, glm::vec3 wOut, glm::vec3 wIn) {
+glm::vec3 Metal::BSDF(const SurfaceInteraction& SurfaceInteraction, glm::vec3 wOut, glm::vec3 wIn)const {
     glm::vec3 V = wOut;
-    glm::vec3 N = hitRecord.GetNormal();
+    glm::vec3 N = SurfaceInteraction.GetNormal();
     glm::vec3 L = wIn;
     glm::vec3 H = glm::reflect(-L, N);
 
@@ -24,11 +24,11 @@ glm::vec3 Metal::BSDF(const HitRecord& hitRecord, glm::vec3 wOut, glm::vec3 wIn)
     float k = std::max(0.f, glm::dot(H, V));
     return (float)(k > 0.95f ? std::pow(k, 64) : 0) * _color;
 }
-bool Metal::SampleDirection(const HitRecord& hitRecord, glm::vec3 wOut, float& pdf, glm::vec3& dir) {
+bool Metal::SampleDirection(const SurfaceInteraction& isec, glm::vec3 wOut, float& pdf, glm::vec3& dir)const {
     pdf = 1;
-    auto R = glm::normalize(glm::reflect(-wOut, hitRecord.GetNormal()));
-    auto N = hitRecord.GetNormal();
-    auto tangent = glm::normalize(hitRecord.GetDpDu());
+    auto R = glm::normalize(glm::reflect(-wOut, isec.GetNormal()));
+    auto N = isec.GetNormal();
+    auto tangent = glm::normalize(isec.GetDpDu());
     auto bitangent = glm::normalize(glm::cross(N, tangent));
 
     auto v = random.NextUnitHemiSphere();
@@ -42,6 +42,9 @@ bool Metal::SampleDirection(const HitRecord& hitRecord, glm::vec3 wOut, float& p
 }
 
 
-glm::vec3 Metal::Merge(const HitRecord& hitRecord, const glm::vec3& wOut, glm::vec3 Ldir, glm::vec3 LBSDF) {
+glm::vec3 Metal::Merge(const SurfaceInteraction& isec, const glm::vec3& wOut, glm::vec3 Ldir, glm::vec3 LBSDF) {
     return LBSDF;
+}
+
+void Metal::ComputeScatteringFunctions(SurfaceInteraction* isec, bool fromCamera) const {
 }

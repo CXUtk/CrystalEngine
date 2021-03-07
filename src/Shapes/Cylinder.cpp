@@ -15,13 +15,12 @@ Cylinder::~Cylinder() {
 }
 
 BoundingBox Cylinder::GetBoundingBox() const {
-    return BoundingBox(glm::vec3(-_radius, -_height / 2, -_radius) + _center,
-        glm::vec3(_radius, _height / 2, _radius) + _center);
+    float R = std::max(_height / 2, _radius);
+    return BoundingBox(glm::vec3(-R) + _center,
+        glm::vec3(R) + _center);
 }
 
-
-
-bool Cylinder::Intersect(const Ray& ray, HitRecord* info) const {
+bool Cylinder::Intersect(const Ray& ray, SurfaceInteraction* info) const {
     glm::vec3 P = _world2Local * (ray.start - _center);
     glm::vec3 d = _world2Local * ray.dir;
 
@@ -55,7 +54,25 @@ bool Cylinder::Intersect(const Ray& ray, HitRecord* info) const {
     return false;
 }
 
-void Cylinder::setHitInfo(glm::vec3 dir, float t, glm::vec3 localHitPos, HitRecord* info) const {
+bool Cylinder::IntersectTest(const Ray& ray, float tMin, float tMax) const {
+    glm::vec3 P = _world2Local * (ray.start - _center);
+    glm::vec3 d = _world2Local * ray.dir;
+
+    auto a = (double)d.x * d.x + (double)d.z * d.z;
+    auto b = 2.0 * ((double)d.x * P.x + (double)d.z * P.z);
+    auto c = ((double)P.x * P.x + (double)P.z * P.z) - (double)_radius * _radius;
+    auto discrim = b * b - 4 * a * c;
+    if (discrim < 0) return false;
+    auto rootd = std::sqrt(discrim);
+    double q;
+    if (b < 0) q = -0.5 * (b - rootd);
+    else q = -0.5 * (b + rootd);
+    float t1 = q / a, t2 = c / q;
+    return (t1 >= tMin && t1 <= tMax) || (t2 >= tMin && t2 <= tMax);
+}
+
+
+void Cylinder::setHitInfo(glm::vec3 dir, float t, glm::vec3 localHitPos, SurfaceInteraction* info) const {
     auto N = glm::normalize(glm::vec3(localHitPos.x, 0, localHitPos.z));
     auto front_face = glm::dot(dir, N) < 0;
     N = front_face ? N : -N;

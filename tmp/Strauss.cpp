@@ -30,11 +30,11 @@ _smoothness(smoothness), _metalness(metalness), _transparency(transparency) {
 Strauss::~Strauss() {
 }
 
-glm::vec3 Strauss::BSDF(const HitRecord& hitRecord, glm::vec3 wOut, glm::vec3 wIn, bool& shouldBounce) {
+glm::vec3 Strauss::BSDF(const SurfaceInteraction& SurfaceInteraction, glm::vec3 wOut, glm::vec3 wIn, bool& shouldBounce) {
     shouldBounce = true;
     glm::vec3 V = -wOut;
     glm::vec3 L = -wIn;
-    glm::vec3 N = hitRecord.GetNormal();
+    glm::vec3 N = SurfaceInteraction.GetNormal();
     glm::vec3 H = glm::normalize(glm::reflect(L, N));
 
     auto alpha = glm::dot(N, L);
@@ -63,6 +63,6 @@ glm::vec3 Strauss::BSDF(const HitRecord& hitRecord, glm::vec3 wOut, glm::vec3 wI
     return Qd + Qs;
 }
 
-glm::vec3 Strauss::Le(const HitRecord& hitRecord, glm::vec3 wOut) {
+glm::vec3 Strauss::Le(const SurfaceInteraction& SurfaceInteraction, glm::vec3 wOut) {
     return _baseColor * 0.1f;
 }

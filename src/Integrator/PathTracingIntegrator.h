@@ -13,6 +13,6 @@ private:
     Random _random;
 
     glm::vec3 evaluate(const Ray ray, std::shared_ptr<const Scene> scene);
-    glm::vec3 sampleLight(const HitRecord& hit, glm::vec3 wOut, std::shared_ptr<const Scene> scene, std::shared_ptr<Material> material);
-    glm::vec3 sampleIndirect(const HitRecord& hit, glm::vec3 wOut, std::shared_ptr<const Scene> scene, std::shared_ptr<Material> material);
+    glm::vec3 sampleLight(const SurfaceInteraction& hit, glm::vec3 wOut, std::shared_ptr<const Scene> scene, const Material* material);
+    glm::vec3 sampleIndirect(const SurfaceInteraction& hit, glm::vec3 wOut, std::shared_ptr<const Scene> scene, const Material* material);
 };

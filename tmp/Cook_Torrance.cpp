@@ -19,11 +19,11 @@ _roughness(roughness) {
 Cook_Torrance::~Cook_Torrance() {
 }
 
-glm::vec3 Cook_Torrance::BSDF(const HitRecord& hitRecord, glm::vec3 wOut, glm::vec3 wIn, bool& shouldBounce) {
+glm::vec3 Cook_Torrance::BSDF(const SurfaceInteraction& SurfaceInteraction, glm::vec3 wOut, glm::vec3 wIn, bool& shouldBounce) {
     shouldBounce = true;
     glm::vec3 V = wOut;
     glm::vec3 L = wIn;
-    glm::vec3 N = hitRecord.GetNormal();
+    glm::vec3 N = SurfaceInteraction.GetNormal();
     glm::vec3 H = glm::normalize(L + V);
 
     float NdotH = std::max(0.f, glm::dot(N, H));
@@ -43,6 +43,6 @@ glm::vec3 Cook_Torrance::BSDF(const HitRecord& hitRecord, glm::vec3 wOut, glm::v
     return diffuse + sp;
 }
 
-glm::vec3 Cook_Torrance::Le(const HitRecord& hitRecord, glm::vec3 wOut) {
+glm::vec3 Cook_Torrance::Le(const SurfaceInteraction& SurfaceInteraction, glm::vec3 wOut) {
     return _baseColor * 0.1f;
 }

@@ -32,7 +32,7 @@ BoundingBox Triangle::GetBoundingBox() const {
     return BoundingBox(minn, maxx);
 }
 
-bool Triangle::Intersect(const Ray& ray, HitRecord* info) const {
+bool Triangle::Intersect(const Ray& ray, SurfaceInteraction* info) const {
     glm::mat3 A(_vertices[1].Position - _vertices[0].Position, _vertices[2].Position - _vertices[0].Position, -ray.dir);
     auto inv = glm::inverse(A);
     glm::vec3 P = ray.start - _vertices[0].Position;
@@ -55,6 +55,17 @@ bool Triangle::Intersect(const Ray& ray, HitRecord* info) const {
 
     info->SetHitInfo(res.z, ray.start + ray.dir * res.z, N, UV, front_face, this, _dpdu, _dpdv);
     return true;
+}
+
+bool Triangle::IntersectTest(const Ray& ray, float tMin, float tMax) const {
+    if (tMin > tMax) return false;
+    glm::mat3 A(_vertices[1].Position - _vertices[0].Position, _vertices[2].Position - _vertices[0].Position, -ray.dir);
+    auto inv = glm::inverse(A);
+    glm::vec3 P = ray.start - _vertices[0].Position;
+    auto res = inv * P;
+    if (isnan(res.x) || isnan(res.y) || isnan(res.z)) return false;
+    if (res.x < 0 || res.x > 1 || res.y < 0 || res.y > 1 || res.x + res.y > 1 || res.z < 0) return false;
+    return res.z >= tMin && res.z <= tMax;
 }
 
 void Triangle::ApplyTransform(glm::mat4 transform, glm::mat4 normalTransfrom) {
