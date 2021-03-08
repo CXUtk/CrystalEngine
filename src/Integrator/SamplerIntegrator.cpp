@@ -1,4 +1,4 @@
-#include "SamplerIntegrator.h"
+﻿#include "SamplerIntegrator.h"
 
 SamplerIntegrator::SamplerIntegrator(std::shared_ptr<Camera> camera, std::shared_ptr<Sampler> sampler) : Integrator(), _camera(camera), _sampler(sampler) {
     _tmpColors = nullptr;
@@ -28,7 +28,7 @@ void SamplerIntegrator::Render(std::shared_ptr<const Scene> scene, std::shared_p
 
                 float u = (j + offset.x) / static_cast<float>(width);
                 float v = (i + offset.y) / static_cast<float>(height);
-                auto dir = camera->getDir(u, v);
+                auto dir = camera->GetDir(u, v);
                 _tmpColors[i * width + j] += Evaluate(Ray(eyePos, dir), scene);
 
                 frameBuffer->Lock();

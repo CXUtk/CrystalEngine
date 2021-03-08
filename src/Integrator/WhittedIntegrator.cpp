@@ -30,16 +30,18 @@ glm::vec3 WhittedIntegrator::evaluate(const Ray& ray, std::shared_ptr<const Scen
         L += emitted(hit, objHit, hitPos);
 
         auto bsdf = objHit->ComputeScatteringFunctions(hit);
+        if (bsdf == nullptr || !bsdf->IsActive()) {
+            return evaluate(Ray(hitPos - N * EPS, ray.dir), scene, depth);
+        }
 
         float pdf;
         for (auto& light : scene->GetLights()) {
             glm::vec3 end;
-            float pdf;
             auto raiance = light->SampleLi(hit, end, &pdf);
             auto dir = glm::normalize(end - hit.GetHitPos());
             SurfaceInteraction hit2;
             float distance = glm::length(end - hit.GetHitPos());
-            if (!scene->IntersectTest(Ray(hit.GetHitPos() + dir * EPS, dir), 0, distance)) {
+            if (!scene->IntersectTest(Ray(hit.GetHitPos() + N * EPS, dir), 0, distance)) {
                 L += raiance * bsdf->DistributionFunction(wOut, dir) / pdf * std::max(0.f, glm::dot(N, dir));
             }
         }

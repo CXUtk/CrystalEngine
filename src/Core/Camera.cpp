@@ -12,15 +12,15 @@ Camera::Camera(glm::vec3 eyePos, glm::vec3 lookat, glm::vec3 up, float fov, floa
     _left = glm::normalize(glm::cross(_look, up));
 }
 
-glm::mat4 Camera::getViewTransform() const {
+glm::mat4 Camera::GetViewTransform() const {
     return glm::lookAt(eyePos, lookAt, up);
 }
 
-glm::mat4 Camera::getProjectTransform() const {
+glm::mat4 Camera::GetProjectionTransform() const {
     return glm::perspective(fov, aspect, zNear, zFar);
 }
 
-glm::vec3 Camera::getDir(float x, float y) {
+glm::vec3 Camera::GetDir(float x, float y) {
     x = x * 2 - 1;
     y = y * 2 - 1;
     x *= W, y *= H;

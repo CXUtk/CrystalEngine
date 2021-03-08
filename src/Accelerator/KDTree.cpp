@@ -44,7 +44,7 @@ bool KDTree::Intersect(const Ray& ray, SurfaceInteraction* info) const {
 }
 
 bool KDTree::IntersectTest(const Ray& ray, float tMin, float tMax) const {
-    return false;
+    return ray_test_p(_root, ray, tMin, tMax);
 }
 
 

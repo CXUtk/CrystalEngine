@@ -39,33 +39,33 @@ std::vector<std::shared_ptr<Object>> CreateCornellBox() {
     glm::mat4 identity = glm::identity<glm::mat4>();
     glm::mat4 transform = identity;
 
-    transform = glm::translate(transform, glm::vec3(0, 0, 3));
+    transform = glm::translate(transform, glm::vec3(0, 0, -3));
     transform = glm::scale(transform, glm::vec3(6, 1, 6));
     std::shared_ptr<Material> groundMat = std::make_shared<Default>(glm::vec3(0.8f), glm::vec2(0, 0));
     auto ground = CreateQuad(transform, groundMat);
 
     transform = identity;
-    transform = glm::translate(transform, glm::vec3(0, 6, 3));
+    transform = glm::translate(transform, glm::vec3(0, 6, -3));
     transform = glm::scale(transform, glm::vec3(6, 1, 6));
     auto ceil = CreateQuad(transform, groundMat);
 
 
     transform = identity;
-    transform = glm::translate(transform, glm::vec3(-3, 3, 3));
+    transform = glm::translate(transform, glm::vec3(-3, 3, -3));
     transform = glm::rotate_slow(transform, glm::half_pi<float>(), glm::vec3(0, 0, 1));
     transform = glm::scale(transform, glm::vec3(6, 1, 6));
     std::shared_ptr<Material> leftWallMat = std::make_shared<Default>(glm::vec3(1, 0.3f, 0.3f), glm::vec2(0, 0));
     auto leftWall = CreateQuad(transform, leftWallMat);
 
     transform = identity;
-    transform = glm::translate(transform, glm::vec3(3, 3, 3));
+    transform = glm::translate(transform, glm::vec3(3, 3, -3));
     transform = glm::rotate_slow(transform, glm::half_pi<float>(), glm::vec3(0, 0, 1));
     transform = glm::scale(transform, glm::vec3(6, 1, 6));
     std::shared_ptr<Material> rightWallMat = std::make_shared<Default>(glm::vec3(0.3f, 1, 0.3f), glm::vec2(0, 0));
     auto rightWall = CreateQuad(transform, rightWallMat);
 
     transform = identity;
-    transform = glm::translate(transform, glm::vec3(0, 3, 6));
+    transform = glm::translate(transform, glm::vec3(0, 3, -6));
     transform = glm::rotate_slow(transform, glm::half_pi<float>(), glm::vec3(1, 0, 0));
     transform = glm::scale(transform, glm::vec3(6, 1, 6));
     auto farWall = CreateQuad(transform, groundMat);
@@ -128,10 +128,10 @@ Scene::Scene() {
     //AddLight(std::make_shared<SphereLight>(glm::vec3(0, 5, 0), 1, glm::vec3(1), 200));
     //AddLight(std::make_shared<SphereLight>(glm::vec3(5, 3, -5), 1, glm::vec3(1), 200));
     //AddLight(std::make_shared<PointLight>(glm::vec3(5, 5, -5), glm::vec3(1), 20));
-    AddLight(std::make_shared<PointLight>(glm::vec3(0, 3, -5), glm::vec3(1), 20));
-    AddLight(std::make_shared<PointLight>(glm::vec3(0, 5, 3), glm::vec3(1), 20));
+    AddLight(std::make_shared<PointLight>(glm::vec3(0, 3, 3), glm::vec3(1), 20));
+    AddLight(std::make_shared<PointLight>(glm::vec3(0, 5, -3), glm::vec3(1), 20));
 
-    _accelerator = Accelerator::GetAccelerator("Brute");
+    _accelerator = Accelerator::GetAccelerator("KDTree");
     _accelerator->Build(_sceneObjects);
 }
 
