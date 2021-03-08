@@ -3,6 +3,8 @@
 #include <Materials/Material.h>
 #include <Lights/Light.h>
 #include "SurfaceInteraction.h"
+#include <Reflection/BSDF.h>
+
 class SurfaceInteraction;
 class Light;
 class Material;
@@ -19,5 +21,5 @@ public:
     virtual const Light* GetLight() const { return nullptr; }
     virtual const Material* GetMaterial() const { return nullptr; }
 
-    virtual void ComputeScatteringFunctions(SurfaceInteraction* isec, bool fromCamera = true) const = 0;
+    virtual std::shared_ptr<BSDF> ComputeScatteringFunctions(const SurfaceInteraction& isec, bool fromCamera = true) const = 0;
 };

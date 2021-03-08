@@ -1,6 +1,7 @@
 ﻿#include "Default.h"
 #include <glm/gtx/transform.hpp>
 #include <Utils/Random.h>
+#include <Reflection/Lambertian.h>
 
 static Random random;
 
@@ -13,28 +14,20 @@ Default::Default(glm::vec3 color, glm::vec2 uvExt) : _color(color), _uvExtend(uv
 Default::~Default() {
 }
 
-glm::vec3 Default::BSDF(const SurfaceInteraction& isec, glm::vec3 wOut, glm::vec3 wIn) const {
+std::shared_ptr<BSDF> Default::ComputeScatteringFunctions(const SurfaceInteraction& isec, bool fromCamera) const {
     auto uv = isec.GetUV() * _uvExtend;
     bool a = fmod(uv.x, 0.5f) < 0.25f;
     bool b = fmod(uv.y, 0.5f) < 0.25f;
+    auto color = _color;
     if (a ^ b) {
-        return glm::vec3(1);
+        color = glm::vec3(1);
     }
-    return _color;
-}
 
-bool Default::SampleDirection(const SurfaceInteraction& isec, glm::vec3 wOut, float& pdf, glm::vec3& dir)const {
+    auto T = glm::normalize(isec.GetDpDu());
     auto N = isec.GetNormal();
-    auto tangent = glm::normalize(isec.GetDpDu());
-    auto bitangent = glm::normalize(glm::cross(N, tangent));
-
-    auto v = random.NextUnitHemiSphere();
-    // 1 / 2pi
-    pdf = 0.5f / glm::pi<float>();
-    dir = v.x* tangent + v.y * N + v.z * bitangent;
-    return false;
+    auto B = glm::normalize(glm::cross(N, T));
+    auto tnb = glm::mat3(T, N, B);
+    return std::make_shared<Lambertian>(color, tnb);
 }
 
-void Default::ComputeScatteringFunctions(SurfaceInteraction* isec, bool fromCamera) const {
-}
 

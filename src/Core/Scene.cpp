@@ -131,7 +131,7 @@ Scene::Scene() {
     AddLight(std::make_shared<PointLight>(glm::vec3(0, 3, -5), glm::vec3(1), 20));
     AddLight(std::make_shared<PointLight>(glm::vec3(0, 5, 3), glm::vec3(1), 20));
 
-    _accelerator = Accelerator::GetAccelerator("KDTree");
+    _accelerator = Accelerator::GetAccelerator("Brute");
     _accelerator->Build(_sceneObjects);
 }
 

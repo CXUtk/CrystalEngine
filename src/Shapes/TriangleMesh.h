@@ -13,9 +13,10 @@ public:
     BoundingBox GetBoundingBox() const override;
     bool Intersect(const Ray& ray, SurfaceInteraction* info) const override;
     bool IntersectTest(const Ray& ray, float tMin = 0, float tMax = std::numeric_limits<float>::infinity()) const override;
-    virtual const Light* GetLight() const override { return _light.get(); }
-    virtual const Material* GetMaterial() const override { return _material.get(); }
-    virtual void ComputeScatteringFunctions(SurfaceInteraction* isec, bool fromCamera = true) const override;
+    
+    const Light* GetLight() const override { return _light.get(); }
+    const Material* GetMaterial() const override { return _material.get(); }
+    std::shared_ptr<BSDF> ComputeScatteringFunctions(const SurfaceInteraction& isec, bool fromCamera = true) const override;
     
     void SetMaterial(const std::shared_ptr<Material>& material) { _material = material; }
 
@@ -28,5 +29,5 @@ private:
     std::shared_ptr<Material> _material;
     std::shared_ptr<Light> _light;
 
-    std::vector<std::shared_ptr<Triangle>> transformed(const std::vector<std::shared_ptr<Triangle>>& triganles, glm::mat4 transform);
+    void transformTriangle(const std::vector<std::shared_ptr<Triangle>>& triganles, glm::mat4 transform);
 };

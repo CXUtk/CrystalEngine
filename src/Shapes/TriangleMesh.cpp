@@ -8,8 +8,9 @@
 TriangleMesh::TriangleMesh(const std::vector<std::shared_ptr<Triangle>>& triangles, glm::mat4 transform,
     const std::shared_ptr<Material>& material, const std::shared_ptr<Light>& light) : _material(material), _light(light) {
     /*transform(triangles, matrix);*/
-    _acceleator = Accelerator::GetAccelerator("KDTree");
-    for (auto& tr : transformed(triangles, transform)) {
+    _acceleator = Accelerator::GetAccelerator("Brute");
+    transformTriangle(triangles, transform);
+    for (auto& tr : triangles) {
         _triangles.push_back(std::make_shared<GeometryObject>(tr, _material, _light));
     }
     _acceleator->Build(_triangles);
@@ -34,15 +35,13 @@ bool TriangleMesh::IntersectTest(const Ray& ray, float tMin, float tMax) const {
     return _acceleator->IntersectTest(ray, tMin, tMax);
 }
 
-void TriangleMesh::ComputeScatteringFunctions(SurfaceInteraction* isec, bool fromCamera) const {
+std::shared_ptr<BSDF> TriangleMesh::ComputeScatteringFunctions(const SurfaceInteraction& isec, bool fromCamera) const {
     return _material->ComputeScatteringFunctions(isec, fromCamera);
 }
 
-std::vector<std::shared_ptr<Triangle>> TriangleMesh::transformed(const std::vector<std::shared_ptr<Triangle>>& triangles, glm::mat4 transform) {
+void TriangleMesh::transformTriangle(const std::vector<std::shared_ptr<Triangle>>& triangles, glm::mat4 transform) {
     auto normalTransfrom = glm::transpose(glm::inverse(transform));
-    auto copy = std::vector<std::shared_ptr<Triangle>>(triangles.begin(), triangles.end());
-    for (auto& t : copy) {
+    for (auto& t : triangles) {
         t->ApplyTransform(transform, normalTransfrom);
     }
-    return copy;
 }

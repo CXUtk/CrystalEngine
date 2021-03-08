@@ -13,6 +13,6 @@ bool GeometryObject::Intersect(const Ray& ray, SurfaceInteraction* isec) const {
     return hit;
 }
 
-void GeometryObject::ComputeScatteringFunctions(SurfaceInteraction* isec, bool fromCamera) const {
+std::shared_ptr<BSDF> GeometryObject::ComputeScatteringFunctions(const SurfaceInteraction& isec, bool fromCamera) const {
     return _material->ComputeScatteringFunctions(isec, fromCamera);
 }

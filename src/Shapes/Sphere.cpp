@@ -47,6 +47,12 @@ bool Sphere::Intersect(const Ray& ray, SurfaceInteraction* info) const {
     info->SetHitInfo(t, realHitPos, _local2World * N, glm::vec2(theta, phi), front_face, this,
         _local2World * glm::vec3(-dummyHitPos.z, 0, dummyHitPos.x),
         _local2World * glm::vec3(0));
+
+    //if (glm::isnan(_local2World * dummyHitPos) != glm::bvec3(0)) {
+    //    printf("%lf %lf %lf %lf %lf\n", ray.dir.x, ray.dir.y, ray.dir.z, a, t2);
+    //    fflush(stdout);
+    //    return false;
+    //}
     return true;
 }
 
@@ -65,4 +71,3 @@ bool Sphere::IntersectTest(const Ray& ray, float tMin, float tMax) const {
     float t2 = (-b - discrim) / (2 * a);
     return (t1 >= tMin && t1 <= tMax) || (t2 >= tMin && t2 <= tMax);
 }
-

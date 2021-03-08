@@ -17,7 +17,7 @@ public:
     virtual const Light* GetLight() const override { return _light.get(); }
     virtual const Material* GetMaterial() const override { return _material.get(); }
 
-    virtual void ComputeScatteringFunctions(SurfaceInteraction* isec, bool fromCamera = true) const override;
+    virtual std::shared_ptr<BSDF> ComputeScatteringFunctions(const SurfaceInteraction& isec, bool fromCamera = true) const override;
 
 private:
     std::shared_ptr<Shape> _shape;

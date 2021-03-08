@@ -11,14 +11,14 @@ SphereLight::SphereLight(glm::vec3 pos, float r, glm::vec3 color, float power) :
 SphereLight::~SphereLight() {
 }
 
-glm::vec3 SphereLight::SampleLi(const SurfaceInteraction& hit, glm::vec3& endpoint, float& pdf) {
+glm::vec3 SphereLight::SampleLi(const SurfaceInteraction& hit, glm::vec3& endpoint, float* pdf) const {
     auto N = random.NextUnitVector();
     endpoint = _pos + _radius * N;
     auto Np = hit.GetHitPos() - endpoint;
     auto vp = glm::normalize(Np);
 
     // pdf = area projected on unit hemisphere / area of unit hemisphere
-    pdf = 1.0f / _surfaceArea;
+    *pdf = 1.0f / _surfaceArea;
 
     auto f = std::max(0.f, glm::dot(N, vp));
     if (f < 1e-6) return glm::vec3(0);
