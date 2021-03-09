@@ -175,7 +175,6 @@ bool KDTree::ray_test_p(int p, const Ray& ray, float tMin, float tMax) const {
     //if (!outerBox.rayIntersect(ray, tMin, tMax)) return false;
     if (_nodes[p].splitAxis == -1) {
         for (auto& obj : _nodes[p].objs) {
-            SurfaceInteraction tmp;
             if (obj->IntersectTest(ray, tMin, tMax)) {
                 return true;
             }

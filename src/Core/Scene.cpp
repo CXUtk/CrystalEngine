@@ -88,6 +88,7 @@ Scene::Scene() {
 
 
     std::shared_ptr<Material> ballA = std::make_shared<Default>(glm::vec3(1, 0.1f, 0.1f));
+    std::shared_ptr<Material> reflectMat = std::make_shared<Metal>(glm::vec3(1), 1.0f);
     //std::shared_ptr<Material> ballB = std::make_shared<Metal>(glm::vec3(1, 1, 1), 2.f);
     //std::shared_ptr<Material> metal = std::make_shared<Phong>(glm::vec3(1, 0.5f, 0.5f), 128, glm::vec3(0.1f, 0.5f, 1.0f));
     ////std::shared_ptr<Material> lights = std::make_shared<Lighted>(glm::vec3(10, 10, 10));
@@ -95,7 +96,7 @@ Scene::Scene() {
     ////std::shared_ptr<Material> ball = std::make_shared<Cook_Torrance>(glm::vec3(0.8, 0.5, 0.2f), 0.2f);
 
     auto sp1 = std::make_shared<GeometryObject>(std::make_shared<Sphere>(glm::vec3(0, 2, 0), 0.5, glm::vec3(0)), ballA, nullptr);
-    auto sp2 = std::make_shared<GeometryObject>(std::make_shared<Sphere>(glm::vec3(-2, 2, 0), 0.5, glm::vec3(0)), ballA, nullptr);
+    auto sp2 = std::make_shared<GeometryObject>(std::make_shared<Sphere>(glm::vec3(-2, 2, -2), 0.5, glm::vec3(0)), reflectMat, nullptr);
 
 
     AddObject(sp1);

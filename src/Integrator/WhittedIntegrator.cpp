@@ -47,9 +47,10 @@ glm::vec3 WhittedIntegrator::evaluate(const Ray& ray, std::shared_ptr<const Scen
         }
 
         glm::vec3 dir;
-        if (depth + 1 < _maxDepth && bsdf->SampleDirection(wOut, &dir, &pdf) != glm::vec3(0)) {
+        auto reflectC = bsdf->SampleDirection(wOut, &dir, &pdf);
+        if (depth + 1 < _maxDepth && pdf != 0 && reflectC != glm::vec3(0)) {
             auto radiance = evaluate(Ray(hitPos + N * EPS, dir), scene, depth + 1);
-            L += radiance * bsdf->DistributionFunction(wOut, dir) / pdf * std::max(0.f, glm::dot(N, dir));
+            L += radiance * reflectC / pdf * std::max(0.f, glm::dot(N, dir));
         }
         return L;
     }

@@ -38,7 +38,7 @@ bool Triangle::Intersect(const Ray& ray, SurfaceInteraction* info) const {
     glm::vec3 P = ray.start - _vertices[0].Position;
     auto res = inv * P;
     if (isnan(res.x) || isnan(res.y) || isnan(res.z)) return false;
-    if (res.x < 0 || res.x > 1 || res.y < 0 || res.y > 1 || res.x + res.y > 1.001 || res.z < 0) return false;
+    if (res.x < 0 || res.x > 1 || res.y < 0 || res.y > 1 || res.x + res.y > 1.0001 || res.z < 0) return false;
 
 
     glm::vec3 bary_coord = glm::vec3(1 - res.x - res.y, res.x, res.y);
