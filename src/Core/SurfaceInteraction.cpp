@@ -1,5 +1,8 @@
 ﻿#include "SurfaceInteraction.h"
 
+
+static constexpr float EPS = 1e-4f;
+
 SurfaceInteraction::SurfaceInteraction() : _hitObject(nullptr), _hitShape(nullptr),
 _distance(std::numeric_limits<float>::infinity()),
 _hitPos(0), _uv(0), _normal(0), _dpdu(0), _dpdv(0),
@@ -8,6 +11,11 @@ _frontFace(false) {
 }
 
 SurfaceInteraction::~SurfaceInteraction() {
+}
+
+Ray SurfaceInteraction::SpawnRay(glm::vec3 dir) const {
+    bool back = glm::dot(dir, _normal) < 0;
+    return Ray(_hitPos + (back ? -_normal : _normal) * EPS, dir);
 }
 
 void SurfaceInteraction::SetHitInfo(float t, glm::vec3 hitPos, glm::vec3 normal, glm::vec2 uv, bool frontFace, 

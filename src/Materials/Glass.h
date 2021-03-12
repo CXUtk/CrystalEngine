@@ -1,10 +1,10 @@
 ﻿#pragma once
 #include "Material.h"
 
-class Phong : public Material {
+class Glass : public Material {
 public:
-    Phong(glm::vec3 baseColor, float expK, glm::vec3 coeff);
-    ~Phong() override;
+    Glass(glm::vec3 baseColor);
+    ~Glass() override;
 
     //glm::vec3 BSDF(const SurfaceInteraction& isec, glm::vec3 wOut, glm::vec3 wIn) const override;
     //bool SampleDirection(const SurfaceInteraction& isec, glm::vec3 wOut, float& pdf, glm::vec3& dir) const override;
@@ -12,7 +12,5 @@ public:
     //void ComputeScatteringFunctions(SurfaceInteraction* isec, bool fromCamera = true) const override;
     std::shared_ptr<BSDF> ComputeScatteringFunctions(const SurfaceInteraction& isec, bool fromCamera = true) const override;
 private:
-    glm::vec3 _baseColor;
-    float _expK;
-    glm::vec3 _coeff;
+    glm::vec3 _color;
 };

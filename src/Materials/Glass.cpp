@@ -1,13 +1,14 @@
-﻿#include "Phong.h"
+﻿#include "Glass.h"
+#include <Reflection/Transmission.h>
 
-Phong::Phong(glm::vec3 baseColor, float expK, glm::vec3 coeff) : _baseColor(baseColor), _expK(expK), _coeff(coeff) {
+Glass::Glass(glm::vec3 baseColor) : _color(baseColor) {
 }
 
-Phong::~Phong() {
+Glass::~Glass() {
 }
 
-std::shared_ptr<BSDF> Phong::ComputeScatteringFunctions(const SurfaceInteraction& isec, bool fromCamera) const {
-    return std::shared_ptr<BSDF>();
+std::shared_ptr<BSDF> Glass::ComputeScatteringFunctions(const SurfaceInteraction& isec, bool fromCamera) const {
+    return std::make_shared<Transmission>(_color, isec.GetNormal());
 }
 //
 //glm::vec3 Phong::BSDF(const SurfaceInteraction& isec, glm::vec3 wOut, glm::vec3 wIn) const {

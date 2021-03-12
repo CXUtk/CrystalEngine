@@ -1,8 +1,6 @@
 ﻿#include "WhittedIntegrator.h"
 
 
-static constexpr float EPS = 1e-4f;
-
 WhittedIntegrator::WhittedIntegrator(std::shared_ptr<Camera> camera, std::shared_ptr<Sampler> sampler, int maxDepth) :
     SamplerIntegrator(camera, sampler),
     _maxDepth(maxDepth) {
@@ -31,7 +29,7 @@ glm::vec3 WhittedIntegrator::evaluate(const Ray& ray, std::shared_ptr<const Scen
 
         auto bsdf = objHit->ComputeScatteringFunctions(hit);
         if (bsdf == nullptr || !bsdf->IsActive()) {
-            return evaluate(Ray(hitPos - N * EPS, ray.dir), scene, depth);
+            return evaluate(hit.SpawnRay(ray.dir), scene, depth);
         }
 
         float pdf;
@@ -41,7 +39,7 @@ glm::vec3 WhittedIntegrator::evaluate(const Ray& ray, std::shared_ptr<const Scen
             auto dir = glm::normalize(end - hit.GetHitPos());
             SurfaceInteraction hit2;
             float distance = glm::length(end - hit.GetHitPos());
-            if (!scene->IntersectTest(Ray(hit.GetHitPos() + N * EPS, dir), 0, distance)) {
+            if (!scene->IntersectTest(hit.SpawnRay(dir), 0, distance)) {
                 L += raiance * bsdf->DistributionFunction(wOut, dir) / pdf * std::max(0.f, glm::dot(N, dir));
             }
         }
@@ -49,8 +47,14 @@ glm::vec3 WhittedIntegrator::evaluate(const Ray& ray, std::shared_ptr<const Scen
         glm::vec3 dir;
         auto reflectC = bsdf->SampleDirection(wOut, &dir, &pdf);
         if (depth + 1 < _maxDepth && pdf != 0 && reflectC != glm::vec3(0)) {
-            auto radiance = evaluate(Ray(hitPos + N * EPS, dir), scene, depth + 1);
-            L += radiance * reflectC / pdf * std::max(0.f, glm::dot(N, dir));
+            if (bsdf->Contains(BxDFType::BxDF_REFLECTION)) {
+                auto radiance = evaluate(hit.SpawnRay(dir), scene, depth + 1);
+                L += radiance * reflectC / pdf * std::max(0.f, glm::dot(N, dir));
+            }
+            else if(bsdf->Contains(BxDFType::BxDF_TRANSMISSION)) {
+                auto radiance = evaluate(hit.SpawnRay(dir), scene, depth + 1);
+                L += radiance * reflectC / pdf;
+            }
         }
         return L;
     }

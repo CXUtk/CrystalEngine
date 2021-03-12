@@ -1,6 +1,5 @@
 ﻿#include "Scene.h"
 #include "Materials/Default.h"
-#include <Materials/Phong.h>
 #include <glm/gtx/transform.hpp>
 #include <Lights/PointLight.h>
 #include <Lights/SphereLight.h>
@@ -9,6 +8,7 @@
 #include <Shapes/TriangleMesh.h>
 #include <Core/GeometryObject.h>
 #include <Shapes/Sphere.h>
+#include <Materials/Glass.h>
 
 //#include <Materials/Phong_Blinn.h>
 //#include <Materials/Strauss.h>
@@ -88,14 +88,15 @@ Scene::Scene() {
 
 
     std::shared_ptr<Material> ballA = std::make_shared<Default>(glm::vec3(1, 0.1f, 0.1f));
-    std::shared_ptr<Material> reflectMat = std::make_shared<Metal>(glm::vec3(1), 1.0f);
+    std::shared_ptr<Material> reflectMat = std::make_shared<Metal>(glm::vec3(0.9f, 0.8f, 0.8f), 1.0f);
+    std::shared_ptr<Material> glassMat = std::make_shared<Glass>(glm::vec3(0.6f, 0.9f, 0.2f));
     //std::shared_ptr<Material> ballB = std::make_shared<Metal>(glm::vec3(1, 1, 1), 2.f);
     //std::shared_ptr<Material> metal = std::make_shared<Phong>(glm::vec3(1, 0.5f, 0.5f), 128, glm::vec3(0.1f, 0.5f, 1.0f));
     ////std::shared_ptr<Material> lights = std::make_shared<Lighted>(glm::vec3(10, 10, 10));
 
     ////std::shared_ptr<Material> ball = std::make_shared<Cook_Torrance>(glm::vec3(0.8, 0.5, 0.2f), 0.2f);
 
-    auto sp1 = std::make_shared<GeometryObject>(std::make_shared<Sphere>(glm::vec3(0, 2, 0), 0.5, glm::vec3(0)), ballA, nullptr);
+    auto sp1 = std::make_shared<GeometryObject>(std::make_shared<Sphere>(glm::vec3(0, 2, 0), 0.5, glm::vec3(0)), reflectMat, nullptr);
     auto sp2 = std::make_shared<GeometryObject>(std::make_shared<Sphere>(glm::vec3(-2, 2, -2), 0.5, glm::vec3(0)), reflectMat, nullptr);
 
 
