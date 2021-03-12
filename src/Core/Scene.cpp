@@ -9,6 +9,7 @@
 #include <Core/GeometryObject.h>
 #include <Shapes/Sphere.h>
 #include <Materials/Glass.h>
+#include <Materials/Phong.h>
 
 //#include <Materials/Phong_Blinn.h>
 //#include <Materials/Strauss.h>
@@ -87,7 +88,7 @@ Scene::Scene() {
     }
 
 
-    std::shared_ptr<Material> ballA = std::make_shared<Default>(glm::vec3(1, 0.1f, 0.1f));
+    std::shared_ptr<Material> ballA = std::make_shared<Phong>(glm::vec3(0.6, 0.5f, 0.2f));
     std::shared_ptr<Material> reflectMat = std::make_shared<Metal>(glm::vec3(0.9f, 0.8f, 0.8f), 1.0f);
     std::shared_ptr<Material> glassMat = std::make_shared<Glass>(glm::vec3(0.6f, 0.9f, 0.2f));
     //std::shared_ptr<Material> ballB = std::make_shared<Metal>(glm::vec3(1, 1, 1), 2.f);
@@ -97,11 +98,11 @@ Scene::Scene() {
     ////std::shared_ptr<Material> ball = std::make_shared<Cook_Torrance>(glm::vec3(0.8, 0.5, 0.2f), 0.2f);
 
     auto sp1 = std::make_shared<GeometryObject>(std::make_shared<Sphere>(glm::vec3(0, 2, 0), 0.5, glm::vec3(0)), reflectMat, nullptr);
-    auto sp2 = std::make_shared<GeometryObject>(std::make_shared<Sphere>(glm::vec3(-2, 2, -2), 0.5, glm::vec3(0)), reflectMat, nullptr);
+    auto sp2 = std::make_shared<GeometryObject>(std::make_shared<Sphere>(glm::vec3(-2, 2, -2), 0.5, glm::vec3(0)), glassMat, nullptr);
 
 
-    AddObject(sp1);
-    AddObject(sp2);
+    //AddObject(sp1);
+    //AddObject(sp2);
     //_sceneObjects.push_back(sp1);
     //_sceneObjects.push_back(sp2);
 
@@ -109,10 +110,12 @@ Scene::Scene() {
 
 
 
-    //ObjLoader loader;
-    //loader.load("Resources/Scenes/cornellbox.obj");
-    //auto bunny = loader.GetMesh(floor, glm::identity<glm::mat4>());
-    //_sceneObjects.push_back(bunny);
+    ObjLoader loader;
+    loader.load("Resources/Scenes/bunny.obj");
+    auto transform = glm::identity<glm::mat4>();
+    transform = glm::translate(transform, glm::vec3(0, 1, -1));
+    auto bunny = loader.GetMesh(ballA, transform);
+    AddObject(bunny);
 
     //auto cylinder = std::shared_ptr<Cylinder>(new Cylinder(glm::vec3(2, -1.f, 2), 1, 1, glm::vec3(0.f, 0.f, 0.f)));
     //cylinder->SetMaterial(metal);
@@ -130,10 +133,10 @@ Scene::Scene() {
     //AddLight(std::make_shared<SphereLight>(glm::vec3(0, 5, 0), 1, glm::vec3(1), 200));
     //AddLight(std::make_shared<SphereLight>(glm::vec3(5, 3, -5), 1, glm::vec3(1), 200));
     //AddLight(std::make_shared<PointLight>(glm::vec3(5, 5, -5), glm::vec3(1), 20));
-    AddLight(std::make_shared<PointLight>(glm::vec3(0, 3, 3), glm::vec3(1), 20));
+    AddLight(std::make_shared<PointLight>(glm::vec3(2, 3, 3), glm::vec3(1), 30));
     AddLight(std::make_shared<PointLight>(glm::vec3(0, 5, -3), glm::vec3(1), 20));
 
-    _accelerator = Accelerator::GetAccelerator("KDTree");
+    _accelerator = Accelerator::GetAccelerator("Brute");
     _accelerator->Build(_sceneObjects);
 }
 

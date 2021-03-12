@@ -77,12 +77,10 @@ std::shared_ptr<TriangleMesh> ObjLoader::GetMesh(std::shared_ptr<Material> mater
             v[2].TexCoords = TexCoords[t.TexID[2]];
         }
 
-        std::shared_ptr<Triangle> tri = std::shared_ptr<Triangle>(
-            new Triangle(v[0], v[1], v[2])
-            );
+        std::shared_ptr<Triangle> tri = std::make_shared<Triangle>(v[0], v[1], v[2]);
         triangles.push_back(tri);
     }
-    return std::make_shared<TriangleMesh>(triangles, transform, nullptr, nullptr);
+    return std::make_shared<TriangleMesh>(triangles, transform, material, nullptr);
 }
 
 //std::vector<DrawTriangle> ObjLoader::GetDrawTriangles() const {

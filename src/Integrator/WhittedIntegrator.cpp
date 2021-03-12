@@ -47,11 +47,11 @@ glm::vec3 WhittedIntegrator::evaluate(const Ray& ray, std::shared_ptr<const Scen
         glm::vec3 dir;
         auto reflectC = bsdf->SampleDirection(wOut, &dir, &pdf);
         if (depth + 1 < _maxDepth && pdf != 0 && reflectC != glm::vec3(0)) {
-            if (bsdf->Contains(BxDFType::BxDF_REFLECTION)) {
+            if (bsdf->Contains(BxDFType::BxDF_REFLECTION) && !bsdf->Contains(BxDFType::BxDF_DIFFUSE)) {
                 auto radiance = evaluate(hit.SpawnRay(dir), scene, depth + 1);
                 L += radiance * reflectC / pdf * std::max(0.f, glm::dot(N, dir));
             }
-            else if(bsdf->Contains(BxDFType::BxDF_TRANSMISSION)) {
+            if (bsdf->Contains(BxDFType::BxDF_TRANSMISSION)) {
                 auto radiance = evaluate(hit.SpawnRay(dir), scene, depth + 1);
                 L += radiance * reflectC / pdf;
             }

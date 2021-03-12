@@ -9,7 +9,7 @@
 
 
 Crystal& Crystal::GetInstance() {
-    static Crystal instance(400, 400);
+    static Crystal instance(800, 600);
     return instance;
 }
 

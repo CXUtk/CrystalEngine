@@ -11,7 +11,7 @@ Metal::Metal(glm::vec3 color, float smoothness) : _color(color), _smoothness(smo
 Metal::~Metal() {
 }
 std::shared_ptr<BSDF> Metal::ComputeScatteringFunctions(const SurfaceInteraction& isec, bool fromCamera) const {
-    return std::make_shared< SpecularReflection>(_color, isec.GetNormal());
+    return std::make_shared<SpecularReflection>(_color, isec.GetNormal());
 }
 //glm::vec3 Metal::BSDF(const SurfaceInteraction& SurfaceInteraction, glm::vec3 wOut, glm::vec3 wIn)const {
 //    glm::vec3 V = wOut;

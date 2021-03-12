@@ -8,7 +8,7 @@
 TriangleMesh::TriangleMesh(const std::vector<std::shared_ptr<Triangle>>& triangles, glm::mat4 transform,
     const std::shared_ptr<Material>& material, const std::shared_ptr<Light>& light) : _material(material), _light(light) {
     /*transform(triangles, matrix);*/
-    _acceleator = Accelerator::GetAccelerator("KDTree");
+    _acceleator = Accelerator::GetAccelerator("Brute");
     transformTriangle(triangles, transform);
     for (auto& tr : triangles) {
         _triangles.push_back(std::make_shared<GeometryObject>(tr, _material, _light));
