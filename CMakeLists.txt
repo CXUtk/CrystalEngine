@@ -11,7 +11,7 @@ file (GLOB_RECURSE HEADER_FILES "${PROJECT_SOURCE_DIR}/src/*.h")
 
 
 # 将源代码添加到此项目的可执行文件。
-add_executable (CrystalEngine ${SRC_FILES} ${HEADER_FILES})
+add_executable (CrystalEngine ${SRC_FILES} ${HEADER_FILES} )
 
 set_target_properties (CrystalEngine PROPERTIES
                       CXX_STANDARD 17

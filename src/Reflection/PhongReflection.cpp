@@ -21,5 +21,6 @@ glm::vec3 PhongReflection::DistributionFunction(glm::vec3 wOut, glm::vec3 wIn) c
 }
 
 glm::vec3 PhongReflection::SampleDirection(glm::vec3 wOut, glm::vec3* wIn, float* pdf) const {
+    *pdf = 0;
     return glm::vec3(0);
 }

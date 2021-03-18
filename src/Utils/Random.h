@@ -16,7 +16,9 @@ public:
 
     glm::vec3 NextUnitVector();
     glm::vec3 NextUnitHemiSphere();
-
+    glm::vec3 PerlinNoise(glm::vec2 uv);
+    
+    float RandomFloat(glm::vec2 uv);
 
 private:
     std::mt19937 mt;

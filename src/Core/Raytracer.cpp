@@ -55,7 +55,7 @@ Raytracer::Raytracer(int width, int height) : _width(width), _height(height) {
     _frameBuffer = std::shared_ptr<FrameBuffer>(new FrameBuffer(width, height));
     _frameBuffer->Clear();
 
-    auto sampler = std::make_shared<DefaultSampler>(1);
+    auto sampler = std::make_shared<DefaultSampler>(16);
     // _integrator = std::shared_ptr<Integrator>(new PathTracingIntegrator(_camera, sampler));
     _integrator = std::make_shared<WhittedIntegrator>(_camera, sampler, 5);
     fprintf(stdout, "Created\n");

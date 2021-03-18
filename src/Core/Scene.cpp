@@ -10,6 +10,9 @@
 #include <Shapes/Sphere.h>
 #include <Materials/Glass.h>
 #include <Materials/Phong.h>
+#include <Materials/Brick.h>
+#include <Textures/ImageTexture.h>
+#include <lodepng/lodepng.h>
 
 //#include <Materials/Phong_Blinn.h>
 //#include <Materials/Strauss.h>
@@ -41,10 +44,13 @@ std::vector<std::shared_ptr<Object>> CreateCornellBox() {
     glm::mat4 transform = identity;
 
     transform = glm::translate(transform, glm::vec3(0, 0, -3));
-    transform = glm::scale(transform, glm::vec3(6, 1, 6));
-    std::shared_ptr<Material> groundMat = std::make_shared<Default>(glm::vec3(0.8f), glm::vec2(0, 0));
-    auto ground = CreateQuad(transform, groundMat);
+    transform = glm::scale(transform, glm::vec3(6, 1, 6)); 
 
+
+
+    std::shared_ptr<Material> groundMat = std::make_shared<Brick>(glm::vec3(0.6, 0.15, 0.1), glm::vec3(1), 0.09f, 0.04f, 0.01f);
+    // std::shared_ptr<Material> groundMat = std::make_shared<Default>(glm::vec3(1.0, 0, 0), glm::vec3(1.0, 1.0, 0.0), glm::vec2(3, 3));
+    auto ground = CreateQuad(transform, groundMat);
     transform = identity;
     transform = glm::translate(transform, glm::vec3(0, 6, -3));
     transform = glm::scale(transform, glm::vec3(6, 1, 6));
@@ -69,7 +75,10 @@ std::vector<std::shared_ptr<Object>> CreateCornellBox() {
     transform = glm::translate(transform, glm::vec3(0, 3, -6));
     transform = glm::rotate_slow(transform, glm::half_pi<float>(), glm::vec3(1, 0, 0));
     transform = glm::scale(transform, glm::vec3(6, 1, 6));
-    auto farWall = CreateQuad(transform, groundMat);
+    auto texture = std::make_shared<ImageTexture>("Resources/Textures/wall.png");
+    std::shared_ptr<Material> farWallMat = std::make_shared<Phong>(texture);
+    // std::shared_ptr<Material> farWallMat = std::make_shared<Default>(glm::vec3(0.8f));
+    auto farWall = CreateQuad(transform, farWallMat);
 
     objs.push_back(ground);
     objs.push_back(ceil);
@@ -110,12 +119,12 @@ Scene::Scene() {
 
 
 
-    ObjLoader loader;
-    loader.load("Resources/Scenes/bunny.obj");
-    auto transform = glm::identity<glm::mat4>();
-    transform = glm::translate(transform, glm::vec3(0, 1, -1));
-    auto bunny = loader.GetMesh(ballA, transform);
-    AddObject(bunny);
+    //ObjLoader loader;
+    //loader.load("Resources/Scenes/bunny.obj");
+    //auto transform = glm::identity<glm::mat4>();
+    //transform = glm::translate(transform, glm::vec3(0, 1, -1));
+    //auto bunny = loader.GetMesh(ballA, transform);
+    // AddObject(bunny);
 
     //auto cylinder = std::shared_ptr<Cylinder>(new Cylinder(glm::vec3(2, -1.f, 2), 1, 1, glm::vec3(0.f, 0.f, 0.f)));
     //cylinder->SetMaterial(metal);
@@ -136,7 +145,7 @@ Scene::Scene() {
     AddLight(std::make_shared<PointLight>(glm::vec3(2, 3, 3), glm::vec3(1), 30));
     AddLight(std::make_shared<PointLight>(glm::vec3(0, 5, -3), glm::vec3(1), 20));
 
-    _accelerator = Accelerator::GetAccelerator("Brute");
+    _accelerator = Accelerator::GetAccelerator("KDTree");
     _accelerator->Build(_sceneObjects);
 }
 

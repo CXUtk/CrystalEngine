@@ -24,7 +24,6 @@ bool Brute::Intersect(const Ray& ray, SurfaceInteraction* isec) const {
             hit = true;
             if (isec->GetDistance() == std::numeric_limits<float>::infinity()) {
                 hit = false;
-                while (true);
             }
         }
     }
