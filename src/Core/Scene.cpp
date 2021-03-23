@@ -75,9 +75,9 @@ std::vector<std::shared_ptr<Object>> CreateCornellBox() {
     transform = glm::translate(transform, glm::vec3(0, 3, -6));
     transform = glm::rotate_slow(transform, glm::half_pi<float>(), glm::vec3(1, 0, 0));
     transform = glm::scale(transform, glm::vec3(6, 1, 6));
-    auto texture = std::make_shared<ImageTexture>("Resources/Textures/wall.png");
-    std::shared_ptr<Material> farWallMat = std::make_shared<Phong>(texture);
-    // std::shared_ptr<Material> farWallMat = std::make_shared<Default>(glm::vec3(0.8f));
+    //auto texture = std::make_shared<ImageTexture>("Resources/Textures/wall.png");
+    //std::shared_ptr<Material> farWallMat = std::make_shared<Phong>(texture);
+    std::shared_ptr<Material> farWallMat = std::make_shared<Default>(glm::vec3(0.8f));
     auto farWall = CreateQuad(transform, farWallMat);
 
     objs.push_back(ground);
@@ -95,23 +95,21 @@ Scene::Scene() {
     for (auto& obj : CreateCornellBox()) {
         AddObject(obj);
     }
-
-
     std::shared_ptr<Material> ballA = std::make_shared<Phong>(glm::vec3(0.6, 0.5f, 0.2f));
     std::shared_ptr<Material> reflectMat = std::make_shared<Metal>(glm::vec3(0.9f, 0.8f, 0.8f), 1.0f);
-    std::shared_ptr<Material> glassMat = std::make_shared<Glass>(glm::vec3(0.6f, 0.9f, 0.2f));
+    std::shared_ptr<Material> glassMat = std::make_shared<Glass>(glm::vec3(1.0f));
     //std::shared_ptr<Material> ballB = std::make_shared<Metal>(glm::vec3(1, 1, 1), 2.f);
     //std::shared_ptr<Material> metal = std::make_shared<Phong>(glm::vec3(1, 0.5f, 0.5f), 128, glm::vec3(0.1f, 0.5f, 1.0f));
     ////std::shared_ptr<Material> lights = std::make_shared<Lighted>(glm::vec3(10, 10, 10));
 
     ////std::shared_ptr<Material> ball = std::make_shared<Cook_Torrance>(glm::vec3(0.8, 0.5, 0.2f), 0.2f);
 
-    auto sp1 = std::make_shared<GeometryObject>(std::make_shared<Sphere>(glm::vec3(0, 2, 0), 0.5, glm::vec3(0)), reflectMat, nullptr);
-    auto sp2 = std::make_shared<GeometryObject>(std::make_shared<Sphere>(glm::vec3(-2, 2, -2), 0.5, glm::vec3(0)), glassMat, nullptr);
+    auto sp1 = std::make_shared<GeometryObject>(std::make_shared<Sphere>(glm::vec3(2, 1, -2), 0.5, glm::vec3(0)), reflectMat, nullptr);
+    auto sp2 = std::make_shared<GeometryObject>(std::make_shared<Sphere>(glm::vec3(0, 1, 0), 0.5, glm::vec3(0)), glassMat, nullptr);
 
 
-    //AddObject(sp1);
-    //AddObject(sp2);
+    AddObject(sp1);
+    AddObject(sp2);
     //_sceneObjects.push_back(sp1);
     //_sceneObjects.push_back(sp2);
 

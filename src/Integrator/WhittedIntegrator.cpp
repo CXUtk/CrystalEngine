@@ -17,7 +17,6 @@ glm::vec3 WhittedIntegrator::Evaluate(const Ray& ray, std::shared_ptr<const Scen
 glm::vec3 WhittedIntegrator::evaluate(const Ray& ray, std::shared_ptr<const Scene> scene, int depth) {
     glm::vec3 L(0);
     if (depth == _maxDepth) return L;
-
     SurfaceInteraction hit;
     if (scene->Intersect(ray, &hit)) {
         glm::vec3 hitPos = hit.GetHitPos();
@@ -28,7 +27,7 @@ glm::vec3 WhittedIntegrator::evaluate(const Ray& ray, std::shared_ptr<const Scen
         L += emitted(hit, objHit, hitPos);
 
         auto bsdf = objHit->ComputeScatteringFunctions(hit);
-        if (bsdf == nullptr || !bsdf->IsActive()) {
+        if (bsdf == nullptr) {
             return evaluate(hit.SpawnRay(ray.dir), scene, depth);
         }
 
@@ -45,20 +44,19 @@ glm::vec3 WhittedIntegrator::evaluate(const Ray& ray, std::shared_ptr<const Scen
         }
 
         glm::vec3 dir;
-        auto reflectC = bsdf->SampleDirection(wOut, &dir, &pdf);
+        auto reflectC = bsdf->SampleDirection(wOut, &dir, &pdf, BxDFType::BxDF_REFLECTION);
         if (depth + 1 < _maxDepth && pdf != 0 && reflectC != glm::vec3(0)) {
-            if (bsdf->Contains(BxDFType::BxDF_REFLECTION) && !bsdf->Contains(BxDFType::BxDF_DIFFUSE)) {
-                auto radiance = evaluate(hit.SpawnRay(dir), scene, depth + 1);
-                L += radiance * reflectC / pdf;
-            }
-            if (bsdf->Contains(BxDFType::BxDF_TRANSMISSION)) {
-                auto radiance = evaluate(hit.SpawnRay(dir), scene, depth + 1);
-                L += radiance * reflectC / pdf;
-            }
+            auto radiance = evaluate(hit.SpawnRay(dir), scene, depth + 1);
+            L += radiance * reflectC / pdf;
+        }
+        auto transmissionC = bsdf->SampleDirection(wOut, &dir, &pdf, BxDFType::BxDF_TRANSMISSION);
+        if (depth + 1 < _maxDepth && pdf != 0 && transmissionC != glm::vec3(0)) {
+            auto radiance = evaluate(hit.SpawnRay(dir), scene, depth + 1);
+            L += radiance * transmissionC / pdf;
         }
         return L;
     }
-    return glm::vec3(0.5, 0.5, 1);
+    return glm::vec3(0);
 }
 
 glm::vec3 WhittedIntegrator::emitted(const SurfaceInteraction& isec, const Object* object, glm::vec3 endpoint) {

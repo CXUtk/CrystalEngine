@@ -33,5 +33,8 @@ std::shared_ptr<BSDF> Brick::ComputeScatteringFunctions(const SurfaceInteraction
     auto B = glm::normalize(glm::cross(N, T));
     auto tnb = glm::mat3(T, N, B);
     auto f = random.PerlinNoise(uv * 200.f) * 0.5f;
-    return std::make_shared<Lambertian>(color * 1.3f - glm::vec3(f), tnb);
+
+    auto bsdf = std::make_shared<BSDF>(&isec);
+    bsdf->AddBxDF(std::make_shared<Lambertian>(color * 1.3f - glm::vec3(f), tnb), glm::vec3(1));
+    return bsdf;
 }

@@ -3,7 +3,7 @@
 #include <Utils/Random.h>
 static Random random;
 PhongReflection::PhongReflection(glm::vec3 color, glm::vec3 normal)
-    : BSDF(BxDFType(BxDFType::BxDF_REFLECTION | BxDFType::BxDF_DIFFUSE)), _color(color), _normal(normal) {
+    : BxDF(BxDFType(BxDFType::BxDF_REFLECTION | BxDFType::BxDF_DIFFUSE)), _color(color), _normal(normal) {
 
 }
 

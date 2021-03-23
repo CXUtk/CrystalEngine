@@ -22,6 +22,8 @@ Phong::~Phong() {
 
 std::shared_ptr<BSDF> Phong::ComputeScatteringFunctions(const SurfaceInteraction& isec, bool fromCamera) const {
     auto uv = isec.GetUV() * _uvExtend;
+    auto bsdf = std::make_shared<BSDF>(&isec);
+    auto N = isec.GetNormal();
     if (_texture == nullptr) {
         bool a = fmod(uv.x, 0.5f) < 0.25f;
         bool b = fmod(uv.y, 0.5f) < 0.25f;
@@ -29,11 +31,10 @@ std::shared_ptr<BSDF> Phong::ComputeScatteringFunctions(const SurfaceInteraction
         if (a ^ b) {
             color = glm::vec3(1);
         }
-        auto N = isec.GetNormal();
-        return std::make_shared<PhongReflection>(color, N);
+        bsdf->AddBxDF(std::make_shared<PhongReflection>(_color, N), glm::vec3(1));
     }
     else {
-        auto N = isec.GetNormal();
-        return std::make_shared<PhongReflection>(_texture->GetTexel(uv), N);
+        bsdf->AddBxDF(std::make_shared<PhongReflection>(_texture->GetTexel(uv), N), glm::vec3(1));
     }
+    return bsdf;
 }

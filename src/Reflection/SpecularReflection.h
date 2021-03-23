@@ -1,7 +1,7 @@
 ﻿#pragma once
 #include "BSDF.h"
 
-class SpecularReflection : public BSDF {
+class SpecularReflection : public BxDF {
 public:
     SpecularReflection(glm::vec3 color, glm::vec3 normal);
     virtual ~SpecularReflection();

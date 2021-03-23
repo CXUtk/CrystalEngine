@@ -1,7 +1,7 @@
 ﻿#pragma once
 #include "BSDF.h"
 
-class PhongReflection : public BSDF {
+class PhongReflection : public BxDF {
 public:
     PhongReflection(glm::vec3 color, glm::vec3 normal);
     virtual ~PhongReflection();

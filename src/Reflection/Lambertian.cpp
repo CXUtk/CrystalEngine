@@ -3,7 +3,7 @@
 #include <Utils/Random.h>
 static Random random;
 Lambertian::Lambertian(glm::vec3 color, const glm::mat3& tnb)
-    : BSDF(BxDFType(BxDFType::BxDF_REFLECTION | BxDFType::BxDF_DIFFUSE)), _color(color), _tnb(tnb) {
+    : BxDF(BxDFType(BxDFType::BxDF_REFLECTION | BxDFType::BxDF_DIFFUSE)), _color(color), _tnb(tnb) {
 
 }
 

@@ -1,7 +1,7 @@
 #pragma once
 #include "BSDF.h"
 
-class Lambertian : public BSDF {
+class Lambertian : public BxDF {
 public:
     Lambertian(glm::vec3 color, const glm::mat3& tnb);
     virtual ~Lambertian();

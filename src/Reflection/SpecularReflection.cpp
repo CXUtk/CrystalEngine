@@ -1,7 +1,7 @@
 ﻿#include "SpecularReflection.h"
 
 SpecularReflection::SpecularReflection(glm::vec3 color, glm::vec3 normal)
-    : BSDF(BxDFType(BxDFType::BxDF_REFLECTION | BxDFType::BxDF_SPECULAR)), _color(color), _normal(normal) {
+    : BxDF(BxDFType(BxDFType::BxDF_REFLECTION | BxDFType::BxDF_SPECULAR)), _color(color), _normal(normal) {
 
 }
 
