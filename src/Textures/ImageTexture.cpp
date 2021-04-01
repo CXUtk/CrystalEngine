@@ -1,8 +1,9 @@
-#include "ImageTexture.h"
+﻿#include "ImageTexture.h"
 #include <vector>
-#include <lodepng/lodepng.h>
+#define STB_IMAGE_IMPLEMENTATION
+#include <stbi/stb_image.h>
 
-#define INDEX(i, j, k) (i * _width + j) * 4 + k
+#define INDEX(i, j, k) (i * _width + j) * _channel + k
 
 ImageTexture::ImageTexture(const unsigned char* imgData, int width, int height, int channel = 3)
     : _width(width), _height(height), _channel(3) {
@@ -17,32 +18,24 @@ ImageTexture::ImageTexture(const unsigned char* imgData, int width, int height, 
 }
 
 ImageTexture::ImageTexture(const std::string& path) {
-    std::vector<unsigned char> png;
-    std::vector<unsigned char> image;
-    unsigned width, height;
-    unsigned error;
-
-    if (error = lodepng::load_file(png, path)) {
-        printf("PNG decoder error %d: %s\n", error, lodepng_error_text(error));
+    unsigned char* data = stbi_load(path.c_str(), &_width, &_height, &_channel, 0);
+    if (!data) {
+        printf("STBI loader error: %s\n", stbi_failure_reason());
         return;
     }
-    error = lodepng::decode(image, width, height, png);
-    if (error) {
-        printf("PNG decoder error %d: %s\n", error, lodepng_error_text(error));
-        return;
-    }
-    _width = width, _height = height, _channel = 4;
     _texels = new glm::vec3[_width * _height];
     for (int i = 0; i < _height; i++) {
         for (int j = 0; j < _width; j++) {
-            for (int k = 0; k < 3; k++) {
-                _texels[i * _width + j][k] = image.data()[INDEX(i, j, k)] / 255.f;
+            for (int k = 0; k < _channel; k++) {
+                _texels[i * _width + j][k] = data[INDEX(i, j, k)] / 255.f;
             }
         }
     }
+    stbi_image_free(data);
 }
 
 ImageTexture::~ImageTexture() {
+    delete[] _texels;
 }
 
 glm::vec3 ImageTexture::GetTexel(glm::vec2 uv) const {
@@ -61,5 +54,6 @@ glm::vec3 ImageTexture::GetTexel(glm::vec2 uv) const {
 glm::vec3 ImageTexture::getColor(glm::vec2 uv) const {
     int x = glm::clamp((int)(uv.x), 0, _width - 1);
     int y = glm::clamp((int)(uv.y), 0, _height - 1);
+    y = _height - y - 1;
     return _texels[y * _width + x];
 }

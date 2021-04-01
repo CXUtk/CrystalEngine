@@ -1,9 +1,11 @@
 ﻿#include "WhittedIntegrator.h"
 
 
-WhittedIntegrator::WhittedIntegrator(std::shared_ptr<Camera> camera, std::shared_ptr<Sampler> sampler, int maxDepth) :
+WhittedIntegrator::WhittedIntegrator(std::shared_ptr<Camera> camera, std::shared_ptr<Sampler> sampler,
+    std::shared_ptr<CubemapTexture> skybox, int maxDepth) :
     SamplerIntegrator(camera, sampler),
-    _maxDepth(maxDepth) {
+    _maxDepth(maxDepth), _skyBox(skybox) {
+
 }
 
 WhittedIntegrator::~WhittedIntegrator() {
@@ -56,7 +58,8 @@ glm::vec3 WhittedIntegrator::evaluate(const Ray& ray, std::shared_ptr<const Scen
         }
         return L;
     }
-    return glm::vec3(0);
+    if (_skyBox == nullptr) return L;
+    return _skyBox->GetTexel(ray.dir);
 }
 
 glm::vec3 WhittedIntegrator::emitted(const SurfaceInteraction& isec, const Object* object, glm::vec3 endpoint) {

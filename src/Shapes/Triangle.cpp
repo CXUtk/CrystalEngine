@@ -1,4 +1,5 @@
 ﻿#include "Triangle.h"
+#include <glm/gtx/transform.hpp>
 
 constexpr bool FLAT_SHADING = false;
 
@@ -60,6 +61,8 @@ bool Triangle::Intersect(const Ray& ray, SurfaceInteraction* info) const {
 bool Triangle::IntersectTest(const Ray& ray, float tMin, float tMax) const {
     if (tMin > tMax) return false;
     glm::mat3 A(_vertices[1].Position - _vertices[0].Position, _vertices[2].Position - _vertices[0].Position, -ray.dir);
+    auto det = glm::determinant(A);
+    if (det < 1e-6) return false;
     auto inv = glm::inverse(A);
     glm::vec3 P = ray.start - _vertices[0].Position;
     auto res = inv * P;

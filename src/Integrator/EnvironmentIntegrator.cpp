@@ -3,10 +3,10 @@
 
 static WhittedIntegrator* inte = nullptr;
 
-EnvironmentIntegrator::EnvironmentIntegrator(std::shared_ptr<Camera> camera, std::shared_ptr<Sampler> sampler) : Integrator(), 
+EnvironmentIntegrator::EnvironmentIntegrator(std::shared_ptr<Camera> camera, std::shared_ptr<Sampler> sampler) : Integrator(),
 _camera(camera), _sampler(sampler) {
     _tmpColors = nullptr;
-    inte = new WhittedIntegrator(camera, sampler, 5);
+    inte = new WhittedIntegrator(camera, sampler, nullptr, 5);
 }
 
 void EnvironmentIntegrator::Render(std::shared_ptr<const Scene> scene, std::shared_ptr<FrameBuffer> frameBuffer) {
@@ -31,7 +31,7 @@ void EnvironmentIntegrator::Render(std::shared_ptr<const Scene> scene, std::shar
         for (int i = 0; i < height; i++) {
             for (int j = 0; j < width; j++) {
                 float w = static_cast<float>(width);
-                float u = (j) / ( w);
+                float u = (j) / (w);
                 float v = (i) / w;
 
                 float r = sqrt(u * u + v * v);
@@ -56,4 +56,3 @@ void EnvironmentIntegrator::Render(std::shared_ptr<const Scene> scene, std::shar
     }
     delete[] _tmpColors;
 }
-
