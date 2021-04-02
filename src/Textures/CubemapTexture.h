@@ -1,6 +1,8 @@
-﻿#include "ImageTexture.h"
+﻿#pragma once
+#include "Texture.h"
 #include <string>
 #include <memory>
+class ImageTexture;
 class CubemapTexture : public Texture {
 public:
     CubemapTexture(const std::string& right, const std::string& left,

@@ -38,7 +38,7 @@ public:
     virtual glm::vec3 DistributionFunction(glm::vec3 wOut, glm::vec3 wIn) const = 0;
     virtual glm::vec3 SampleDirection(glm::vec3 wOut, glm::vec3* wIn, float* pdf) const = 0;
 
-    bool Contains(BxDFType type) const { return (_bxdfType & type) == type; }
+    bool Contains(BxDFType type) const { return (_bxdfType & type); }
     
     bool IsActive() const { return _active; }
     void SetActive(bool value) { _active = value; }

@@ -1,6 +1,8 @@
 ﻿#include "SamplerIntegrator.h"
 
-SamplerIntegrator::SamplerIntegrator(std::shared_ptr<Camera> camera, std::shared_ptr<Sampler> sampler) : Integrator(), _camera(camera), _sampler(sampler) {
+SamplerIntegrator::SamplerIntegrator(std::shared_ptr<Camera> camera, 
+    std::shared_ptr<Sampler> sampler, 
+    std::shared_ptr<CubemapTexture> skybox) : Integrator(), _camera(camera), _sampler(sampler), _skyBox(skybox) {
     _tmpColors = nullptr;
 }
 

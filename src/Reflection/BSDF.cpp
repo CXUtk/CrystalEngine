@@ -1,4 +1,4 @@
-#include "BSDF.h"
+﻿#include "BSDF.h"
 #include <Core/SurfaceInteraction.h>
 
 BSDF::BSDF(const SurfaceInteraction* si) : _hit(si) {
@@ -35,7 +35,6 @@ glm::vec3 BSDF::SampleDirection(glm::vec3 wOut, glm::vec3* wIn, float* pdf, BxDF
             result += _weights[i] * bxdf->SampleDirection(wOut, &twIn, &tpdf);
             *wIn = twIn;
             *pdf += tpdf;
-            break;
         }
     }
     return result;

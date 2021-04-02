@@ -13,7 +13,6 @@ public:
 private:
     Random _random;
     int _maxDepth;
-    std::shared_ptr<CubemapTexture> _skyBox;
 
     glm::vec3 evaluate(const Ray& ray, std::shared_ptr<const Scene> scene, int depth);
     glm::vec3 emitted(const SurfaceInteraction& isec, const Object* object, glm::vec3 wOut);

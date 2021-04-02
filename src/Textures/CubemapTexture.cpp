@@ -1,4 +1,5 @@
 ﻿#include "CubemapTexture.h"
+#include "ImageTexture.h"
 
 struct CubeUV {
     int id;

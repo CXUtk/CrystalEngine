@@ -26,11 +26,18 @@ glm::vec3 Random::NextUnitHemiSphere() {
     return glm::vec3(r * std::cos(theta), v, r * std::sin(theta));
 }
 
+glm::vec3 Random::NextUnitHemiSphereAlpha(float alpha) {
+    auto v = std::pow(NextFloat(), alpha);
+    auto theta = NextFloat() * glm::two_pi<float>();
+    auto r = std::sqrt(1 - v * v);
+    return glm::vec3(r * std::cos(theta), v, r * std::sin(theta));
+}
+
 glm::vec3 Random::PerlinNoise(glm::vec2 uv) {
     glm::vec2 grid = glm::floor(uv);
     glm::vec2 xy = glm::fract(uv);
     xy = glm::smoothstep(glm::vec2(0), glm::vec2(1), xy);
-    
+
     auto a = RandomFloat(grid);
     auto b = RandomFloat(grid + glm::vec2(1, 0));
     auto c = RandomFloat(grid + glm::vec2(0, 1));

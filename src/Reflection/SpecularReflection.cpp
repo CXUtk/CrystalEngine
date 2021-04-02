@@ -1,5 +1,8 @@
 ﻿#include "SpecularReflection.h"
+#include <Utils/Random.h>
+#include <glm/gtx/transform.hpp>
 
+static Random random;
 SpecularReflection::SpecularReflection(glm::vec3 color, glm::vec3 normal)
     : BxDF(BxDFType(BxDFType::BxDF_REFLECTION | BxDFType::BxDF_SPECULAR)), _color(color), _normal(normal) {
 

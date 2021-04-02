@@ -1,7 +1,9 @@
 ﻿#include "Triangle.h"
+#include "Utils/Math.h"
 #include <glm/gtx/transform.hpp>
 
 constexpr bool FLAT_SHADING = false;
+constexpr float EPS = 1e-7;
 
 glm::vec3 bary_interp(glm::vec3 bary, glm::vec3 A, glm::vec3 B, glm::vec3 C) {
     return bary.x * A + bary.y * B + bary.z * C;
@@ -35,13 +37,12 @@ BoundingBox Triangle::GetBoundingBox() const {
 
 bool Triangle::Intersect(const Ray& ray, SurfaceInteraction* info) const {
     glm::mat3 A(_vertices[1].Position - _vertices[0].Position, _vertices[2].Position - _vertices[0].Position, -ray.dir);
-    auto inv = glm::inverse(A);
+    auto det = glm::determinant(A);
+    if (std::abs(det) < EPS) return false;
+    auto inv = adjoint(A, 1 / det);
     glm::vec3 P = ray.start - _vertices[0].Position;
     auto res = inv * P;
-    if (isnan(res.x) || isnan(res.y) || isnan(res.z)) return false;
     if (res.x < 0 || res.x > 1 || res.y < 0 || res.y > 1 || res.x + res.y > 1.0001 || res.z < 0) return false;
-
-
     glm::vec3 bary_coord = glm::vec3(1 - res.x - res.y, res.x, res.y);
     glm::vec3 N;
     glm::vec2 UV = bary_interp(bary_coord, _vertices[0].TexCoords, _vertices[1].TexCoords, _vertices[2].TexCoords);
@@ -62,11 +63,10 @@ bool Triangle::IntersectTest(const Ray& ray, float tMin, float tMax) const {
     if (tMin > tMax) return false;
     glm::mat3 A(_vertices[1].Position - _vertices[0].Position, _vertices[2].Position - _vertices[0].Position, -ray.dir);
     auto det = glm::determinant(A);
-    if (det < 1e-6) return false;
-    auto inv = glm::inverse(A);
+    if (std::abs(det) < EPS) return false;
+    auto inv = adjoint(A, 1 / det);
     glm::vec3 P = ray.start - _vertices[0].Position;
     auto res = inv * P;
-    if (isnan(res.x) || isnan(res.y) || isnan(res.z)) return false;
     if (res.x < 0 || res.x > 1 || res.y < 0 || res.y > 1 || res.x + res.y > 1 || res.z < 0) return false;
     return res.z >= tMin && res.z <= tMax;
 }

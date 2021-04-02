@@ -1,10 +1,10 @@
 ﻿#include "WhittedIntegrator.h"
-
+static constexpr float EPS = 1e-6;
 
 WhittedIntegrator::WhittedIntegrator(std::shared_ptr<Camera> camera, std::shared_ptr<Sampler> sampler,
     std::shared_ptr<CubemapTexture> skybox, int maxDepth) :
-    SamplerIntegrator(camera, sampler),
-    _maxDepth(maxDepth), _skyBox(skybox) {
+    SamplerIntegrator(camera, sampler, skybox),
+    _maxDepth(maxDepth) {
 
 }
 
@@ -40,7 +40,7 @@ glm::vec3 WhittedIntegrator::evaluate(const Ray& ray, std::shared_ptr<const Scen
             auto dir = glm::normalize(end - hit.GetHitPos());
             SurfaceInteraction hit2;
             float distance = glm::length(end - hit.GetHitPos());
-            if (!scene->IntersectTest(hit.SpawnRay(dir), 0, distance)) {
+            if (!scene->IntersectTest(hit.SpawnRay(dir), 0, distance - EPS)) {
                 L += raiance * bsdf->DistributionFunction(wOut, dir) / pdf * std::max(0.f, glm::dot(N, dir));
             }
         }
@@ -58,8 +58,8 @@ glm::vec3 WhittedIntegrator::evaluate(const Ray& ray, std::shared_ptr<const Scen
         }
         return L;
     }
-    if (_skyBox == nullptr) return L;
-    return _skyBox->GetTexel(ray.dir);
+    if (GetSkyBox() == nullptr) return L;
+    return GetSkyBox()->GetTexel(ray.dir);
 }
 
 glm::vec3 WhittedIntegrator::emitted(const SurfaceInteraction& isec, const Object* object, glm::vec3 endpoint) {
