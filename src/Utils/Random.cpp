@@ -33,6 +33,15 @@ glm::vec3 Random::NextUnitHemiSphereAlpha(float alpha) {
     return glm::vec3(r * std::cos(theta), v, r * std::sin(theta));
 }
 
+glm::vec3 Random::NextCosineUnitHemiSphere() {
+    auto r = std::sqrt(NextFloat());
+    auto theta = NextFloat() * glm::two_pi<float>();
+
+    auto x = r * std::cos(theta);
+    auto z = r * std::sin(theta);
+    return glm::vec3(x, std::sqrt(1 - r), z);
+}
+
 glm::vec3 Random::PerlinNoise(glm::vec2 uv) {
     glm::vec2 grid = glm::floor(uv);
     glm::vec2 xy = glm::fract(uv);

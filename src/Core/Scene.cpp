@@ -2,6 +2,7 @@
 #include "Materials/Default.h"
 #include <glm/gtx/transform.hpp>
 #include <Lights/PointLight.h>
+#include <Lights/AreaLight.h>
 #include <Lights/SphereLight.h>
 #include <Materials/Metal.h>
 #include <Utils/ObjLoader.h>
@@ -49,7 +50,7 @@ std::vector<std::shared_ptr<Object>> CreateCornellBox() {
 
 
     //std::shared_ptr<Material> groundMat = std::make_shared<Brick>(glm::vec3(0.6, 0.15, 0.1), glm::vec3(1), 0.09f, 0.04f, 0.01f);
-    std::shared_ptr<Material> groundMat = std::make_shared<Default>(glm::vec3(1.0, 1.0, 0.0));
+    std::shared_ptr<Material> groundMat = std::make_shared<Default>(glm::vec3(1.0, 1.0, 1.0), glm::vec2(0));
     auto ground = CreateQuad(transform, groundMat);
     transform = identity;
     transform = glm::translate(transform, glm::vec3(0, 6, -3));
@@ -78,14 +79,13 @@ std::vector<std::shared_ptr<Object>> CreateCornellBox() {
     auto texture = std::make_shared<ImageTexture>("Resources/Textures/twist.png");
     std::shared_ptr<Material> farWallMat = std::make_shared<Phong>(texture);
     //std::shared_ptr<Material> farWallMat = std::make_shared<Default>(glm::vec3(0.8f));
-    auto farWall = CreateQuad(transform, farWallMat);
+    auto farWall = CreateQuad(transform, groundMat);
 
     objs.push_back(ground);
-    //objs.push_back(ceil);
-    //objs.push_back(leftWall);
-    //objs.push_back(rightWall);
-    //objs.push_back(farWall);
-
+    objs.push_back(ceil);
+    objs.push_back(leftWall);
+    objs.push_back(rightWall);
+    objs.push_back(farWall);
     return objs;
 }
 
@@ -99,7 +99,7 @@ Scene::Scene() {
     std::shared_ptr<Material> ballB = std::make_shared<Phong>(glm::vec3(0.1f, 0.2f, 0.7f));
     std::shared_ptr<Material> ballC = std::make_shared<Phong>(glm::vec3(0.7f, 0.1f, 0.8f));
     std::shared_ptr<Material> ballD = std::make_shared<Default>(glm::vec3(1.0f, 1.0f, 1.0f));
-    std::shared_ptr<Material> reflectMat = std::make_shared<Metal>(glm::vec3(0.9f, 0.7f, 0.2f), 1.0f);
+    std::shared_ptr<Material> reflectMat = std::make_shared<Metal>(glm::vec3(1.f, 1.f, 1.f), 1.0f);
     std::shared_ptr<Material> glassMat = std::make_shared<Glass>(glm::vec3(1.0f));
     //std::shared_ptr<Material> ballB = std::make_shared<Metal>(glm::vec3(1, 1, 1), 2.f);
     //std::shared_ptr<Material> metal = std::make_shared<Phong>(glm::vec3(1, 0.5f, 0.5f), 128, glm::vec3(0.1f, 0.5f, 1.0f));
@@ -107,12 +107,12 @@ Scene::Scene() {
 
     ////std::shared_ptr<Material> ball = std::make_shared<Cook_Torrance>(glm::vec3(0.8, 0.5, 0.2f), 0.2f);
 
-    auto sp1 = std::make_shared<GeometryObject>(std::make_shared<Sphere>(glm::vec3(0, 0.5, -3), 0.5, glm::vec3(0)), reflectMat, nullptr);
-    auto sp2 = std::make_shared<GeometryObject>(std::make_shared<Sphere>(glm::vec3(-2, 0.5, -3), 0.5, glm::vec3(0)), ballD, nullptr);
-    auto sp3 = std::make_shared<GeometryObject>(std::make_shared<Sphere>(glm::vec3(0, 0.5, -1), 0.5, glm::vec3(0)), ballD, nullptr);
-    auto sp4 = std::make_shared<GeometryObject>(std::make_shared<Sphere>(glm::vec3(2, 0.5, -3), 0.5, glm::vec3(0)), ballD, nullptr);
+    auto sp1 = std::make_shared<GeometryObject>(std::make_shared<Sphere>(glm::vec3(0, 1, -3), 1, glm::vec3(0)), reflectMat, nullptr);
+    auto sp2 = std::make_shared<GeometryObject>(std::make_shared<Sphere>(glm::vec3(-2, 1, -3), 1, glm::vec3(0)), ballD, nullptr);
+    auto sp3 = std::make_shared<GeometryObject>(std::make_shared<Sphere>(glm::vec3(0, 1, -2), 0.5, glm::vec3(0)), ballD, nullptr);
+    auto sp4 = std::make_shared<GeometryObject>(std::make_shared<Sphere>(glm::vec3(2, 1, -3), 1, glm::vec3(0)), ballD, nullptr);
 
-    AddObject(sp1);
+    //AddObject(sp1);
     AddObject(sp2);
     AddObject(sp3);
     AddObject(sp4);
@@ -147,7 +147,8 @@ Scene::Scene() {
     //AddLight(std::make_shared<SphereLight>(glm::vec3(5, 3, -5), 1, glm::vec3(1), 200));
     //AddLight(std::make_shared<PointLight>(glm::vec3(5, 5, -5), glm::vec3(1), 20));
     //AddLight(std::make_shared<PointLight>(glm::vec3(2, 3, 3), glm::vec3(1), 30));
-    AddLight(std::make_shared<PointLight>(glm::vec3(0, 5, -3), glm::vec3(1), 20));
+    //AddLight(std::make_shared<PointLight>(glm::vec3(0, 5, -3), glm::vec3(1), 12));
+    AddLight(std::make_shared<AreaLight>(glm::vec3(1, 5.99, -2), glm::vec3(-2, 0, 0), glm::vec3(0, 0, -2), 30));
 
     _accelerator = Accelerator::GetAccelerator("KDTree");
     _accelerator->Build(_sceneObjects);

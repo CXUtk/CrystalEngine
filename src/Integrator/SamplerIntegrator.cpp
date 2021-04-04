@@ -1,7 +1,7 @@
 ﻿#include "SamplerIntegrator.h"
 
-SamplerIntegrator::SamplerIntegrator(std::shared_ptr<Camera> camera, 
-    std::shared_ptr<Sampler> sampler, 
+SamplerIntegrator::SamplerIntegrator(std::shared_ptr<Camera> camera,
+    std::shared_ptr<Sampler> sampler,
     std::shared_ptr<CubemapTexture> skybox) : Integrator(), _camera(camera), _sampler(sampler), _skyBox(skybox) {
     _tmpColors = nullptr;
 }
@@ -19,6 +19,9 @@ void SamplerIntegrator::Render(std::shared_ptr<const Scene> scene, std::shared_p
 
     double progress = 0;
     double totalSamples = (double)numSamples * width * height;
+
+    std::shared_ptr<std::thread> threads[4];
+
     for (int k = 0; k < numSamples; k++) {
         glm::vec2 offset = glm::vec2(0.5f, 0.5f);
         if (k != 0) {
