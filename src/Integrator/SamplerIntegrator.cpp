@@ -1,4 +1,5 @@
 ﻿#include "SamplerIntegrator.h"
+#include <mutex>
 
 SamplerIntegrator::SamplerIntegrator(std::shared_ptr<Camera> camera,
     std::shared_ptr<Sampler> sampler,
@@ -20,29 +21,44 @@ void SamplerIntegrator::Render(std::shared_ptr<const Scene> scene, std::shared_p
     double progress = 0;
     double totalSamples = (double)numSamples * width * height;
 
-    std::shared_ptr<std::thread> threads[4];
+    constexpr int NUM_THREADS = 4;
+    std::shared_ptr<std::thread> threads[NUM_THREADS];
 
-    for (int k = 0; k < numSamples; k++) {
-        glm::vec2 offset = glm::vec2(0.5f, 0.5f);
-        if (k != 0) {
-            offset = glm::vec2(_sampler->NextFloat(), _sampler->NextFloat());
-        }
+    std::mutex progressLock;
 
-        for (int i = 0; i < height; i++) {
-            for (int j = 0; j < width; j++) {
+    for (int th = 0; th < NUM_THREADS; th++) {
+        threads[th] = std::make_shared<std::thread>([&, th]() {
+            for (int k = 0; k < numSamples; k++) {
+                glm::vec2 offset = glm::vec2(0.5f, 0.5f);
+                if (k != 0) {
+                    offset = glm::vec2(_sampler->NextFloat(), _sampler->NextFloat());
+                }
 
-                float u = (j + offset.x) / static_cast<float>(width);
-                float v = (i + offset.y) / static_cast<float>(height);
-                auto dir = camera->GetDir(u, v);
-                _tmpColors[i * width + j] += Evaluate(Ray(eyePos, dir), scene);
+                for (int i = th; i < height; i += NUM_THREADS) {
+                    for (int j = 0; j < width; j++) {
 
-                frameBuffer->Lock();
-                frameBuffer->SetPixel(j, i, _tmpColors[i * width + j] / static_cast<float>(k + 1));
-                frameBuffer->Unlock();
+                        float u = (j + offset.x) / static_cast<float>(width);
+                        float v = (i + offset.y) / static_cast<float>(height);
+                        auto dir = camera->GetDir(u, v);
+                        _tmpColors[i * width + j] += Evaluate(Ray(eyePos, dir), scene);
+
+                        frameBuffer->Lock();
+                        frameBuffer->SetPixel(j, i, _tmpColors[i * width + j] / static_cast<float>(k + 1));
+                        frameBuffer->Unlock();
+
+                        //printf("Thread %d: %d, %d\n", th, i, j);
+                    }
+                }
+                progressLock.lock();
+                progress += width * ((double)(height - th - 1) / NUM_THREADS + 1);
+                progressLock.unlock();
+                printf("Tracing: %.2lf %%\n", progress / totalSamples * 100.f);
             }
-            progress += width;
-        }
-        printf("Tracing: %.2lf %%\n", progress / totalSamples * 100.f);
+          });
+    }
+
+    for (int th = 0; th < NUM_THREADS; th++) {
+        threads[th]->join();
     }
     delete[] _tmpColors;
 }

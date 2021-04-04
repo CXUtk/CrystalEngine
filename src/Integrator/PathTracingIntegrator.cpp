@@ -22,14 +22,18 @@ glm::vec3 PathTracingIntegrator::evaluate(const Ray ray, std::shared_ptr<const S
     SurfaceInteraction hit;
     float beta = (level > 3) ? pRR : 1.0f;
     if (scene->Intersect(ray, &hit)) {
+        if (level == 0)
+            dirL = emitted(hit, hit.GetHitObject(), hit.GetHitPos());
         auto material = hit.GetHitObject()->GetMaterial();
-        dirL = emitted(hit, hit.GetHitObject(), hit.GetHitPos());
+        if (material == nullptr) return dirL;
         auto bsdf = material->ComputeScatteringFunctions(hit);
+        if (bsdf == nullptr) return dirL;
+
         dirL += sampleLight(hit, -ray.dir, scene, bsdf, level);
 
         if (level > 3 && _random.NextFloat() > pRR) return dirL;//return material->Merge(hit, -ray.dir, dirL, indirL);
 
-        indirL += sampleIndirect(hit, -ray.dir, scene, bsdf, level);
+        indirL += sampleIndirect(hit, -ray.dir, scene, bsdf, level) / beta;
         //return material->Merge(hit, -ray.dir, dirL, indirL);
     }
     else {
@@ -50,6 +54,7 @@ glm::vec3 PathTracingIntegrator::sampleLight(const SurfaceInteraction& hit, glm:
         glm::vec3 lightP;
         float pdf;
         auto radiance = light->SampleLi(hit, lightP, &pdf);
+        if (std::abs(pdf) < EPS) continue;
 
         auto v = lightP - hitPos;
         auto dir = glm::normalize(v);
@@ -73,7 +78,7 @@ glm::vec3 PathTracingIntegrator::sampleIndirect(const SurfaceInteraction& hit, g
     float pdf;
     glm::vec3 dir;
     auto brdf = bsdf->SampleDirection(wOut, &dir, &pdf, BxDF_ALL);
-    if (pdf == 0) return glm::vec3(0);
+    if (std::abs(pdf) < EPS) return glm::vec3(0);
 
     auto Li = evaluate(Ray(hit.GetHitPos() + N * EPS, dir), scene, level + 1);
     auto cosine = std::max(0.f, glm::dot(N, dir));
@@ -82,8 +87,7 @@ glm::vec3 PathTracingIntegrator::sampleIndirect(const SurfaceInteraction& hit, g
 
 glm::vec3 PathTracingIntegrator::emitted(const SurfaceInteraction& isec, const Object* object, glm::vec3 endpoint) {
     auto light = object->GetLight();
-    if (!light)return glm::vec3(0);
-    float pdf;
-    auto Le = light->SampleLi(isec, endpoint, &pdf);
-    return Le / pdf;
+    if (!light) return glm::vec3(0);
+    auto Le = light->IntensityPerArea();
+    return Le;
 }

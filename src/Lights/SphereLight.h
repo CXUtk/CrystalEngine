@@ -1,4 +1,4 @@
-#pragma once
+﻿#pragma once
 #include "Light.h"
 class SphereLight : public Light {
 public:
@@ -6,6 +6,7 @@ public:
     ~SphereLight() override;
     glm::vec3 SampleLi(const SurfaceInteraction& hit, glm::vec3& endpoint, float* pdf) const override;
     float GetArea() const override;
+    glm::vec3 IntensityPerArea() const override { return _color * _power; }
 
 private:
     glm::vec3 _pos, _color;

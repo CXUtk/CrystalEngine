@@ -21,7 +21,7 @@
 //#include <Materials/Lighted.h>
 
 
-std::shared_ptr<TriangleMesh> CreateQuad(glm::mat4 transform, const std::shared_ptr<Material> material) {
+std::shared_ptr<TriangleMesh> CreateQuad(glm::mat4 transform, const std::shared_ptr<Material>& material, const std::shared_ptr<Light>& light = nullptr) {
     static VertexData quadVertices[4] = {
         { glm::vec3(-0.5, 0, 0.5), glm::vec3(0, 1, 0), glm::vec2(0, 0)  },
         { glm::vec3(-0.5, 0, -0.5), glm::vec3(0, 1, 0), glm::vec2(0, 1) },
@@ -34,7 +34,7 @@ std::shared_ptr<TriangleMesh> CreateQuad(glm::mat4 transform, const std::shared_
 
     list.push_back(tr1);
     list.push_back(tr2);
-    return std::make_shared<TriangleMesh>(list, transform, material, nullptr);
+    return std::make_shared<TriangleMesh>(list, transform, material, light);
 }
 
 
@@ -148,7 +148,18 @@ Scene::Scene() {
     //AddLight(std::make_shared<PointLight>(glm::vec3(5, 5, -5), glm::vec3(1), 20));
     //AddLight(std::make_shared<PointLight>(glm::vec3(2, 3, 3), glm::vec3(1), 30));
     //AddLight(std::make_shared<PointLight>(glm::vec3(0, 5, -3), glm::vec3(1), 12));
-    AddLight(std::make_shared<AreaLight>(glm::vec3(1, 5.99, -2), glm::vec3(-2, 0, 0), glm::vec3(0, 0, -2), 30));
+
+    auto areaLight = std::make_shared<AreaLight>(glm::vec3(1, 5.99, -2), glm::vec3(-2, 0, 0), glm::vec3(0, 0, -2), 30);
+    AddLight(areaLight);
+
+    glm::mat4 identity = glm::identity<glm::mat4>();
+    glm::mat4 transform = identity;
+
+    transform = glm::translate(transform, glm::vec3(0, 5.995, -3));
+    transform = glm::scale(transform, glm::vec3(2, 1, 2));
+
+    auto light = CreateQuad(transform, nullptr, areaLight);
+    AddObject(light);
 
     _accelerator = Accelerator::GetAccelerator("KDTree");
     _accelerator->Build(_sceneObjects);
