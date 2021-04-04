@@ -1,4 +1,4 @@
-#pragma once
+﻿#pragma once
 #include <glm/glm.hpp>
 #include <vector>
 #include <memory>
@@ -20,7 +20,8 @@ public:
     BSDF(const SurfaceInteraction* si);
     int NumBxDFs() const { return _bxdfs.size(); }
     void AddBxDF(const std::shared_ptr<BxDF>& bxdf, glm::vec3 w);
-    
+    BxDFType Flags() const;
+
     glm::vec3 DistributionFunction(glm::vec3 wOut, glm::vec3 wIn) const;
     glm::vec3 SampleDirection(glm::vec3 wOut, glm::vec3* wIn, float* pdf, BxDFType sampleType) const;
 
@@ -39,9 +40,11 @@ public:
     virtual glm::vec3 SampleDirection(glm::vec3 wOut, glm::vec3* wIn, float* pdf) const = 0;
 
     bool Contains(BxDFType type) const { return (_bxdfType & type); }
-    
+
     bool IsActive() const { return _active; }
     void SetActive(bool value) { _active = value; }
+
+    BxDFType GetType() const { return _bxdfType; }
 
 private:
     BxDFType _bxdfType;

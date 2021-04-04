@@ -107,14 +107,14 @@ Scene::Scene() {
 
     ////std::shared_ptr<Material> ball = std::make_shared<Cook_Torrance>(glm::vec3(0.8, 0.5, 0.2f), 0.2f);
 
-    auto sp1 = std::make_shared<GeometryObject>(std::make_shared<Sphere>(glm::vec3(0, 1, -3), 1, glm::vec3(0)), reflectMat, nullptr);
+    auto sp1 = std::make_shared<GeometryObject>(std::make_shared<Sphere>(glm::vec3(0, 1, -3), 0.6, glm::vec3(0)), reflectMat, nullptr);
     auto sp2 = std::make_shared<GeometryObject>(std::make_shared<Sphere>(glm::vec3(-2, 1, -3), 1, glm::vec3(0)), ballD, nullptr);
     auto sp3 = std::make_shared<GeometryObject>(std::make_shared<Sphere>(glm::vec3(0, 1, -2), 0.5, glm::vec3(0)), ballD, nullptr);
     auto sp4 = std::make_shared<GeometryObject>(std::make_shared<Sphere>(glm::vec3(2, 1, -3), 1, glm::vec3(0)), ballD, nullptr);
 
-    //AddObject(sp1);
+    AddObject(sp1);
     AddObject(sp2);
-    AddObject(sp3);
+    //AddObject(sp3);
     AddObject(sp4);
     //_sceneObjects.push_back(sp1);
     //_sceneObjects.push_back(sp2);

@@ -40,7 +40,11 @@ void SamplerIntegrator::Render(std::shared_ptr<const Scene> scene, std::shared_p
                         float u = (j + offset.x) / static_cast<float>(width);
                         float v = (i + offset.y) / static_cast<float>(height);
                         auto dir = camera->GetDir(u, v);
-                        _tmpColors[i * width + j] += Evaluate(Ray(eyePos, dir), scene);
+                        auto radiance = Evaluate(Ray(eyePos, dir), scene);
+                        if (glm::isnan(radiance) != glm::bvec3(false)) {
+                            radiance = glm::vec3(0);
+                        }
+                        _tmpColors[i * width + j] += radiance;
 
                         frameBuffer->Lock();
                         frameBuffer->SetPixel(j, i, _tmpColors[i * width + j] / static_cast<float>(k + 1));
@@ -54,7 +58,7 @@ void SamplerIntegrator::Render(std::shared_ptr<const Scene> scene, std::shared_p
                 progressLock.unlock();
                 printf("Tracing: %.2lf %%\n", progress / totalSamples * 100.f);
             }
-          });
+            });
     }
 
     for (int th = 0; th < NUM_THREADS; th++) {
