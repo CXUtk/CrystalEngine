@@ -17,13 +17,14 @@ glm::vec3 PathTracingIntegrator::Evaluate(const Ray& ray, std::shared_ptr<const 
 }
 
 
-glm::vec3 PathTracingIntegrator::evaluate(const Ray ray, std::shared_ptr<const Scene> scene, int level, bool specular) {
+glm::vec3 PathTracingIntegrator::evaluate(const Ray& ray, std::shared_ptr<const Scene> scene, int level, bool specular) {
     glm::vec3 dirL(0), indirL(0);
     SurfaceInteraction hit;
     float beta = (level > 3) ? pRR : 1.0f;
     if (scene->Intersect(ray, &hit)) {
         if (level == 0 || specular)
             dirL = emitted(hit, hit.GetHitObject(), hit.GetHitPos());
+
         auto material = hit.GetHitObject()->GetMaterial();
         if (material == nullptr) return dirL;
         auto bsdf = material->ComputeScatteringFunctions(hit);
@@ -33,7 +34,7 @@ glm::vec3 PathTracingIntegrator::evaluate(const Ray ray, std::shared_ptr<const S
 
         if (level > 3 && _random.NextFloat() > pRR) return dirL;//return material->Merge(hit, -ray.dir, dirL, indirL);
 
-        indirL += sampleIndirect(hit, -ray.dir, scene, bsdf, level, specular) / beta;
+        indirL += sampleIndirect(hit, -ray.dir, scene, bsdf, level, specular) ;
         //return material->Merge(hit, -ray.dir, dirL, indirL);
     }
     else {
@@ -54,14 +55,14 @@ glm::vec3 PathTracingIntegrator::sampleLight(const SurfaceInteraction& hit, glm:
         glm::vec3 lightP;
         float pdf;
         auto radiance = light->SampleLi(hit, lightP, &pdf);
-        if (std::abs(pdf) < EPS) continue;
+        if (std::abs(pdf) < 1e-6) continue;
 
         auto v = lightP - hitPos;
         auto dir = glm::normalize(v);
         SurfaceInteraction hit2;
 
         float distance = glm::length(v);
-        if (!scene->IntersectTest(Ray(hitPos + N * EPS, dir), 0, distance)) {
+        if (!scene->IntersectTest(Ray(hitPos + N * EPS, dir), 0, distance - EPS)) {
             L += radiance * bsdf->DistributionFunction(wOut, dir) * std::max(0.f, glm::dot(N, dir)) / pdf;
         }
     }
@@ -83,7 +84,7 @@ glm::vec3 PathTracingIntegrator::sampleIndirect(const SurfaceInteraction& hit, g
     specular &= (bsdf->Flags() & BxDF_SPECULAR) != 0;
     if (std::abs(pdf) < EPS) return glm::vec3(0);
 
-    auto Li = evaluate(Ray(hit.GetHitPos() + N * EPS, dir), scene, level + 1, specular);
+    auto Li = evaluate(hit.SpawnRay(dir), scene, level + 1, specular);
     auto cosine = specular ? 1.0f : std::max(0.f, glm::dot(N, dir));
     return Li * brdf * cosine / pdf;
 }

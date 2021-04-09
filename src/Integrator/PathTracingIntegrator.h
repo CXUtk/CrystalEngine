@@ -12,7 +12,7 @@ public:
 private:
     Random _random;
 
-    glm::vec3 evaluate(const Ray ray, std::shared_ptr<const Scene> scene, int level, bool specular);
+    glm::vec3 evaluate(const Ray& ray, std::shared_ptr<const Scene> scene, int level, bool specular);
     glm::vec3 sampleLight(const SurfaceInteraction& hit,
         glm::vec3 wOut, std::shared_ptr<const Scene> scene,
         const std::shared_ptr<BSDF>& bsdf, int level);

@@ -21,7 +21,7 @@ void SamplerIntegrator::Render(std::shared_ptr<const Scene> scene, std::shared_p
     double progress = 0;
     double totalSamples = (double)numSamples * width * height;
 
-    constexpr int NUM_THREADS = 4;
+    constexpr int NUM_THREADS = 1;
     std::shared_ptr<std::thread> threads[NUM_THREADS];
 
     std::mutex progressLock;

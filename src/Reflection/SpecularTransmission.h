@@ -1,10 +1,10 @@
 ﻿#pragma once
 #include "BSDF.h"
 
-class Transmission : public BxDF {
+class SpecularTransmission : public BxDF {
 public:
-    Transmission(glm::vec3 color, glm::vec3 normal, float etaA, float etaB);
-    virtual ~Transmission();
+    SpecularTransmission(glm::vec3 color, glm::vec3 normal, float etaA, float etaB);
+    virtual ~SpecularTransmission();
 
     glm::vec3 DistributionFunction(glm::vec3 wOut, glm::vec3 wIn) const override;
     glm::vec3 SampleDirection(glm::vec3 wOut, glm::vec3* wIn, float* pdf) const override;
