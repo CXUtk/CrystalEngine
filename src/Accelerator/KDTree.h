@@ -33,7 +33,7 @@ private:
         SAH,
         EQUAL,
     };
-    static constexpr int MAX_DEPTH = 20;
+    static constexpr int MAX_DEPTH = 10;
     static constexpr int MAX_NODES = 1 << 15;
     static constexpr SplitMethod SPLIT_METHOD = SplitMethod::SAH;
 

@@ -26,7 +26,7 @@ KDTree::~KDTree() {
 
 void KDTree::Build(const std::vector<std::shared_ptr<Object>>& objects) {
     masterBox = BoundingBox();
-    _nodes.reserve(objects.size() * 2);
+    _nodes.reserve(objects.size() * 100);
     for (const auto& ptr : objects) {
         _objects.push_back(ptr.get());
         masterBox = masterBox.Union(ptr->GetBoundingBox());
@@ -60,7 +60,7 @@ void KDTree::push_up(int p) {
 }
 
 void KDTree::_build(int& p, const BoundingBox& outerBox, std::vector<Object*>& objs, int depth) {
-    if (objs.size() <= 8 || depth == MAX_DEPTH) {
+    if (objs.size() <= 1 || depth == MAX_DEPTH) {
         p = newNode(objs, outerBox, -1, -1);
         return;
     }
@@ -125,7 +125,7 @@ void KDTree::_build(int& p, const BoundingBox& outerBox, std::vector<Object*>& o
     std::vector<Object*> leftTri, rightTri;
     for (auto&
         obj : objs) {
-        if (obj->GetBoundingBox().GetMinPos()[split] < splitPos) {
+        if (obj->GetBoundingBox().GetMinPos()[split] <= splitPos) {
             leftTri.push_back(obj);
         }
         if (obj->GetBoundingBox().GetMaxPos()[split] > splitPos) {
