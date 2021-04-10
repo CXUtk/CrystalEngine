@@ -34,7 +34,7 @@ glm::vec3 PathTracingIntegrator::evaluate(const Ray& ray, std::shared_ptr<const 
 
         if (level > 3 && _random.NextFloat() > pRR) return dirL;//return material->Merge(hit, -ray.dir, dirL, indirL);
 
-        indirL += sampleIndirect(hit, -ray.dir, scene, bsdf, level, specular) / beta;
+        indirL += sampleIndirect(hit, -ray.dir, scene, bsdf, level, specular);
         //return material->Merge(hit, -ray.dir, dirL, indirL);
     }
     else {
