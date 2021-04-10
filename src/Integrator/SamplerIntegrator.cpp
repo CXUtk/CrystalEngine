@@ -54,7 +54,7 @@ void SamplerIntegrator::Render(std::shared_ptr<const Scene> scene, std::shared_p
                     }
                 }
                 progressLock.lock();
-                progress += width * ((double)(height - th - 1) / NUM_THREADS + 1);
+                progress += width * ((height - th - 1) / NUM_THREADS + 1);
                 progressLock.unlock();
                 printf("Tracing: %.2lf %%\n", progress / totalSamples * 100.f);
             }
