@@ -43,7 +43,7 @@ std::shared_ptr<BSDF> Phong::ComputeScatteringFunctions(const SurfaceInteraction
         }
     }
     else {
-        bsdf->AddBxDF(std::make_shared<Lambertian>(_texture->GetTexel(uv), tnb), glm::vec3(.8f));
+        // bsdf->AddBxDF(std::make_shared<Lambertian>(_texture->GetTexel(uv), tnb), glm::vec3(.8f));
         bsdf->AddBxDF(std::make_shared<PhongReflection>(_texture->GetTexel(uv), N, T), glm::vec3(1));
     }
     return bsdf;

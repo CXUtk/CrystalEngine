@@ -36,6 +36,7 @@ glm::vec3 PathTracingIntegrator::evaluate(const Ray& ray, std::shared_ptr<const 
 
         indirL += sampleIndirect(hit, -ray.dir, scene, bsdf, level, specular);
         //return material->Merge(hit, -ray.dir, dirL, indirL);
+
     }
     else {
         if (GetSkyBox() == nullptr) return dirL;
@@ -84,14 +85,16 @@ glm::vec3 PathTracingIntegrator::sampleIndirect(const SurfaceInteraction& hit, g
     specular &= (bsdf->Flags() & BxDF_SPECULAR) != 0;
     if (std::abs(pdf) < EPS) return glm::vec3(0);
 
+
     auto Li = evaluate(hit.SpawnRay(dir), scene, level + 1, specular);
     auto cosine = specular ? 1.0f : std::max(0.f, glm::dot(N, dir));
+
     return Li * brdf * cosine / pdf;
 }
 
 glm::vec3 PathTracingIntegrator::emitted(const SurfaceInteraction& isec, const Object* object, glm::vec3 endpoint) {
     auto light = object->GetLight();
-    if (!light) return glm::vec3(0);
+    if (light == nullptr) return glm::vec3(0);
     auto Le = light->IntensityPerArea();
     return Le;
 }

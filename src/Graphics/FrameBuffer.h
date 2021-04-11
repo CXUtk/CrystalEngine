@@ -12,6 +12,7 @@ public:
     void Clear();
     void Lock();
     void Unlock();
+    void ToneReproduction();
     const unsigned char* GetData() const { return _data; }
     const std::vector<unsigned char> GetDataVector() const;
 

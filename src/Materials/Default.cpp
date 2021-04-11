@@ -12,7 +12,7 @@ Default::Default(glm::vec3 color) :_color(color), _color2(glm::vec3(1)), _uvExte
 Default::Default(glm::vec3 color, glm::vec2 uvExt) : _color(color), _color2(glm::vec3(1)), _uvExtend(uvExt) {
 }
 
-Default::Default(glm::vec3 color, glm::vec3 color2, glm::vec2 uvExt) 
+Default::Default(glm::vec3 color, glm::vec3 color2, glm::vec2 uvExt)
     : _color(color), _color2(color2), _uvExtend(uvExt) {
 }
 
@@ -36,5 +36,3 @@ std::shared_ptr<BSDF> Default::ComputeScatteringFunctions(const SurfaceInteracti
     bsdf->AddBxDF(std::make_shared<Lambertian>(color, tnb), glm::vec3(1));
     return bsdf;
 }
-
-

@@ -51,7 +51,7 @@ std::vector<std::shared_ptr<Object>> CreateCornellBox() {
 
     std::shared_ptr<Material> groundMat = std::make_shared<Brick>(glm::vec3(0.6, 0.15, 0.1), glm::vec3(1), 0.09f, 0.04f, 0.01f);
     std::shared_ptr<Material> ceilMat = std::make_shared<Default>(glm::vec3(1.f), glm::vec2(0));
-    auto ground = CreateQuad(transform, groundMat);
+    auto ground = CreateQuad(transform, ceilMat);
     transform = identity;
     transform = glm::translate(transform, glm::vec3(0, 6, -3));
     transform = glm::scale(transform, glm::vec3(6, 1, 6));
@@ -126,9 +126,14 @@ Scene::Scene() {
     ObjLoader loader;
     loader.load("Resources/Scenes/bunny.obj");
     auto transform = glm::identity<glm::mat4>();
-    transform = glm::translate(transform, glm::vec3(-0.5, 0.2, -3));
+    transform = glm::translate(transform, glm::vec3(-1, 0.2, -3));
     auto bunny = loader.GetMesh(ballD, transform);
     AddObject(bunny);
+
+    //transform = glm::identity<glm::mat4>();
+    //transform = glm::translate(transform, glm::vec3(1, 1, -1));
+    //bunny = loader.GetMesh(ballD, transform);
+    //AddObject(bunny);
 
     //auto cylinder = std::shared_ptr<Cylinder>(new Cylinder(glm::vec3(2, -1.f, 2), 1, 1, glm::vec3(0.f, 0.f, 0.f)));
     //cylinder->SetMaterial(metal);
@@ -147,9 +152,9 @@ Scene::Scene() {
     //AddLight(std::make_shared<SphereLight>(glm::vec3(5, 3, -5), 1, glm::vec3(1), 200));
     //AddLight(std::make_shared<PointLight>(glm::vec3(5, 5, -5), glm::vec3(1), 20));
     //AddLight(std::make_shared<PointLight>(glm::vec3(2, 3, 3), glm::vec3(1), 30));
-    //AddLight(std::make_shared<PointLight>(glm::vec3(0, 5, -3), glm::vec3(1), 12));
+    //AddLight(std::make_shared<PointLight>(glm::vec3(0, 3, 3), glm::vec3(1), 12));
 
-    auto areaLight = std::make_shared<AreaLight>(glm::vec3(1, 5.99, -2), glm::vec3(-2, 0, 0), glm::vec3(0, 0, -2), 15);
+    auto areaLight = std::make_shared<AreaLight>(glm::vec3(1, 5.99, -2), glm::vec3(-2, 0, 0), glm::vec3(0, 0, -2), 10);
     AddLight(areaLight);
 
     glm::mat4 identity = glm::identity<glm::mat4>();

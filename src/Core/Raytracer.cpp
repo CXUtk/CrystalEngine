@@ -55,7 +55,7 @@ Raytracer::Raytracer(int width, int height) : _width(width), _height(height) {
     _frameBuffer = std::shared_ptr<FrameBuffer>(new FrameBuffer(width, height));
     _frameBuffer->Clear();
 
-    auto sampler = std::make_shared<DefaultSampler>(512);
+    auto sampler = std::make_shared<DefaultSampler>(16);
     // _integrator = std::shared_ptr<Integrator>(new PathTracingIntegrator(_camera, sampler));
     auto skybox = std::make_shared<CubemapTexture>(
         "Resources/Textures/right.jpg",
@@ -66,7 +66,7 @@ Raytracer::Raytracer(int width, int height) : _width(width), _height(height) {
         "Resources/Textures/back.jpg");
 
     //_integrator = std::make_shared<WhittedIntegrator>(_camera, sampler, nullptr, 6);
-    _integrator = std::make_shared<PathTracingIntegrator>(_camera, sampler, nullptr);
+    _integrator = std::make_shared<PathTracingIntegrator>(_camera, sampler, skybox);
     fprintf(stdout, "Created\n");
 }
 
@@ -75,6 +75,10 @@ void Raytracer::Trace(std::shared_ptr<Scene> scene) {
     startTime = clock();
 
     _integrator->Render(scene, _frameBuffer);
+
+    _frameBuffer->Lock();
+    _frameBuffer->ToneReproduction();
+    _frameBuffer->Unlock();
     //------------------------------------------------
     endTime = clock();  //计时结束
     printf("The running time is: %.4fs",

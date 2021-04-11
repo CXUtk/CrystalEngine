@@ -36,7 +36,7 @@ void SamplerIntegrator::Render(std::shared_ptr<const Scene> scene, std::shared_p
 
                 for (int i = th; i < height; i += NUM_THREADS) {
                     for (int j = 0; j < width; j++) {
-
+                        //i = 280, j = 228;
                         float u = (j + offset.x) / static_cast<float>(width);
                         float v = (i + offset.y) / static_cast<float>(height);
                         auto dir = camera->GetDir(u, v);
@@ -49,8 +49,6 @@ void SamplerIntegrator::Render(std::shared_ptr<const Scene> scene, std::shared_p
                         frameBuffer->Lock();
                         frameBuffer->SetPixel(j, i, _tmpColors[i * width + j] / static_cast<float>(k + 1));
                         frameBuffer->Unlock();
-
-                        //printf("Thread %d: %d, %d\n", th, i, j);
                     }
                 }
                 progressLock.lock();

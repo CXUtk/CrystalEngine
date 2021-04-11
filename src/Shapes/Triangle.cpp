@@ -42,7 +42,7 @@ bool Triangle::Intersect(const Ray& ray, SurfaceInteraction* info) const {
     auto inv = adjoint(A, 1 / det);
     glm::vec3 P = ray.start - _vertices[0].Position;
     auto res = inv * P;
-    if (res.x < 0 || res.x > 1 || res.y < 0 || res.y > 1 || res.x + res.y > 1.0001 || res.z < 0) return false;
+    if (res.x < 0 || res.x > 1 || res.y < 0 || res.y > 1 || res.x + res.y > 1.0 + EPS || res.z < 0) return false;
     glm::vec3 bary_coord = glm::vec3(1 - res.x - res.y, res.x, res.y);
     glm::vec3 N;
     glm::vec2 UV = bary_interp(bary_coord, _vertices[0].TexCoords, _vertices[1].TexCoords, _vertices[2].TexCoords);
@@ -55,7 +55,21 @@ bool Triangle::Intersect(const Ray& ray, SurfaceInteraction* info) const {
     auto front_face = glm::dot(ray.dir, N) < 0;
     N = front_face ? N : -N;
 
-    info->SetHitInfo(res.z, ray.start + ray.dir * res.z, N, UV, front_face, this, _dpdu, _dpdv);
+
+    auto dpdu = _dpdu;
+    // If there are no tangent vector attached
+    if (dpdu == glm::vec3(0)) {
+        for (int i = 0; i < 3; i++) {
+            glm::vec3 v(0);
+            v[i] = 1;
+            auto tmp = glm::cross(v, N);
+            if (tmp != glm::vec3(0)) {
+                dpdu = glm::normalize(tmp);
+                break;
+            }
+        }
+    }
+    info->SetHitInfo(res.z, ray.start + ray.dir * res.z, N, UV, front_face, this, dpdu, glm::cross(N, dpdu));
     return true;
 }
 
@@ -85,7 +99,7 @@ void Triangle::calculateDerivative() {
         glm::vec2(_vertices[1].TexCoords.x - _vertices[2].TexCoords.x, _vertices[1].TexCoords.y - _vertices[2].TexCoords.y)
     );
     A = glm::inverse(A);
-    if (glm::isnan(A[0]) != glm::bvec2(0)) {
+    if (glm::isnan(A[0]) != glm::bvec2(false) || glm::isnan(A[1]) != glm::bvec2(false)) {
         _dpdu = _dpdv = glm::vec3(0);
     }
     else {

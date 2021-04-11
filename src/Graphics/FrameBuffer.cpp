@@ -32,6 +32,21 @@ void FrameBuffer::Unlock() {
     _mutexLock.unlock();
 }
 
+void FrameBuffer::ToneReproduction() {
+    for (int i = 0; i < _height; i++) {
+        for (int j = 0; j < _width; j++) {
+            for (int k = 0; k < nChannel; k++) {
+                int id = nChannel * (i * _width + j) + k;
+                int radiance = _data[id];
+                double cr = (radiance + 0.5) / 256;
+                cr = std::pow(cr, 1.0 / 2.2);
+                unsigned char c = (unsigned char)std::floor(glm::clamp(cr, 0.0, 1.0) * 256 - 0.5);
+                _data[id] = c;
+            }
+        }
+    }
+}
+
 const std::vector<unsigned char> FrameBuffer::GetDataVector() const {
     std::vector<unsigned char> res;
     res.reserve(_width * _height * (nChannel + 1));

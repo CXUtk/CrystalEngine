@@ -26,13 +26,14 @@ KDTree::~KDTree() {
 
 void KDTree::Build(const std::vector<std::shared_ptr<Object>>& objects) {
     masterBox = BoundingBox();
-    _nodes.reserve(objects.size() * 100);
+    _nodes.reserve(1 << 21);
     for (const auto& ptr : objects) {
         _objects.push_back(ptr.get());
         masterBox = masterBox.Union(ptr->GetBoundingBox());
     }
     int sz = _objects.size();
     _build(_root, masterBox, _objects, 0);
+    _nodes.shrink_to_fit();
 }
 
 bool KDTree::Intersect(const Ray& ray, SurfaceInteraction* info) const {
