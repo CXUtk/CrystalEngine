@@ -10,7 +10,7 @@ public:
     virtual ~PhotonMPIntegrator() override {}
 
     void Render(std::shared_ptr<const Scene> scene, std::shared_ptr<FrameBuffer> frameBuffer);
-    virtual glm::vec3 Evaluate(const Ray& ray, std::shared_ptr<const Scene> scene) = 0;
+    glm::vec3 Evaluate(const Ray& ray, std::shared_ptr<const Scene> scene);
 
     std::shared_ptr<Camera> GetCamera() const { return _camera; }
     std::shared_ptr<Sampler> GetSampler() const { return _sampler; }
@@ -27,4 +27,5 @@ private:
 
     void generateGlobalMap(std::shared_ptr<const Scene> scene);
     void photonTravel(const Ray& ray, std::shared_ptr<const Scene> scene, const glm::vec3& power, int depth);
+    glm::vec3 evaluate(const Ray& ray, std::shared_ptr<const Scene> scene, int depth);
 };

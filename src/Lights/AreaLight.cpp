@@ -4,7 +4,7 @@
 
 static Random random;
 
-AreaLight::AreaLight(glm::vec3 pos, glm::vec3 u, glm::vec3 v, float emitPerArea) : _pos(pos), _u(u), _v(v), _emitPerArea(emitPerArea) {
+AreaLight::AreaLight(glm::vec3 pos, glm::vec3 u, glm::vec3 v, float power) : _pos(pos), _u(u), _v(v), _power(power) {
 
 }
 
@@ -17,15 +17,20 @@ glm::vec3 AreaLight::SampleLi(const SurfaceInteraction& hit, glm::vec3& endpoint
     auto d = hit.GetHitPos() - endpoint;
     auto dir = glm::normalize(d);
     *pdf = 1 / glm::length(glm::cross(_u, _v));
-    return glm::vec3(1) * _emitPerArea * std::max(0.f, glm::dot(normal, dir)) / glm::dot(d, d);
+    return glm::vec3(1) * _power * std::max(0.f, glm::dot(normal, dir)) / glm::dot(d, d);
 }
 
 glm::vec3 AreaLight::SampleEmission(glm::vec3* pos, glm::vec3* dir, float* pdf) const {
-    *pos = _pos + random.NextFloat() * _u + random.NextFloat() * _v;
     auto normal = glm::normalize(glm::cross(_u, _v));
+    *pos = _pos + random.NextFloat() * _u + random.NextFloat() * _v + normal * 1e-5f;
+
     auto T = glm::normalize(glm::cross(normal, _u));
     auto B = glm::normalize(glm::cross(normal, T));
     auto d = random.NextCosineUnitHemiSphere();
     *dir = T * d.x + normal * d.y + B * d.z;
-    return glm::vec3(_emitPerArea) * std::max(0.f, d.y);
+
+    auto p = (glm::length(glm::cross(_u, _v)) * glm::pi<float>());
+    auto cosine = std::max(0.f, d.y);
+    *pdf = cosine / p;
+    return glm::vec3(_power) / p * cosine;
 }

@@ -1,6 +1,6 @@
 ﻿#include "PMKDTree.h"
 
-PMKDTree::PMKDTree() {
+PMKDTree::PMKDTree() : _root(0), _tot(0) {
 }
 
 PMKDTree::~PMKDTree() {
@@ -8,7 +8,7 @@ PMKDTree::~PMKDTree() {
 
 void PMKDTree::Build(const std::vector<Photon>& objects) {
     _photons = objects;
-    _nodes.reserve(objects.size());
+    _nodes.reserve(objects.size() * 4);
     _nodes.push_back(PMKDTreeNode());
     _build(_root, 0, _photons.size() - 1);
 }
@@ -53,7 +53,7 @@ void PMKDTree::_build(int& p, int l, int r) {
     auto cmp = [=](const Photon& a, const Photon& b) {
         return a.Pos[split] < b.Pos[split];
     };
-    std::nth_element(_photons.begin() + l, _photons.begin() + mid, _photons.end());
+    std::nth_element(_photons.begin() + l, _photons.begin() + mid, _photons.begin() + r + 1, cmp);
     p = newNode(_photons[mid], split);
 
     _build(_nodes[p].ch[0], l, mid - 1);
@@ -70,21 +70,20 @@ void PMKDTree::_query(int p, const glm::vec3& pos, std::priority_queue<QNode>& Q
         Q.pop();
         Q.push(QNode(len, p));
     }
+    auto split = node.splitAxis;
+    int d = pos[split] > node.photon.Pos[split]; 
+    auto box = _nodes[node.ch[d]].box;
     len = Q.top().distance;
-    float nearest = len + 1;
-    auto box = _nodes[node.ch[0]].box;
-    for (int i = 0; i < 3; i++) {
-        nearest = std::min(nearest, std::abs(pos[i] - box.GetMaxPos()[i]));
-        nearest = std::min(nearest, std::abs(pos[i] - box.GetMinPos()[i]));
-    }
-    if (nearest < len) _query(node.ch[0], pos, Q, K);
+    auto predict = std::max({ 0.f, box.GetMinPos()[split] - pos[split], pos[split] - box.GetMaxPos()[split] });
+    if(predict < len)
+        _query(node.ch[d], pos, Q, K);
 
     len = Q.top().distance;
-    nearest = len + 1;
-    box = _nodes[node.ch[1]].box;
-    for (int i = 0; i < 3; i++) {
-        nearest = std::min(nearest, std::abs(pos[i] - box.GetMaxPos()[i]));
-        nearest = std::min(nearest, std::abs(pos[i] - box.GetMinPos()[i]));
-    }
-    if (nearest < len) _query(node.ch[1], pos, Q, K);
+
+    if (!node.ch[!d]) return;
+    box = _nodes[node.ch[!d]].box;
+    predict = (!d ? (box.GetMinPos()[split] - pos[split]) : (pos[split] - box.GetMaxPos()[split]));
+    if(predict < len)
+        _query(node.ch[!d], pos, Q, K);
+    
 }

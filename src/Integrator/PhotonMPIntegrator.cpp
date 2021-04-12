@@ -71,16 +71,21 @@ void PhotonMPIntegrator::Render(std::shared_ptr<const Scene> scene, std::shared_
     delete[] _tmpColors;
 }
 
+glm::vec3 PhotonMPIntegrator::Evaluate(const Ray& ray, std::shared_ptr<const Scene> scene) {
+    return evaluate(ray, scene, 0);
+}
+
 void PhotonMPIntegrator::generateGlobalMap(std::shared_ptr<const Scene> scene) {
+    constexpr float NUM_PHOTONS = 100000.f;
     for (const auto& light : scene->GetLights()) {
         glm::vec3 pos, dir;
         float pdf;
-        for (int i = 0; i < 1000000; i++) {
-            glm::vec3 Le = light->SampleEmission(&pos, &dir, &pdf);
-            Photon p{ pos, dir, Le / pdf };
-            photonTravel(Ray(pos, dir), scene, p, 0);
+        for (int i = 0; i < NUM_PHOTONS; i++) {
+            glm::vec3 Le = light->SampleEmission(&pos, &dir, &pdf) / NUM_PHOTONS;
+            photonTravel(Ray(pos, dir), scene, Le / pdf, 0);
         }
     }
+    _photonMap->Build(_photonCollector);
 }
 
 void PhotonMPIntegrator::photonTravel(const Ray& ray, std::shared_ptr<const Scene> scene, const glm::vec3& power, int depth) {
@@ -88,9 +93,9 @@ void PhotonMPIntegrator::photonTravel(const Ray& ray, std::shared_ptr<const Scen
     SurfaceInteraction hit;
     if (scene->Intersect(ray, &hit)) {
         auto material = hit.GetHitObject()->GetMaterial();
-        if (material == nullptr) return photonTravel(hit.SpawnRay(ray.dir, true), scene, power, depth);
+        if (material == nullptr) return;
         auto bsdf = material->ComputeScatteringFunctions(hit);
-        if (bsdf == nullptr) return photonTravel(hit.SpawnRay(ray.dir, true), scene, power, depth);
+        if (bsdf == nullptr) return;
 
         float pdf;
         glm::vec3 dir;
@@ -99,7 +104,7 @@ void PhotonMPIntegrator::photonTravel(const Ray& ray, std::shared_ptr<const Scen
         if (std::abs(pdf) < EPS) return;
 
         if (!specular) {
-            Photon p;
+            Photon p{};
             p.Pos = hit.GetHitPos();
             p.Dir = ray.dir;
             p.Power = power;
@@ -110,4 +115,53 @@ void PhotonMPIntegrator::photonTravel(const Ray& ray, std::shared_ptr<const Scen
         }
     }
 
+}
+
+glm::vec3 PhotonMPIntegrator::evaluate(const Ray& ray, std::shared_ptr<const Scene> scene, int depth) {
+    glm::vec3 L(0);
+    if (depth == 10) return L;
+    SurfaceInteraction hit;
+    if (scene->Intersect(ray, &hit)) {
+        glm::vec3 hitPos = hit.GetHitPos();
+        glm::vec3 N = hit.GetNormal();
+        glm::vec3 wOut = -ray.dir;
+        auto objHit = hit.GetHitObject();
+
+        if (depth == 0) {
+            // Le light emitted
+            auto light = objHit->GetLight();
+            auto Le = glm::vec3(0);
+            if (light != nullptr)
+                Le = light->IntensityPerArea();
+            L += Le;
+        }
+
+        auto material = objHit->GetMaterial();
+        if (material == nullptr) return L;
+
+        auto bsdf = objHit->ComputeScatteringFunctions(hit);
+        if (bsdf == nullptr) return L;
+
+        if ((bsdf->Flags() & BxDFType::BxDF_DIFFUSE) != 0) {
+            auto photons = _photonMap->NearestNeighbor(hitPos, 10);
+            float r = 0;
+            glm::vec3 radiance = glm::vec3(0);
+            for (auto p : photons) {
+                r = std::max(r, glm::length(p->Pos - hitPos));
+                radiance += bsdf->DistributionFunction(-p->Dir, -ray.dir) * p->Power * std::max(0.f, glm::dot(-p->Dir, N));
+            }
+            return L + radiance / (glm::pi<float>() * r * r);
+        }
+
+        float pdf;
+        glm::vec3 dir;
+        auto reflectC = bsdf->SampleDirection(wOut, &dir, &pdf, BxDFType::BxDF_SPECULAR);
+        if (depth + 1 < 10 && pdf != 0 && reflectC != glm::vec3(0)) {
+            auto radiance = evaluate(hit.SpawnRay(dir), scene, depth + 1);
+            L += radiance * reflectC / pdf;
+        }
+        return L;
+    }
+    if (GetSkyBox() == nullptr) return L;
+    return GetSkyBox()->GetTexel(ray.dir);
 }

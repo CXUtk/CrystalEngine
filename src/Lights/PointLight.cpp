@@ -15,7 +15,7 @@ glm::vec3 PointLight::SampleLi(const SurfaceInteraction& hit, glm::vec3& endpoin
     *pdf = 1;
     auto v = endpoint - hit.GetHitPos();
     float distSQ = glm::dot(v, v);
-    return _color * _power / distSQ;
+    return _color * _power / (4 * glm::pi<float>() * distSQ);
 }
 
 glm::vec3 PointLight::IntensityPerArea() const {
@@ -26,5 +26,5 @@ glm::vec3 PointLight::SampleEmission(glm::vec3* pos, glm::vec3* dir, float* pdf)
     *pos = _pos;
     *dir = random.NextUnitVector();
     *pdf = .5f / glm::two_pi<float>();
-    return _color;
+    return _power * _color / (2 * glm::two_pi<float>());
 }

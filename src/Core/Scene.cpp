@@ -107,10 +107,10 @@ Scene::Scene() {
 
     ////std::shared_ptr<Material> ball = std::make_shared<Cook_Torrance>(glm::vec3(0.8, 0.5, 0.2f), 0.2f);
 
-    auto sp1 = std::make_shared<GeometryObject>(std::make_shared<Sphere>(glm::vec3(0, 3, -1), 0.9, glm::vec3(0)), glassMat, nullptr);
+    auto sp1 = std::make_shared<GeometryObject>(std::make_shared<Sphere>(glm::vec3(1, 1, -1), 0.9, glm::vec3(0)), glassMat, nullptr);
     auto sp2 = std::make_shared<GeometryObject>(std::make_shared<Sphere>(glm::vec3(-2, 1, -3), 0.9, glm::vec3(0)), ballD, nullptr);
     auto sp3 = std::make_shared<GeometryObject>(std::make_shared<Sphere>(glm::vec3(0, 1, -2), 0.5, glm::vec3(0)), ballD, nullptr);
-    auto sp4 = std::make_shared<GeometryObject>(std::make_shared<Sphere>(glm::vec3(2, 1, -3), 0.9, glm::vec3(0)), ballC, nullptr);
+    auto sp4 = std::make_shared<GeometryObject>(std::make_shared<Sphere>(glm::vec3(2, 1, -3), 0.9, glm::vec3(0)), ballD, nullptr);
 
     AddObject(sp1);
     //AddObject(sp2);
@@ -126,7 +126,8 @@ Scene::Scene() {
     ObjLoader loader;
     loader.load("Resources/Scenes/cube.obj");
     auto transform = glm::identity<glm::mat4>();
-    transform = glm::translate(transform, glm::vec3(-1, 0.2, -3));
+    transform = glm::translate(transform, glm::vec3(-1, 1, -3));
+    transform = glm::rotate(transform, glm::radians(30.f), glm::vec3(0, 1, 0));
     auto bunny = loader.GetMesh(ballD, transform);
     AddObject(bunny);
 
@@ -154,7 +155,7 @@ Scene::Scene() {
     //AddLight(std::make_shared<PointLight>(glm::vec3(2, 3, 3), glm::vec3(1), 30));
     //AddLight(std::make_shared<PointLight>(glm::vec3(0, 3, 3), glm::vec3(1), 12));
 
-    auto areaLight = std::make_shared<AreaLight>(glm::vec3(1, 5.99, -2), glm::vec3(-2, 0, 0), glm::vec3(0, 0, -2), 10);
+    auto areaLight = std::make_shared<AreaLight>(glm::vec3(1, 5.99, -2), glm::vec3(-2, 0, 0), glm::vec3(0, 0, -2), 60);
     AddLight(areaLight);
 
     glm::mat4 identity = glm::identity<glm::mat4>();
