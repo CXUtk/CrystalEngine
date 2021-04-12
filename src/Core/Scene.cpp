@@ -62,14 +62,14 @@ std::vector<std::shared_ptr<Object>> CreateCornellBox() {
     transform = glm::translate(transform, glm::vec3(-3, 3, -3));
     transform = glm::rotate_slow(transform, glm::half_pi<float>(), glm::vec3(0, 0, 1));
     transform = glm::scale(transform, glm::vec3(6, 1, 6));
-    std::shared_ptr<Material> leftWallMat = std::make_shared<Default>(glm::vec3(1, 0.3f, 0.3f), glm::vec2(0, 0));
+    std::shared_ptr<Material> leftWallMat = std::make_shared<Default>(glm::vec3(1, 0.1f, 0.1f), glm::vec2(0, 0));
     auto leftWall = CreateQuad(transform, leftWallMat);
 
     transform = identity;
     transform = glm::translate(transform, glm::vec3(3, 3, -3));
     transform = glm::rotate_slow(transform, glm::half_pi<float>(), glm::vec3(0, 0, 1));
     transform = glm::scale(transform, glm::vec3(6, 1, 6));
-    std::shared_ptr<Material> rightWallMat = std::make_shared<Default>(glm::vec3(0.3f, 1, 0.3f), glm::vec2(0, 0));
+    std::shared_ptr<Material> rightWallMat = std::make_shared<Default>(glm::vec3(0.1f, 1, 0.1f), glm::vec2(0, 0));
     auto rightWall = CreateQuad(transform, rightWallMat);
 
     transform = identity;
@@ -124,7 +124,7 @@ Scene::Scene() {
 
 
     ObjLoader loader;
-    loader.load("Resources/Scenes/bunny.obj");
+    loader.load("Resources/Scenes/cube.obj");
     auto transform = glm::identity<glm::mat4>();
     transform = glm::translate(transform, glm::vec3(-1, 0.2, -3));
     auto bunny = loader.GetMesh(ballD, transform);

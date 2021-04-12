@@ -26,7 +26,7 @@ KDTree::~KDTree() {
 
 void KDTree::Build(const std::vector<std::shared_ptr<Object>>& objects) {
     masterBox = BoundingBox();
-    _nodes.reserve(1 << 21);
+    _nodes.reserve(MAX_NODES);
     for (const auto& ptr : objects) {
         _objects.push_back(ptr.get());
         masterBox = masterBox.Union(ptr->GetBoundingBox());
@@ -37,11 +37,9 @@ void KDTree::Build(const std::vector<std::shared_ptr<Object>>& objects) {
 }
 
 bool KDTree::Intersect(const Ray& ray, SurfaceInteraction* info) const {
-    bool ret = false;
     float tMin = 0, tMax = info->GetDistance();
-    if (!masterBox.RayIntersects(ray, tMin, tMax)) return false;
-    ret |= ray_test(_root, ray, info, tMin, tMax);
-    return ret;
+    //if (!masterBox.RayIntersects(ray, tMin, tMax)) return false;
+    return ray_test(_root, ray, info, tMin, tMax);
 }
 
 bool KDTree::IntersectTest(const Ray& ray, float tMin, float tMax) const {

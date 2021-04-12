@@ -29,3 +29,7 @@ glm::vec3 SphereLight::SampleLi(const SurfaceInteraction& hit, glm::vec3& endpoi
 float SphereLight::GetArea() const {
     return _surfaceArea;
 }
+
+glm::vec3 SphereLight::SampleEmission(glm::vec3* pos, glm::vec3* dir, float* pdf) const {
+    return glm::vec3();
+}

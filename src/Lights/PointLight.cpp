@@ -1,4 +1,7 @@
 ﻿#include "PointLight.h"
+#include <Utils/Random.h>
+#include <glm/gtx/transform.hpp>
+static Random random;
 
 PointLight::PointLight(glm::vec3 pos, glm::vec3 color, float power) : _pos(pos), _color(color), _power(power) {
 
@@ -13,4 +16,15 @@ glm::vec3 PointLight::SampleLi(const SurfaceInteraction& hit, glm::vec3& endpoin
     auto v = endpoint - hit.GetHitPos();
     float distSQ = glm::dot(v, v);
     return _color * _power / distSQ;
+}
+
+glm::vec3 PointLight::IntensityPerArea() const {
+    return _power * _color;
+}
+
+glm::vec3 PointLight::SampleEmission(glm::vec3* pos, glm::vec3* dir, float* pdf) const {
+    *pos = _pos;
+    *dir = random.NextUnitVector();
+    *pdf = .5f / glm::two_pi<float>();
+    return _color;
 }

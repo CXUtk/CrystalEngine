@@ -8,6 +8,8 @@ public:
     float GetArea() const override;
     glm::vec3 IntensityPerArea() const override { return _color * _power; }
 
+    glm::vec3 SampleEmission(glm::vec3* pos, glm::vec3* dir, float* pdf) const override;
+
 private:
     glm::vec3 _pos, _color;
     float _power, _radius;

@@ -65,8 +65,8 @@ Raytracer::Raytracer(int width, int height) : _width(width), _height(height) {
         "Resources/Textures/front.jpg",
         "Resources/Textures/back.jpg");
 
-    //_integrator = std::make_shared<WhittedIntegrator>(_camera, sampler, nullptr, 6);
-    _integrator = std::make_shared<PathTracingIntegrator>(_camera, sampler, skybox);
+    _integrator = std::make_shared<WhittedIntegrator>(_camera, sampler, nullptr, 6);
+    //_integrator = std::make_shared<PathTracingIntegrator>(_camera, sampler, nullptr);
     fprintf(stdout, "Created\n");
 }
 
@@ -76,9 +76,9 @@ void Raytracer::Trace(std::shared_ptr<Scene> scene) {
 
     _integrator->Render(scene, _frameBuffer);
 
-    _frameBuffer->Lock();
-    _frameBuffer->ToneReproduction();
-    _frameBuffer->Unlock();
+    //_frameBuffer->Lock();
+    //_frameBuffer->ToneReproduction();
+    //_frameBuffer->Unlock();
     //------------------------------------------------
     endTime = clock();  //计时结束
     printf("The running time is: %.4fs",

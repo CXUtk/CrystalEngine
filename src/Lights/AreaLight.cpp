@@ -19,3 +19,13 @@ glm::vec3 AreaLight::SampleLi(const SurfaceInteraction& hit, glm::vec3& endpoint
     *pdf = 1 / glm::length(glm::cross(_u, _v));
     return glm::vec3(1) * _emitPerArea * std::max(0.f, glm::dot(normal, dir)) / glm::dot(d, d);
 }
+
+glm::vec3 AreaLight::SampleEmission(glm::vec3* pos, glm::vec3* dir, float* pdf) const {
+    *pos = _pos + random.NextFloat() * _u + random.NextFloat() * _v;
+    auto normal = glm::normalize(glm::cross(_u, _v));
+    auto T = glm::normalize(glm::cross(normal, _u));
+    auto B = glm::normalize(glm::cross(normal, T));
+    auto d = random.NextCosineUnitHemiSphere();
+    *dir = T * d.x + normal * d.y + B * d.z;
+    return glm::vec3(_emitPerArea) * std::max(0.f, d.y);
+}
