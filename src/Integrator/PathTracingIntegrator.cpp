@@ -23,7 +23,7 @@ glm::vec3 PathTracingIntegrator::evaluate(const Ray& ray, std::shared_ptr<const 
     float beta = (level > 3) ? pRR : 1.0f;
     if (scene->Intersect(ray, &hit)) {
         if (level == 0 || specular)
-            dirL = emitted(hit, hit.GetHitObject(), hit.GetHitPos());
+            dirL = emitted(hit, hit.GetHitObject(), hit.GetHitPos(), -ray.dir);
 
         auto material = hit.GetHitObject()->GetMaterial();
         if (material == nullptr) return dirL;
@@ -92,9 +92,9 @@ glm::vec3 PathTracingIntegrator::sampleIndirect(const SurfaceInteraction& hit, g
     return Li * brdf * cosine / pdf;
 }
 
-glm::vec3 PathTracingIntegrator::emitted(const SurfaceInteraction& isec, const Object* object, glm::vec3 endpoint) {
+glm::vec3 PathTracingIntegrator::emitted(const SurfaceInteraction& isec, const Object* object, glm::vec3 endpoint, glm::vec3 dir) {
     auto light = object->GetLight();
     if (light == nullptr) return glm::vec3(0);
-    auto Le = light->IntensityPerArea();
+    auto Le = light->SampleRadiance(dir);
     return Le;
 }

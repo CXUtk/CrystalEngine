@@ -18,9 +18,10 @@ glm::vec3 PointLight::SampleLi(const SurfaceInteraction& hit, glm::vec3& endpoin
     return _color * _power / (4 * glm::pi<float>() * distSQ);
 }
 
-glm::vec3 PointLight::IntensityPerArea() const {
-    return _power * _color;
+glm::vec3 PointLight::SampleRadiance(glm::vec3 dir) const {
+    return _power * _color / (4 * glm::pi<float>());
 }
+
 
 glm::vec3 PointLight::SampleEmission(glm::vec3* pos, glm::vec3* dir, float* pdf) const {
     *pos = _pos;

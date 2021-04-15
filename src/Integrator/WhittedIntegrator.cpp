@@ -28,7 +28,7 @@ glm::vec3 WhittedIntegrator::evaluate(const Ray& ray, std::shared_ptr<const Scen
 
         if (depth == 0) {
             // Le light emitted
-            L += emitted(hit, objHit, hitPos);
+            L += emitted(hit, objHit, hitPos, -ray.dir);
         }
 
         auto material = objHit->GetMaterial();
@@ -74,9 +74,9 @@ glm::vec3 WhittedIntegrator::evaluate(const Ray& ray, std::shared_ptr<const Scen
     return GetSkyBox()->GetTexel(ray.dir);
 }
 
-glm::vec3 WhittedIntegrator::emitted(const SurfaceInteraction& isec, const Object* object, glm::vec3 endpoint) {
+glm::vec3 WhittedIntegrator::emitted(const SurfaceInteraction& isec, const Object* object, glm::vec3 endpoint, glm::vec3 dir) {
     auto light = object->GetLight();
     if (!light) return glm::vec3(0);
-    auto Le = light->IntensityPerArea();
+    auto Le = light->SampleRadiance(dir);
     return Le;
 }

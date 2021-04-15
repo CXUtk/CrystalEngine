@@ -44,6 +44,7 @@ class PMKDTree {
 public:
     PMKDTree();
     ~PMKDTree();
+    void Clear();
     void Build(const std::vector<Photon>& objects);
     std::vector<Photon*> NearestNeighbor(const glm::vec3& pos, int K);
 

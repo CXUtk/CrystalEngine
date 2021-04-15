@@ -52,12 +52,25 @@ const std::vector<unsigned char> FrameBuffer::GetDataVector() const {
     res.reserve(_width * _height * (nChannel + 1));
     for (int i = _height - 1; i >= 0; i--) {
         for (int j = 0; j < _width; j++) {
-            int id = i * _width + j;
-            res.push_back(_data[id * 3]);
-            res.push_back(_data[id * 3 + 1]);
-            res.push_back(_data[id * 3 + 2]);
+            for (int k = 0; k < nChannel; k++) {
+                int id = nChannel * (i * _width + j) + k;
+                int radiance = _data[id];
+                double cr = (radiance + 0.5) / 256;
+                cr = std::pow(cr, 1.0 / 2.2);
+                unsigned char c = (unsigned char)std::floor(glm::clamp(cr, 0.0, 1.0) * 256 - 0.5);
+                res.push_back(c);
+            }
             res.push_back(255);
         }
     }
+    //for (int i = _height - 1; i >= 0; i--) {
+    //    for (int j = 0; j < _width; j++) {
+    //        int id = i * _width + j;
+    //        res.push_back(_data[id * nChannel]);
+    //        res.push_back(_data[id * nChannel + 1]);
+    //        res.push_back(_data[id * nChannel + 2]);
+    //        res.push_back(255);
+    //    }
+    //}
     return res;
 }

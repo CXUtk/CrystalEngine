@@ -1,8 +1,10 @@
 ﻿#include "PhotonMPIntegrator.h"
 #include <mutex>
+#include <Utils/Random.h>
 
 static constexpr float pRR = 0.8f;
 static constexpr float EPS = 1e-5;
+static Random random;
 
 PhotonMPIntegrator::PhotonMPIntegrator(std::shared_ptr<Camera> camera,
     std::shared_ptr<Sampler> sampler,
@@ -12,8 +14,6 @@ PhotonMPIntegrator::PhotonMPIntegrator(std::shared_ptr<Camera> camera,
 }
 
 void PhotonMPIntegrator::Render(std::shared_ptr<const Scene> scene, std::shared_ptr<FrameBuffer> frameBuffer) {
-
-    generateGlobalMap(scene);
 
     auto camera = GetCamera();
     auto eyePos = camera->GetEyePos();
@@ -27,14 +27,16 @@ void PhotonMPIntegrator::Render(std::shared_ptr<const Scene> scene, std::shared_
     double progress = 0;
     double totalSamples = (double)numSamples * width * height;
 
-    constexpr int NUM_THREADS = 6;
+    constexpr int NUM_THREADS = 1;
     std::shared_ptr<std::thread> threads[NUM_THREADS];
 
     std::mutex progressLock;
+    generateGlobalMap(scene);
 
     for (int th = 0; th < NUM_THREADS; th++) {
         threads[th] = std::make_shared<std::thread>([&, th]() {
             for (int k = 0; k < numSamples; k++) {
+                generateGlobalMap(scene);
                 glm::vec2 offset = glm::vec2(0.5f, 0.5f);
                 if (k != 0) {
                     offset = glm::vec2(_sampler->NextFloat(), _sampler->NextFloat());
@@ -42,7 +44,6 @@ void PhotonMPIntegrator::Render(std::shared_ptr<const Scene> scene, std::shared_
 
                 for (int i = th; i < height; i += NUM_THREADS) {
                     for (int j = 0; j < width; j++) {
-                        //i = 280, j = 228;
                         float u = (j + offset.x) / static_cast<float>(width);
                         float v = (i + offset.y) / static_cast<float>(height);
                         auto dir = camera->GetDir(u, v);
@@ -85,11 +86,12 @@ void PhotonMPIntegrator::generateGlobalMap(std::shared_ptr<const Scene> scene) {
             photonTravel(Ray(pos, dir), scene, Le / pdf, 0);
         }
     }
+    _photonMap->Clear();
     _photonMap->Build(_photonCollector);
+    _photonCollector.clear();
 }
 
 void PhotonMPIntegrator::photonTravel(const Ray& ray, std::shared_ptr<const Scene> scene, const glm::vec3& power, int depth) {
-    if (depth > 6) return;
     SurfaceInteraction hit;
     if (scene->Intersect(ray, &hit)) {
         auto material = hit.GetHitObject()->GetMaterial();
@@ -109,9 +111,15 @@ void PhotonMPIntegrator::photonTravel(const Ray& ray, std::shared_ptr<const Scen
             p.Dir = ray.dir;
             p.Power = power;
             _photonCollector.push_back(p);
+            if (random.NextFloat() > 0.7) {
+                auto N = hit.GetNormal();
+                return photonTravel(hit.SpawnRay(dir), scene, power * brdf / pdf * std::max(0.f, glm::dot(dir, N)), depth + 1);
+            }
         }
         else {
-            return photonTravel(hit.SpawnRay(dir), scene, power * brdf, depth + 1);
+            if (random.NextFloat() < pRR) {
+                return photonTravel(hit.SpawnRay(dir), scene, power * brdf / pdf / pRR, depth + 1);
+            }
         }
     }
 
@@ -127,14 +135,13 @@ glm::vec3 PhotonMPIntegrator::evaluate(const Ray& ray, std::shared_ptr<const Sce
         glm::vec3 wOut = -ray.dir;
         auto objHit = hit.GetHitObject();
 
-        if (depth == 0) {
-            // Le light emitted
-            auto light = objHit->GetLight();
-            auto Le = glm::vec3(0);
-            if (light != nullptr)
-                Le = light->IntensityPerArea();
-            L += Le;
-        }
+        // Le light emitted
+        auto light = objHit->GetLight();
+        auto Le = glm::vec3(0);
+        if (light != nullptr)
+            Le = light->SampleRadiance(-ray.dir);
+        L += Le;
+
 
         auto material = objHit->GetMaterial();
         if (material == nullptr) return L;
@@ -143,7 +150,7 @@ glm::vec3 PhotonMPIntegrator::evaluate(const Ray& ray, std::shared_ptr<const Sce
         if (bsdf == nullptr) return L;
 
         if ((bsdf->Flags() & BxDFType::BxDF_DIFFUSE) != 0) {
-            auto photons = _photonMap->NearestNeighbor(hitPos, 10);
+            auto photons = _photonMap->NearestNeighbor(hitPos, 100);
             float r = 0;
             glm::vec3 radiance = glm::vec3(0);
             for (auto p : photons) {

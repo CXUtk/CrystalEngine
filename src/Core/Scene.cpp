@@ -100,7 +100,7 @@ Scene::Scene() {
     std::shared_ptr<Material> ballC = std::make_shared<Phong>(glm::vec3(1.f, 1.f, 1.f));
     std::shared_ptr<Material> ballD = std::make_shared<Default>(glm::vec3(1.0f, 1.0f, 1.0f));
     std::shared_ptr<Material> reflectMat = std::make_shared<Metal>(glm::vec3(.8f, 0.8f, 0.2f), 1.0f);
-    std::shared_ptr<Material> glassMat = std::make_shared<Glass>(glm::vec3(1.0f), 1.5f);
+    std::shared_ptr<Material> glassMat = std::make_shared<Glass>(glm::vec3(1.0f), 0.95f);
     //std::shared_ptr<Material> ballB = std::make_shared<Metal>(glm::vec3(1, 1, 1), 2.f);
     //std::shared_ptr<Material> metal = std::make_shared<Phong>(glm::vec3(1, 0.5f, 0.5f), 128, glm::vec3(0.1f, 0.5f, 1.0f));
     ////std::shared_ptr<Material> lights = std::make_shared<Lighted>(glm::vec3(10, 10, 10));
@@ -110,7 +110,7 @@ Scene::Scene() {
     auto sp1 = std::make_shared<GeometryObject>(std::make_shared<Sphere>(glm::vec3(1, 1, -1), 0.9, glm::vec3(0)), glassMat, nullptr);
     auto sp2 = std::make_shared<GeometryObject>(std::make_shared<Sphere>(glm::vec3(-2, 1, -3), 0.9, glm::vec3(0)), ballD, nullptr);
     auto sp3 = std::make_shared<GeometryObject>(std::make_shared<Sphere>(glm::vec3(0, 1, -2), 0.5, glm::vec3(0)), ballD, nullptr);
-    auto sp4 = std::make_shared<GeometryObject>(std::make_shared<Sphere>(glm::vec3(2, 1, -3), 0.9, glm::vec3(0)), ballD, nullptr);
+    auto sp4 = std::make_shared<GeometryObject>(std::make_shared<Sphere>(glm::vec3(2, 1, -3), 0.9, glm::vec3(0)), reflectMat, nullptr);
 
     AddObject(sp1);
     //AddObject(sp2);
@@ -122,14 +122,21 @@ Scene::Scene() {
 
 
 
-
-    ObjLoader loader;
-    loader.load("Resources/Scenes/cube.obj");
     auto transform = glm::identity<glm::mat4>();
     transform = glm::translate(transform, glm::vec3(-1, 1, -3));
     transform = glm::rotate(transform, glm::radians(30.f), glm::vec3(0, 1, 0));
-    auto bunny = loader.GetMesh(ballD, transform);
-    AddObject(bunny);
+
+    ObjLoader loader;
+    loader.load("Resources/Scenes/cube.obj");
+    auto cube = loader.GetMesh(ballD, transform);
+    AddObject(cube);
+
+    std::shared_ptr<Material> glassMat2 = std::make_shared<Glass>(glm::vec3(1.0f), 1.5f);
+    transform = glm::identity<glm::mat4>();
+    transform = glm::translate(transform, glm::vec3(-1, 3, -3));
+    loader.load("Resources/Scenes/gd32.obj");
+    auto bunny = loader.GetMesh(glassMat2, transform);
+    //AddObject(bunny);
 
     //transform = glm::identity<glm::mat4>();
     //transform = glm::translate(transform, glm::vec3(1, 1, -1));
@@ -155,7 +162,7 @@ Scene::Scene() {
     //AddLight(std::make_shared<PointLight>(glm::vec3(2, 3, 3), glm::vec3(1), 30));
     //AddLight(std::make_shared<PointLight>(glm::vec3(0, 3, 3), glm::vec3(1), 12));
 
-    auto areaLight = std::make_shared<AreaLight>(glm::vec3(1, 5.99, -2), glm::vec3(-2, 0, 0), glm::vec3(0, 0, -2), 60);
+    auto areaLight = std::make_shared<AreaLight>(glm::vec3(1, 5.99, -2), glm::vec3(-2, 0, 0), glm::vec3(0, 0, -2), 200);
     AddLight(areaLight);
 
     glm::mat4 identity = glm::identity<glm::mat4>();

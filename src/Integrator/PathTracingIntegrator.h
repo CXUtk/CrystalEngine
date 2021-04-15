@@ -21,6 +21,6 @@ private:
         glm::vec3 wOut, std::shared_ptr<const Scene> scene,
         const std::shared_ptr<BSDF>& bsdf, int level, bool specular);
 
-    glm::vec3 emitted(const SurfaceInteraction& isec, const Object* object, glm::vec3 endpoint);
+    glm::vec3 emitted(const SurfaceInteraction& isec, const Object* object, glm::vec3 endpoint, glm::vec3 dir);
 
 };

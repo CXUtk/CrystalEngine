@@ -6,6 +6,12 @@ PMKDTree::PMKDTree() : _root(0), _tot(0) {
 PMKDTree::~PMKDTree() {
 }
 
+void PMKDTree::Clear() {
+    _root = _tot = 0;
+    _nodes.clear();
+    _photons.clear();
+}
+
 void PMKDTree::Build(const std::vector<Photon>& objects) {
     _photons = objects;
     _nodes.reserve(objects.size() * 4);
@@ -19,7 +25,7 @@ std::vector<Photon*> PMKDTree::NearestNeighbor(const glm::vec3& pos, int K) {
     for (int i = 0; i < K; i++) Q.push(QNode(std::numeric_limits<float>::infinity(), -1));
     _query(_root, pos, Q, K);
     while (!Q.empty()) {
-        auto node = Q.top();
+        auto& node = Q.top();
         Q.pop();
         result.push_back(&_nodes[node.id].photon);
     }
@@ -64,26 +70,26 @@ void PMKDTree::_build(int& p, int l, int r) {
 
 void PMKDTree::_query(int p, const glm::vec3& pos, std::priority_queue<QNode>& Q, int K) {
     if (!p) return;
-    auto node = _nodes[p];
+    auto& node = _nodes[p];
     auto len = glm::length(pos - node.photon.Pos);
     if (Q.top().distance > len) {
         Q.pop();
         Q.push(QNode(len, p));
     }
     auto split = node.splitAxis;
-    int d = pos[split] > node.photon.Pos[split]; 
-    auto box = _nodes[node.ch[d]].box;
+    int d = pos[split] > node.photon.Pos[split];
+    auto& box = _nodes[node.ch[d]].box;
     len = Q.top().distance;
     auto predict = std::max({ 0.f, box.GetMinPos()[split] - pos[split], pos[split] - box.GetMaxPos()[split] });
-    if(predict < len)
+    if (predict < len)
         _query(node.ch[d], pos, Q, K);
 
     len = Q.top().distance;
 
     if (!node.ch[!d]) return;
-    box = _nodes[node.ch[!d]].box;
-    predict = (!d ? (box.GetMinPos()[split] - pos[split]) : (pos[split] - box.GetMaxPos()[split]));
-    if(predict < len)
+    auto& box2 = _nodes[node.ch[!d]].box;
+    predict = (!d ? (box2.GetMinPos()[split] - pos[split]) : (pos[split] - box2.GetMaxPos()[split]));
+    if (predict < len)
         _query(node.ch[!d], pos, Q, K);
-    
+
 }
