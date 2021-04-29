@@ -11,8 +11,9 @@ uniform sampler2D uTexture;
 
 void main(){
     vec4 C = texture(uTexture, fTexCoord);
-    color.r = pow( C.r, 1 / 2.2 );
-    color.g = pow( C.g, 1 / 2.2 );
-    color.b = pow( C.b, 1 / 2.2 );
-    color.a = C.a;
+    color = C;
+//    color.r = pow( C.r, 1 / 2.2 );
+//    color.g = pow( C.g, 1 / 2.2 );
+//    color.b = pow( C.b, 1 / 2.2 );
+//    color.a = C.a;
 }

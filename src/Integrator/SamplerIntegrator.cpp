@@ -1,4 +1,6 @@
 ﻿#include "SamplerIntegrator.h"
+#include <ToneMapping/WardMapper.h>
+#include <ToneMapping/ReinhardMapper.h>
 #include <mutex>
 
 SamplerIntegrator::SamplerIntegrator(std::shared_ptr<Camera> camera,
@@ -62,5 +64,15 @@ void SamplerIntegrator::Render(std::shared_ptr<const Scene> scene, std::shared_p
     for (int th = 0; th < NUM_THREADS; th++) {
         threads[th]->join();
     }
+    for (int i = 0; i < height; i++) {
+        for (int j = 0; j < width; j++) {
+            _tmpColors[i * width + j] /= numSamples;
+        }
+    }
+
+    ReinhardMapper mapper;
+    mapper.Map(_tmpColors, height, width);
+    frameBuffer->Reset(width, height, _tmpColors);
+
     delete[] _tmpColors;
 }

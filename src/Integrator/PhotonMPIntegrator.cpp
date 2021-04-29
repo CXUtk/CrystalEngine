@@ -27,16 +27,17 @@ void PhotonMPIntegrator::Render(std::shared_ptr<const Scene> scene, std::shared_
     double progress = 0;
     double totalSamples = (double)numSamples * width * height;
 
-    constexpr int NUM_THREADS = 1;
+    constexpr int NUM_THREADS = 6;
     std::shared_ptr<std::thread> threads[NUM_THREADS];
 
     std::mutex progressLock;
-    generateGlobalMap(scene);
+    //generateGlobalMap(scene);
 
-    for (int th = 0; th < NUM_THREADS; th++) {
-        threads[th] = std::make_shared<std::thread>([&, th]() {
-            for (int k = 0; k < numSamples; k++) {
-                generateGlobalMap(scene);
+    
+    for (int k = 0; k < numSamples; k++) {
+        generateGlobalMap(scene);
+        for (int th = 0; th < NUM_THREADS; th++) {
+            threads[th] = std::make_shared<std::thread>([&, th]() {
                 glm::vec2 offset = glm::vec2(0.5f, 0.5f);
                 if (k != 0) {
                     offset = glm::vec2(_sampler->NextFloat(), _sampler->NextFloat());
@@ -62,13 +63,15 @@ void PhotonMPIntegrator::Render(std::shared_ptr<const Scene> scene, std::shared_
                 progress += width * ((height - th - 1) / NUM_THREADS + 1);
                 progressLock.unlock();
                 printf("Tracing: %.2lf %%\n", progress / totalSamples * 100.f);
-            }
-            });
+
+                });
+        }
+        for (int th = 0; th < NUM_THREADS; th++) {
+            threads[th]->join();
+        }
     }
 
-    for (int th = 0; th < NUM_THREADS; th++) {
-        threads[th]->join();
-    }
+
     delete[] _tmpColors;
 }
 
@@ -77,7 +80,7 @@ glm::vec3 PhotonMPIntegrator::Evaluate(const Ray& ray, std::shared_ptr<const Sce
 }
 
 void PhotonMPIntegrator::generateGlobalMap(std::shared_ptr<const Scene> scene) {
-    constexpr float NUM_PHOTONS = 100000.f;
+    constexpr float NUM_PHOTONS = 1000000.f;
     for (const auto& light : scene->GetLights()) {
         glm::vec3 pos, dir;
         float pdf;
@@ -111,14 +114,14 @@ void PhotonMPIntegrator::photonTravel(const Ray& ray, std::shared_ptr<const Scen
             p.Dir = ray.dir;
             p.Power = power;
             _photonCollector.push_back(p);
-            if (random.NextFloat() > 0.7) {
+            if (random.NextFloat() < pRR) {
                 auto N = hit.GetNormal();
                 return photonTravel(hit.SpawnRay(dir), scene, power * brdf / pdf * std::max(0.f, glm::dot(dir, N)), depth + 1);
             }
         }
         else {
             if (random.NextFloat() < pRR) {
-                return photonTravel(hit.SpawnRay(dir), scene, power * brdf / pdf / pRR, depth + 1);
+                return photonTravel(hit.SpawnRay(dir), scene, power * brdf / pdf, depth + 1);
             }
         }
     }
@@ -150,7 +153,7 @@ glm::vec3 PhotonMPIntegrator::evaluate(const Ray& ray, std::shared_ptr<const Sce
         if (bsdf == nullptr) return L;
 
         if ((bsdf->Flags() & BxDFType::BxDF_DIFFUSE) != 0) {
-            auto photons = _photonMap->NearestNeighbor(hitPos, 100);
+            auto photons = _photonMap->NearestNeighbor(hitPos, 1000);
             float r = 0;
             glm::vec3 radiance = glm::vec3(0);
             for (auto p : photons) {

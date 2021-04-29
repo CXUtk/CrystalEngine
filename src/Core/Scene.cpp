@@ -9,6 +9,7 @@
 #include <Shapes/TriangleMesh.h>
 #include <Core/GeometryObject.h>
 #include <Shapes/Sphere.h>
+#include <Shapes/Cylinder.h>
 #include <Materials/Glass.h>
 #include <Materials/Phong.h>
 #include <Materials/Brick.h>
@@ -100,22 +101,25 @@ Scene::Scene() {
     std::shared_ptr<Material> ballC = std::make_shared<Phong>(glm::vec3(1.f, 1.f, 1.f));
     std::shared_ptr<Material> ballD = std::make_shared<Default>(glm::vec3(1.0f, 1.0f, 1.0f));
     std::shared_ptr<Material> reflectMat = std::make_shared<Metal>(glm::vec3(.8f, 0.8f, 0.2f), 1.0f);
-    std::shared_ptr<Material> glassMat = std::make_shared<Glass>(glm::vec3(1.0f), 0.95f);
+    std::shared_ptr<Material> reflectMat2 = std::make_shared<Metal>(glm::vec3(1.f), 1.0f);
+    std::shared_ptr<Material> glassMat = std::make_shared<Glass>(glm::vec3(1.0f), 1.5f);
     //std::shared_ptr<Material> ballB = std::make_shared<Metal>(glm::vec3(1, 1, 1), 2.f);
     //std::shared_ptr<Material> metal = std::make_shared<Phong>(glm::vec3(1, 0.5f, 0.5f), 128, glm::vec3(0.1f, 0.5f, 1.0f));
     ////std::shared_ptr<Material> lights = std::make_shared<Lighted>(glm::vec3(10, 10, 10));
 
     ////std::shared_ptr<Material> ball = std::make_shared<Cook_Torrance>(glm::vec3(0.8, 0.5, 0.2f), 0.2f);
 
-    auto sp1 = std::make_shared<GeometryObject>(std::make_shared<Sphere>(glm::vec3(1, 1, -1), 0.9, glm::vec3(0)), glassMat, nullptr);
+    auto sp1 = std::make_shared<GeometryObject>(std::make_shared<Sphere>(glm::vec3(1.8, 1, -1.5), 0.8, glm::vec3(0)), glassMat, nullptr);
     auto sp2 = std::make_shared<GeometryObject>(std::make_shared<Sphere>(glm::vec3(-2, 1, -3), 0.9, glm::vec3(0)), ballD, nullptr);
     auto sp3 = std::make_shared<GeometryObject>(std::make_shared<Sphere>(glm::vec3(0, 1, -2), 0.5, glm::vec3(0)), ballD, nullptr);
-    auto sp4 = std::make_shared<GeometryObject>(std::make_shared<Sphere>(glm::vec3(2, 1, -3), 0.9, glm::vec3(0)), reflectMat, nullptr);
+    auto sp4 = std::make_shared<GeometryObject>(std::make_shared<Sphere>(glm::vec3(-1, 2.8, -3), 0.8, glm::vec3(0)), reflectMat, nullptr);
+    auto ring = std::make_shared<GeometryObject>(std::make_shared<Cylinder>(glm::vec3(-1, 0.25, -1), 0.5, 0.5, glm::vec3(0)), reflectMat2, nullptr);
 
     AddObject(sp1);
     //AddObject(sp2);
     //AddObject(sp3);
     AddObject(sp4);
+    //AddObject(ring);
     //_sceneObjects.push_back(sp1);
     //_sceneObjects.push_back(sp2);
 
@@ -162,8 +166,10 @@ Scene::Scene() {
     //AddLight(std::make_shared<PointLight>(glm::vec3(2, 3, 3), glm::vec3(1), 30));
     //AddLight(std::make_shared<PointLight>(glm::vec3(0, 3, 3), glm::vec3(1), 12));
 
-    auto areaLight = std::make_shared<AreaLight>(glm::vec3(1, 5.99, -2), glm::vec3(-2, 0, 0), glm::vec3(0, 0, -2), 200);
+    auto areaLight = std::make_shared<AreaLight>(glm::vec3(1, 5.99, -2), glm::vec3(-2, 0, 0), glm::vec3(0, 0, -2), 300);
+    auto pointLight = std::make_shared<PointLight>(glm::vec3(0, 5, -3), glm::vec3(1), 50);
     AddLight(areaLight);
+
 
     glm::mat4 identity = glm::identity<glm::mat4>();
     transform = identity;

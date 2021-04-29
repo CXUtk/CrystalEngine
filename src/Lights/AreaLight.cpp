@@ -17,16 +17,17 @@ glm::vec3 AreaLight::SampleLi(const SurfaceInteraction& hit, glm::vec3& endpoint
     auto d = hit.GetHitPos() - endpoint;
     auto dir = glm::normalize(d);
 
-    auto p = glm::length(glm::cross(_u, _v));
+    auto area = glm::length(glm::cross(_u, _v));
+    auto p = area * glm::pi<float>();
     auto cosine = std::max(0.f, glm::dot(dir, normal));
-    *pdf = 1.f;
+    *pdf = 1.f / area;
     return glm::vec3(_power) * cosine / p / glm::dot(d, d);
 }
 
 
 glm::vec3 AreaLight::SampleRadiance(glm::vec3 dir) const {
     auto normal = glm::normalize(glm::cross(_u, _v));
-    return std::max(0.f, glm::dot(normal, dir)) * glm::vec3(_power) / glm::length(glm::cross(_u, _v));
+    return std::max(0.f, glm::dot(normal, dir)) * glm::vec3(_power / glm::pi<float>()) / glm::length(glm::cross(_u, _v));
 }
 
 glm::vec3 AreaLight::SampleEmission(glm::vec3* pos, glm::vec3* dir, float* pdf) const {

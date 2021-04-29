@@ -55,10 +55,10 @@ const std::vector<unsigned char> FrameBuffer::GetDataVector() const {
             for (int k = 0; k < nChannel; k++) {
                 int id = nChannel * (i * _width + j) + k;
                 int radiance = _data[id];
-                double cr = (radiance + 0.5) / 256;
-                cr = std::pow(cr, 1.0 / 2.2);
-                unsigned char c = (unsigned char)std::floor(glm::clamp(cr, 0.0, 1.0) * 256 - 0.5);
-                res.push_back(c);
+                //double cr = (radiance + 0.5) / 256;
+                //cr = std::pow(cr, 1.0 / 2.2);
+                //unsigned char c = (unsigned char)std::floor(glm::clamp(cr, 0.0, 1.0) * 256 - 0.5);
+                res.push_back(radiance);
             }
             res.push_back(255);
         }
@@ -73,4 +73,18 @@ const std::vector<unsigned char> FrameBuffer::GetDataVector() const {
     //    }
     //}
     return res;
+}
+
+void FrameBuffer::Reset(int width, int height, glm::vec3* colors) {
+    _width = width;
+    _height = height;
+    for (int i = 0; i < _height; i++) {
+        for (int j = 0; j < _width; j++) {
+            int start = nChannel * (i * _width + j);
+            auto color = colors[i * _width + j];
+            _data[start] = (unsigned char)floor(glm::clamp(color.r, 0.f, 0.999f) * 256);
+            _data[start + 1] = (unsigned char)floor(glm::clamp(color.g, 0.f, 0.999f) * 256);
+            _data[start + 2] = (unsigned char)floor(glm::clamp(color.b, 0.f, 0.999f) * 256);
+        }
+    }
 }

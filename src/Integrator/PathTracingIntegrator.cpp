@@ -55,7 +55,7 @@ glm::vec3 PathTracingIntegrator::sampleLight(const SurfaceInteraction& hit, glm:
     for (auto& light : scene->GetLights()) {
         glm::vec3 lightP;
         float pdf;
-        auto radiance = light->SampleLi(hit, lightP, &pdf);
+        auto irradiance = light->SampleLi(hit, lightP, &pdf);
         if (std::abs(pdf) < 1e-6) continue;
 
         auto v = lightP - hitPos;
@@ -64,7 +64,7 @@ glm::vec3 PathTracingIntegrator::sampleLight(const SurfaceInteraction& hit, glm:
 
         float distance = glm::length(v);
         if (!scene->IntersectTest(Ray(hitPos + N * EPS, dir), 0, distance - EPS)) {
-            L += radiance * bsdf->DistributionFunction(wOut, dir) * std::max(0.f, glm::dot(N, dir)) / pdf;
+            L += irradiance * std::max(0.f, glm::dot(N, dir)) * bsdf->DistributionFunction(wOut, dir) / pdf;
         }
     }
     return L;

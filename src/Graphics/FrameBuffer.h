@@ -15,6 +15,7 @@ public:
     void ToneReproduction();
     const unsigned char* GetData() const { return _data; }
     const std::vector<unsigned char> GetDataVector() const;
+    void Reset(int width, int height, glm::vec3* colors);
 
     int GetWidth() const { return _width; }
     int GetHeight()const { return _height; }
