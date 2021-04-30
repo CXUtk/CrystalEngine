@@ -51,6 +51,11 @@ glm::vec3 ImageTexture::GetTexel(glm::vec2 uv) const {
     return glm::mix(glm::mix(A, B, dxdy.x), glm::mix(C, D, dxdy.x), dxdy.y);
 }
 
+glm::vec3 ImageTexture::GetTexel(glm::ivec2 uv) const {
+    uv.y = _height - uv.y - 1;
+    return _texels[uv.y * _width + uv.x];
+}
+
 glm::vec3 ImageTexture::getColor(glm::vec2 uv) const {
     int x = glm::clamp((int)(uv.x), 0, _width - 1);
     int y = glm::clamp((int)(uv.y), 0, _height - 1);

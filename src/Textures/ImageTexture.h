@@ -9,6 +9,10 @@ public:
     ~ImageTexture() override;
 
     glm::vec3 GetTexel(glm::vec2 uv) const override;
+    glm::vec3 GetTexel(glm::ivec2 uv) const;
+
+    int GetWidth() const { return _width; }
+    int GetHeight() const { return _height; }
 
 private:
     glm::vec3* _texels;

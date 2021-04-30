@@ -3,6 +3,7 @@
 #include <Integrator/PathTracingIntegrator.h>
 #include <Integrator/EnvironmentIntegrator.h>
 #include <Integrator/PhotonMPIntegrator.h>
+#include <Integrator/PRTIntegrator.h>
 #include <Sampler/DefaultSampler.h>
 
 // 传入线段起点坐标 (x1, y1), 终点坐标 (x2, y2)
@@ -67,8 +68,9 @@ Raytracer::Raytracer(int width, int height) : _width(width), _height(height) {
         "Resources/Textures/back.jpg");
 
     //_integrator = std::make_shared<WhittedIntegrator>(_camera, sampler, nullptr, 6);
-    _integrator = std::make_shared<PathTracingIntegrator>(_camera, sampler, nullptr);
+    //_integrator = std::make_shared<PathTracingIntegrator>(_camera, sampler, nullptr);
     //_integrator = std::make_shared<PhotonMPIntegrator>(_camera, sampler, nullptr);
+    _integrator = std::make_shared<PathTracingIntegrator>(_camera, sampler, nullptr);
     fprintf(stdout, "Created\n");
 }
 
