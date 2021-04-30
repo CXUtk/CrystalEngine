@@ -70,7 +70,7 @@ void SamplerIntegrator::Render(std::shared_ptr<const Scene> scene, std::shared_p
         }
     }
 
-    ReinhardMapper mapper;
+    WardMapper mapper;
     mapper.Map(_tmpColors, height, width);
     frameBuffer->Reset(width, height, _tmpColors);
 

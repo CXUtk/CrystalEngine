@@ -8,9 +8,9 @@ class ImageTexture;
 
 class CubemapTexture : public Texture {
 public:
-    CubemapTexture(const std::string& right, const std::string& left,
-        const std::string& top, const std::string& bottom,
-        const std::string& front, const std::string& back);
+    CubemapTexture(const std::string& posx, const std::string& negx,
+        const std::string& posy, const std::string& negy,
+        const std::string& posz, const std::string& negz);
 
     ~CubemapTexture() override;
 

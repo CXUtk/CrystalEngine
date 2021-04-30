@@ -92,6 +92,38 @@ std::vector<std::shared_ptr<Object>> CreateCornellBox() {
 
 
 Scene::Scene() {
+    buildScene2();
+
+    _accelerator = Accelerator::GetAccelerator("KDTree");
+    _accelerator->Build(_sceneObjects);
+}
+
+Scene::~Scene() {
+
+}
+
+bool Scene::Intersect(const Ray& ray, SurfaceInteraction* isec) const {
+    return _accelerator->Intersect(ray, isec);
+}
+
+bool Scene::IntersectTest(const Ray& ray, float tMin, float tMax) const {
+    return _accelerator->IntersectTest(ray, tMin, tMax);
+}
+
+bool Scene::IntersectWithLight(const Ray& ray, SurfaceInteraction* isec) const {
+    bool hit = _accelerator->Intersect(ray, isec);
+    return false;
+}
+
+void Scene::AddObject(std::shared_ptr<Object> object) {
+    _sceneObjects.push_back(object);
+}
+
+void Scene::AddLight(std::shared_ptr<Light> light) {
+    _lights.push_back(light);
+}
+
+void Scene::buildScene1() {
     std::shared_ptr<Material> floor = std::make_shared<Default>(glm::vec3(0.5f), glm::vec2(10, 10));
     for (auto& obj : CreateCornellBox()) {
         AddObject(obj);
@@ -179,32 +211,19 @@ Scene::Scene() {
 
     auto light = CreateQuad(transform, nullptr, areaLight);
     AddObject(light);
-
-    _accelerator = Accelerator::GetAccelerator("KDTree");
-    _accelerator->Build(_sceneObjects);
 }
 
-Scene::~Scene() {
+void Scene::buildScene2() {
 
-}
+    glm::mat4 identity = glm::identity<glm::mat4>();
+    std::shared_ptr<Material> ballA = std::make_shared<Default>(glm::vec3(1.0f));
 
-bool Scene::Intersect(const Ray& ray, SurfaceInteraction* isec) const {
-    return _accelerator->Intersect(ray, isec);
-}
+    ObjLoader loader;
+    loader.load("Resources/Scenes/bunny.obj");
+    auto bunny = loader.GetMesh(ballA, identity);
+    AddObject(bunny);
 
-bool Scene::IntersectTest(const Ray& ray, float tMin, float tMax) const {
-    return _accelerator->IntersectTest(ray, tMin, tMax);
-}
+    auto pointLight = std::make_shared<PointLight>(glm::vec3(0, 5, 2), glm::vec3(1), 300);
+    // AddLight(pointLight);
 
-bool Scene::IntersectWithLight(const Ray& ray, SurfaceInteraction* isec) const {
-    bool hit = _accelerator->Intersect(ray, isec);
-    return false;
-}
-
-void Scene::AddObject(std::shared_ptr<Object> object) {
-    _sceneObjects.push_back(object);
-}
-
-void Scene::AddLight(std::shared_ptr<Light> light) {
-    _lights.push_back(light);
 }

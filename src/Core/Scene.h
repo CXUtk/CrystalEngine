@@ -21,9 +21,15 @@ public:
 
     std::vector<std::shared_ptr<Light>> GetLights() const { return _lights; }
 
+
+
+
 private:
     std::vector<std::shared_ptr<Object>> _sceneObjects;
     std::vector<std::shared_ptr<Light>> _lights;
 
     std::unique_ptr<Accelerator> _accelerator;
+
+    void buildScene1();
+    void buildScene2();
 };

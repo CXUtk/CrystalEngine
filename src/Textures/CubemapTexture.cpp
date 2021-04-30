@@ -1,6 +1,13 @@
 ﻿#include "CubemapTexture.h"
 #include "ImageTexture.h"
+#include <glm/gtx/transform.hpp>
 
+// +x Right
+// -x Left
+// +y Up
+// -y Down
+// +z Back
+// -z Front
 
 struct CubeUV {
     int id;
@@ -20,7 +27,7 @@ static glm::vec3 cubeNormals[6] = {
 static glm::vec3 cubeUVX[6] = {
     glm::vec3(0, 0, 1),
     glm::vec3(0, 0, -1),
-    glm::vec3(1, 0, 0),
+    glm::vec3(-1, 0, 0),
     glm::vec3(-1, 0, 0),
     glm::vec3(-1, 0, 0),
     glm::vec3(1, 0, 0),
@@ -29,7 +36,7 @@ static glm::vec3 cubeUVX[6] = {
 static glm::vec3 cubeUVY[6] = {
     glm::vec3(0, 1, 0),
     glm::vec3(0, 1, 0),
-    glm::vec3(0, 0, 1),
+    glm::vec3(0, 0, -1),
     glm::vec3(0, 0, 1),
     glm::vec3(0, 1, 0),
     glm::vec3(0, 1, 0),
@@ -84,18 +91,15 @@ float CalcArea(int u_, int v_, int width,
     return angle;
 }
 
-CubemapTexture::CubemapTexture(const std::string& right,
-    const std::string& left,
-    const std::string& top,
-    const std::string& bottom,
-    const std::string& front,
-    const std::string& back) {
-    _cubemaps[0] = std::make_shared<ImageTexture>(right);
-    _cubemaps[1] = std::make_shared<ImageTexture>(left);
-    _cubemaps[2] = std::make_shared<ImageTexture>(top);
-    _cubemaps[3] = std::make_shared<ImageTexture>(bottom);
-    _cubemaps[4] = std::make_shared<ImageTexture>(front);
-    _cubemaps[5] = std::make_shared<ImageTexture>(back);
+CubemapTexture::CubemapTexture(const std::string& posx, const std::string& negx,
+    const std::string& posy, const std::string& negy,
+    const std::string& posz, const std::string& negz) {
+    _cubemaps[0] = std::make_shared<ImageTexture>(posx);
+    _cubemaps[1] = std::make_shared<ImageTexture>(negx);
+    _cubemaps[2] = std::make_shared<ImageTexture>(posy);
+    _cubemaps[3] = std::make_shared<ImageTexture>(negy);
+    _cubemaps[4] = std::make_shared<ImageTexture>(posz);
+    _cubemaps[5] = std::make_shared<ImageTexture>(negz);
 }
 
 CubemapTexture::~CubemapTexture() {
@@ -110,18 +114,25 @@ glm::vec3 CubemapTexture::GetTexel(glm::vec3 dir) const {
 }
 
 void CubemapTexture::PRTProject(const std::shared_ptr<PRTEval>& evaluator) const {
+    float totWeight = 0;
     for (int i = 0; i < 6; i++) {
         int w = _cubemaps[i]->GetWidth();
         int h = _cubemaps[i]->GetHeight();
+        auto c = _cubemaps[i]->GetTexel(glm::ivec2(0, 0));
+        printf("%lf %lf %lf\n", c.r, c.g, c.b);
         for (int j = 0; j < h; j++) {
             for (int k = 0; k < w; k++) {
                 auto Li = _cubemaps[i]->GetTexel(glm::ivec2(k, j));
-                auto uv = glm::vec2((float)j / h - 0.5f, (float)k / w - 0.5f);
-                auto dir = glm::normalize(cubeNormals[i] + uv.x * cubeUVX[i] + uv.y * cubeUVY[i]);
-                evaluator->Project(dir, Li, CalcArea(k, j, w, h));
+                auto uv = glm::vec2((float)(k + 0.5) / w - 0.5f, (float)(j + 0.5) / h - 0.5f);
+                auto dir = glm::normalize(cubeNormals[i] * 0.5f + uv.x * cubeUVX[i] + uv.y * cubeUVY[i]);
+                auto dw = CalcArea(k, j, w, h);
+                evaluator->Project(dir, Li, dw);
+                totWeight += dw;
             }
         }
     }
+    evaluator->ScaleBy(4 * glm::pi<float>() / totWeight);
+    printf("%lf\n", totWeight);
 }
 
 glm::vec3 CubemapTexture::getColor(glm::vec3 dir) const {
