@@ -23,19 +23,17 @@
 
 
 std::shared_ptr<TriangleMesh> CreateQuad(glm::mat4 transform, const std::shared_ptr<Material>& material, const std::shared_ptr<Light>& light = nullptr) {
-    static VertexData quadVertices[4] = {
-        { glm::vec3(-0.5, 0, 0.5), glm::vec3(0, 1, 0), glm::vec2(0, 0)  },
-        { glm::vec3(-0.5, 0, -0.5), glm::vec3(0, 1, 0), glm::vec2(0, 1) },
-        { glm::vec3(0.5, 0, -0.5), glm::vec3(0, 1, 0), glm::vec2(1, 1) },
-        { glm::vec3(0.5, 0, 0.5), glm::vec3(0, 1, 0), glm::vec2(1, 0)  },
-    };
-    std::vector<std::shared_ptr<Triangle>> list;
-    std::shared_ptr<Triangle> tr1 = std::shared_ptr<Triangle>(new Triangle(quadVertices[0], quadVertices[1], quadVertices[2]));
-    std::shared_ptr<Triangle> tr2 = std::shared_ptr<Triangle>(new Triangle(quadVertices[0], quadVertices[2], quadVertices[3]));
+    std::vector<VertexData> vertices;
+    vertices.push_back({ glm::vec3(-0.5, 0, 0.5), glm::vec3(0, 1, 0), glm::vec2(0, 0) });
+    vertices.push_back({ glm::vec3(-0.5, 0, -0.5), glm::vec3(0, 1, 0), glm::vec2(0, 1) });
+    vertices.push_back({ glm::vec3(0.5, 0, -0.5), glm::vec3(0, 1, 0), glm::vec2(1, 1) });
+    vertices.push_back({ glm::vec3(0.5, 0, 0.5), glm::vec3(0, 1, 0), glm::vec2(1, 0) });
 
-    list.push_back(tr1);
-    list.push_back(tr2);
-    return std::make_shared<TriangleMesh>(list, transform, material, light);
+    std::vector<glm::ivec3> faceIndices;
+    faceIndices.push_back(glm::ivec3(0, 1, 2));
+    faceIndices.push_back(glm::ivec3(0, 2, 3));
+
+    return std::make_shared<TriangleMesh>(vertices, faceIndices, material, light);
 }
 
 

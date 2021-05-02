@@ -36,7 +36,7 @@ class ObjLoader {
 public:
 
     void load(const std::string& path);
-    std::vector<glm::vec3> Vertices;
+    std::vector<glm::vec3> Positions;
     std::vector<glm::vec2> TexCoords;
     std::vector<glm::vec3> Normals;
     std::vector<TriangleFaceIndex> Triangles;

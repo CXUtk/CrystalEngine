@@ -16,6 +16,6 @@ public:
     std::vector<glm::mat3> GetSH3RGBMat() const;
 private:
     int _order;
-    glm::vec3 _coeff[100];
+    glm::vec3 _coeff[10];
     glm::mat4 _lightMat[3];
 };

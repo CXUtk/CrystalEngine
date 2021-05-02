@@ -18,7 +18,7 @@ struct cmpVec3 {
 static std::map<glm::vec3, int, cmpVec3> pointSet;
 static std::map<int, int> vIDMap;
 void ObjLoader::load(const std::string& path) {
-    Vertices.clear();
+    Positions.clear();
     Triangles.clear();
     pointSet.clear();
     vIDMap.clear();
@@ -57,30 +57,50 @@ bool readInt(const char* S, int& idx, int& num) {
 
 
 std::shared_ptr<TriangleMesh> ObjLoader::GetMesh(std::shared_ptr<Material> material, glm::mat4 transform) const {
+    glm::mat4 normalTrans = glm::transpose(glm::inverse(transform));
 
-    std::vector<std::shared_ptr<Triangle>> triangles;
-    for (auto& t : Triangles) {
-        VertexData v[3]{};
-        v[0].Position = Vertices[t.VertexID[0]];
-        v[1].Position = Vertices[t.VertexID[1]];
-        v[2].Position = Vertices[t.VertexID[2]];
+    std::vector<VertexData> Vertices;
+    int sz = Positions.size();
+    for (int i = 0; i < sz; i++) {
+        VertexData v;
+        memset(&v, 0, sizeof(v));
+        v.Position = glm::vec3(transform * glm::vec4(Positions[i], 1.0f));
 
         if (Normals.size()) {
-            v[0].Normal = Normals[t.NormalID[0]];
-            v[1].Normal = Normals[t.NormalID[1]];
-            v[2].Normal = Normals[t.NormalID[2]];
+            v.Normal = glm::vec3(normalTrans * glm::vec4(Normals[i], 0.0f));
         }
-
         if (TexCoords.size()) {
-            v[0].TexCoords = TexCoords[t.TexID[0]];
-            v[1].TexCoords = TexCoords[t.TexID[1]];
-            v[2].TexCoords = TexCoords[t.TexID[2]];
+            v.TexCoords = TexCoords[i];
         }
-
-        std::shared_ptr<Triangle> tri = std::make_shared<Triangle>(v[0], v[1], v[2]);
-        triangles.push_back(tri);
+        Vertices.push_back(v);
     }
-    return std::make_shared<TriangleMesh>(triangles, transform, material, nullptr);
+    std::vector<glm::ivec3> triangleFaceIndices;
+    for (auto& t : Triangles) {
+        triangleFaceIndices.push_back(glm::ivec3(t.VertexID[0], t.VertexID[1], t.VertexID[2]));
+    }
+    //std::vector<std::shared_ptr<Triangle>> triangles;
+    //for (auto& t : Triangles) {
+    //    VertexData v[3]{};
+    //    v[0].Position = Positions[t.VertexID[0]];
+    //    v[1].Position = Positions[t.VertexID[1]];
+    //    v[2].Position = Positions[t.VertexID[2]];
+
+    //    if (Normals.size()) {
+    //        v[0].Normal = Normals[t.NormalID[0]];
+    //        v[1].Normal = Normals[t.NormalID[1]];
+    //        v[2].Normal = Normals[t.NormalID[2]];
+    //    }
+
+    //    if (TexCoords.size()) {
+    //        v[0].TexCoords = TexCoords[t.TexID[0]];
+    //        v[1].TexCoords = TexCoords[t.TexID[1]];
+    //        v[2].TexCoords = TexCoords[t.TexID[2]];
+    //    }
+
+    //    std::shared_ptr<Triangle> tri = std::make_shared<Triangle>(v[0], v[1], v[2]);
+    //    triangles.push_back(tri);
+    //}
+    return std::make_shared<TriangleMesh>(Vertices, triangleFaceIndices, material, nullptr);
 }
 
 //std::vector<DrawTriangle> ObjLoader::GetDrawTriangles() const {
@@ -113,9 +133,9 @@ void ObjLoader::process() {
         _totV++;
         auto pt = glm::vec3(x, y, z);
         if (pointSet.find(pt) == pointSet.end()) {
-            Vertices.push_back(pt);
-            pointSet[pt] = Vertices.size();
-            vIDMap[_totV] = Vertices.size();
+            Positions.push_back(pt);
+            pointSet[pt] = Positions.size();
+            vIDMap[_totV] = Positions.size();
         }
         else {
             vIDMap[_totV] = pointSet[pt];
@@ -158,7 +178,7 @@ void ObjLoader::process() {
 
         // Triangulation process
         auto cmp = [&](int a, int b) {
-            return Vertices[a].x < Vertices[b].x;
+            return Positions[a].x < Positions[b].x;
         };
         int sz = vertices.size();
         if (sz == 3) {

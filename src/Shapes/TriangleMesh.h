@@ -9,7 +9,7 @@ class Scene;
 class GeometryObject;
 class TriangleMesh : public Object {
 public:
-    TriangleMesh(const std::vector<std::shared_ptr<Triangle>>& triangles, glm::mat4 transform, const std::shared_ptr<Material>& material,
+    TriangleMesh(const std::vector<VertexData>& Vertices, const std::vector<glm::ivec3>& triangleFaceIndices, const std::shared_ptr<Material>& material,
         const std::shared_ptr<Light>& light);
     ~TriangleMesh() override;
 
@@ -33,6 +33,5 @@ private:
 
     std::shared_ptr<Material> _material;
     std::shared_ptr<Light> _light;
-
-    void transformTriangle(const std::vector<std::shared_ptr<Triangle>>& triganles, glm::mat4 transform);
+    std::vector<VertexData> _vertices;
 };
