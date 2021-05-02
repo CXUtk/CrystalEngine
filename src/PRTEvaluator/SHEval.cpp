@@ -67,10 +67,16 @@ void SHEval::PrintCoefficient() const {
     }
 }
 
+float myDot(glm::mat3 A, glm::mat3 B) {
+    return glm::dot(A[0], B[0]) + glm::dot(A[1], B[1]) + glm::dot(A[2], B[2]);
+}
+
 glm::vec3 SHEval::GetShading(const SurfaceInteraction& isec) const {
-    auto normal = isec.GetNormal();
-    glm::vec4 N = glm::vec4(normal, 1.0f);
-    return glm::vec3(glm::dot(N, _lightMat[0] * N), glm::dot(N, _lightMat[1] * N), glm::dot(N, _lightMat[2] * N));
+    //auto normal = isec.GetNormal();
+    //glm::vec4 N = glm::vec4(normal, 1.0f);
+    //return glm::vec3(glm::dot(N, _lightMat[0] * N), glm::dot(N, _lightMat[1] * N), glm::dot(N, _lightMat[2] * N));
+    auto prt = isec.GetRadianceTransfer();
+    return glm::vec3(myDot(prt, GetSH3Mat(0)), myDot(prt, GetSH3Mat(1)), myDot(prt, GetSH3Mat(2)));
 }
 
 void SHEval::CalculateLight() {
@@ -110,4 +116,18 @@ void SHEval::ScaleBy(float scale) {
     for (int i = 0; i < _order * _order; i++) {
         _coeff[i] *= scale;
     }
+}
+
+glm::mat3 SHEval::GetSH3Mat(int index) const {
+    return glm::mat3(glm::vec3(_coeff[0][index], _coeff[1][index], _coeff[2][index]),
+        glm::vec3(_coeff[3][index], _coeff[4][index], _coeff[5][index]),
+        glm::vec3(_coeff[6][index], _coeff[7][index], _coeff[8][index]));
+}
+
+std::vector<glm::mat3> SHEval::GetSH3RGBMat() const {
+    std::vector<glm::mat3> res;
+    res.push_back(GetSH3Mat(0));
+    res.push_back(GetSH3Mat(1));
+    res.push_back(GetSH3Mat(2));
+    return res;
 }

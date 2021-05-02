@@ -1,11 +1,11 @@
-#pragma once
+﻿#pragma once
 #include "Object.h"
 #include <Shapes/Shape.h>
 #include <memory>
 
 class GeometryObject : public Object {
 public:
-    GeometryObject(const std::shared_ptr<Shape>& shape, const std::shared_ptr<Material>& material, 
+    GeometryObject(const std::shared_ptr<Shape>& shape, const std::shared_ptr<Material>& material,
         const std::shared_ptr<Light>& light);
 
     virtual BoundingBox GetBoundingBox() const override { return _shape->GetBoundingBox(); }
@@ -18,6 +18,8 @@ public:
     virtual const Material* GetMaterial() const override { return _material.get(); }
 
     virtual std::shared_ptr<BSDF> ComputeScatteringFunctions(const SurfaceInteraction& isec, bool fromCamera = true) const override;
+
+    std::shared_ptr<Shape> GetShape() const { return _shape; }
 
 private:
     std::shared_ptr<Shape> _shape;

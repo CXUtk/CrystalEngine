@@ -45,7 +45,7 @@ void drawLine(int x1, int y1, int x2, int y2, const std::shared_ptr<FrameBuffer>
 
 Raytracer::Raytracer(int width, int height) : _width(width), _height(height) {
     _camera = std::shared_ptr<Camera>(new Camera(
-        glm::vec3(2, 3, 5),
+        glm::vec3(0, 3, 5),
         glm::vec3(0, 0, -3),
         glm::vec3(0, 1, 0),
         glm::pi<float>() / 3,

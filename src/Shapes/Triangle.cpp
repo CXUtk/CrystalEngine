@@ -1,9 +1,14 @@
 ﻿#include "Triangle.h"
 #include "Utils/Math.h"
 #include <glm/gtx/transform.hpp>
+#include <Core/Scene.h>
+#include <Utils/Random.h>
+#include <PRTEvaluator/SHEval.h>
 
 constexpr bool FLAT_SHADING = false;
 constexpr float EPS = 1e-7;
+
+static Random random;
 
 glm::vec3 bary_interp(glm::vec3 bary, glm::vec3 A, glm::vec3 B, glm::vec3 C) {
     return bary.x * A + bary.y * B + bary.z * C;
@@ -69,6 +74,9 @@ bool Triangle::Intersect(const Ray& ray, SurfaceInteraction* info) const {
             }
         }
     }
+
+    glm::mat3 prt = _vertices[0].PRT * bary_coord[0] + _vertices[1].PRT * bary_coord[1] + _vertices[2].PRT * bary_coord[2];
+    info->SetRadianceTransfer(prt);
     info->SetHitInfo(res.z, ray.start + ray.dir * res.z, N, UV, front_face, this, dpdu, glm::cross(N, dpdu));
     return true;
 }
@@ -92,6 +100,46 @@ void Triangle::ApplyTransform(glm::mat4 transform, glm::mat4 normalTransfrom) {
     }
     calculateDerivative();
 }
+
+void Triangle::ComputeTransferFunction(const std::shared_ptr<Scene>& scene) {
+
+    constexpr int NUM_SAMPLES = 200;
+    int BLOCK = std::sqrt(NUM_SAMPLES / 2);
+    float step = glm::pi<float>() / BLOCK;
+
+    for (int i = 0; i < 3; i++) {
+        memset(&_vertices[i].PRT, 0, sizeof(glm::mat3));
+    }
+    SHEval sheval(3);
+    int num = 0;
+    for (int j = 0; j < BLOCK * 2; j++) {
+        for (int k = 0; k < BLOCK; k++) {
+            glm::vec3 vec(0);
+            float phi = j * step + random.NextFloat() * step;
+            float theta = k * step + random.NextFloat() * step;
+            float r = std::sin(theta);
+            auto dir = glm::vec3(r * std::cos(phi), std::cos(theta), -r * std::sin(phi));
+
+            for (int i = 0; i < 3; i++) {
+                auto N = _vertices[i].Normal;
+                auto P = _vertices[i].Position;
+                auto v = glm::dot(N, dir);
+                if (v >= 0 && !scene->IntersectTest(Ray(P + N * 1e-5f, dir))) {
+                    vec[i] = v;
+                }
+            }
+            sheval.Project(dir, vec, 1.0f);
+            num++;
+        }
+    }
+    sheval.ScaleBy(4.f * glm::pi<float>() / num);
+    for (int i = 0; i < 3; i++) {
+        _vertices[i].PRT = sheval.GetSH3Mat(i);
+    }
+    printf("Finish\n");
+}
+
+
 
 void Triangle::calculateDerivative() {
     glm::mat2 A(

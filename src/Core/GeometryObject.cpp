@@ -1,7 +1,7 @@
-#include "GeometryObject.h"
+﻿#include "GeometryObject.h"
 
-GeometryObject::GeometryObject(const std::shared_ptr<Shape>& shape, 
-    const std::shared_ptr<Material>& material, 
+GeometryObject::GeometryObject(const std::shared_ptr<Shape>& shape,
+    const std::shared_ptr<Material>& material,
     const std::shared_ptr<Light>& light) : _shape(shape), _material(material), _light(light) {
 
 }

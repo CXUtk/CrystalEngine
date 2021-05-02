@@ -123,6 +123,10 @@ void Scene::AddLight(std::shared_ptr<Light> light) {
     _lights.push_back(light);
 }
 
+void Scene::AddTriangleMesh(std::shared_ptr<TriangleMesh> mesh) {
+    _triangleMeshes.push_back(mesh);
+}
+
 void Scene::buildScene1() {
     std::shared_ptr<Material> floor = std::make_shared<Default>(glm::vec3(0.5f), glm::vec2(10, 10));
     for (auto& obj : CreateCornellBox()) {
@@ -222,8 +226,9 @@ void Scene::buildScene2() {
     loader.load("Resources/Scenes/bunny.obj");
     auto bunny = loader.GetMesh(ballA, identity);
     AddObject(bunny);
+    AddTriangleMesh(bunny);
 
     auto pointLight = std::make_shared<PointLight>(glm::vec3(0, 5, 2), glm::vec3(1), 300);
-    // AddLight(pointLight);
+    //AddLight(pointLight);
 
 }

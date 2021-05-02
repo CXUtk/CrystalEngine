@@ -53,7 +53,11 @@ glm::vec3 ImageTexture::GetTexel(glm::vec2 uv) const {
 
 glm::vec3 ImageTexture::GetTexel(glm::ivec2 uv) const {
     uv.y = _height - uv.y - 1;
-    return _texels[uv.y * _width + uv.x];
+    auto c = _texels[uv.y * _width + uv.x];
+    c.r = std::pow(c.r, 2.2);
+    c.g = std::pow(c.g, 2.2);
+    c.b = std::pow(c.b, 2.2);
+    return c;
 }
 
 glm::vec3 ImageTexture::getColor(glm::vec2 uv) const {

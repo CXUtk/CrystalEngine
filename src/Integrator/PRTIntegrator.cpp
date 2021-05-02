@@ -16,6 +16,9 @@ PRTIntegrator::~PRTIntegrator() {
 void PRTIntegrator::Preprocess(const std::shared_ptr<Scene>& scene) {
     _prt->CalculateLight();
     _prt->PrintCoefficient();
+    for (auto& triangles : scene->GetTriangleMeshes()) {
+        triangles->PrecomputeRadianceTransfer(scene);
+    }
 }
 
 glm::vec3 PRTIntegrator::Evaluate(const Ray& ray, std::shared_ptr<const Scene> scene) {
