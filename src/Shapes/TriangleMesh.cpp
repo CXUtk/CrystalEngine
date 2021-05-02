@@ -5,7 +5,7 @@
 #include <Utils/Random.h>
 #include <PRTEvaluator/SHEval.h>
 #include <thread>
-
+#include <cstdio>
 
 
 TriangleMesh::TriangleMesh(const std::vector<VertexData>& Vertices, const std::vector<glm::ivec3>& triangleFaceIndices, const std::shared_ptr<Material>& material,
@@ -56,7 +56,7 @@ std::shared_ptr<BSDF> TriangleMesh::ComputeScatteringFunctions(const SurfaceInte
 }
 
 void TriangleMesh::PrecomputeRadianceTransfer(const std::shared_ptr<Scene>& scene) {
-    constexpr int NUM_SAMPLES = 200;
+    constexpr int NUM_SAMPLES = 2000;
     int BLOCK = std::sqrt(NUM_SAMPLES / 2);
     float step = glm::pi<float>() / BLOCK;
 
@@ -97,4 +97,14 @@ void TriangleMesh::PrecomputeRadianceTransfer(const std::shared_ptr<Scene>& scen
     for (int i = 0; i < NUM_THREADS; i++) {
         threads[i]->join();
     }
+
+
+    FILE* output = fopen("PRT.txt", "w");
+    for (auto& v : _vertices) {
+        for (int i = 0; i < 3; i++) {
+            fprintf(output, "%lf %lf %lf ", v.PRT[i].x, v.PRT[i].y, v.PRT[i].z);
+        }
+        fprintf(output, "\n");
+    }
+    fclose(output);
 }
