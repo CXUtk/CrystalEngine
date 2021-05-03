@@ -132,14 +132,7 @@ void ObjLoader::process() {
         _ptr += sscanf(lineBuffer + _ptr, "%lf%lf%lf", &x, &y, &z);
         _totV++;
         auto pt = glm::vec3(x, y, z);
-        if (pointSet.find(pt) == pointSet.end()) {
-            Positions.push_back(pt);
-            pointSet[pt] = Positions.size();
-            vIDMap[_totV] = Positions.size();
-        }
-        else {
-            vIDMap[_totV] = pointSet[pt];
-        }
+        Positions.push_back(pt);
     }
     else if (!strcmp(start, "f")) {
         int c = 0;
@@ -153,26 +146,7 @@ void ObjLoader::process() {
                 id++;
                 if (!b || faceV[id - 1] != '/')break;
             }
-            vertices.push_back({ vIDMap[vd[0]] - 1, vIDMap[vd[1]] - 1, vIDMap[vd[2]] - 1 });
-            //int i = 0;
-            //int num = 0;
-            //bool neg = false;
-            //for (; faceV[i] != '\0' && faceV[i] != '/'; i++) {
-            //    if (!isdigit(faceV[i])) {
-            //        if (faceV[i] == '-') {
-            //            neg = true;
-            //        }
-            //        continue;
-            //    }
-            //    // assert(isdigit(faceV[i]));
-            //    num *= 10;
-            //    num += faceV[i] - '0';
-            //}
-            //if (!neg)
-            //    num--;
-            //else
-            //    num = Vertices.size() - num - 1;
-            //vertices.push_back(num);
+            vertices.push_back({ vd[0] - 1, vd[1] - 1, vd[2] - 1 });
             _ptr += strlen(faceV) + 1;
         }
 

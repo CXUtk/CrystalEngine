@@ -37,8 +37,8 @@ TriangleMesh::~TriangleMesh() {
 
 BoundingBox TriangleMesh::GetBoundingBox() const {
     BoundingBox box;
-    for (auto& tri : _triangles) {
-        box = box.Union(tri->GetBoundingBox());
+    for (auto& v : _vertices) {
+        box = box.Union(v.Position);
     }
     return box;
 }
@@ -60,7 +60,7 @@ void TriangleMesh::PrecomputeRadianceTransfer(const std::shared_ptr<Scene>& scen
     int BLOCK = std::sqrt(NUM_SAMPLES / 2);
     float step = glm::pi<float>() / BLOCK;
 
-    constexpr int NUM_THREADS = 1;
+    constexpr int NUM_THREADS = 6;
     std::shared_ptr<std::thread> threads[NUM_THREADS];
     int vertexCount = _vertices.size();
 
@@ -81,15 +81,13 @@ void TriangleMesh::PrecomputeRadianceTransfer(const std::shared_ptr<Scene>& scen
                     float sinphi = std::cos(phi);
                     for (int k = 0; k < BLOCK; k++) {
                         float theta = k * step + random.NextFloat() * step;
-                        printf("%lf\n", theta);
                         float r = std::sin(theta);
                         auto dir = glm::vec3(r * sinphi, std::cos(theta), r * cosphi);
-
                         auto cosTheta = std::max(0.f, glm::dot(N, dir));
-                        if (!scene->IntersectTest(Ray(P + N * 1e-4f, dir))) {
+                        if (!scene->IntersectTest(Ray(P + N * 1e-5f, dir))) {
                             sheval.Project(dir, glm::vec3(cosTheta), 1.0f);
-                            num++;
                         }
+                        num++;
                     }
                 }
                 sheval.ScaleBy(4.f * glm::pi<float>() / num);
