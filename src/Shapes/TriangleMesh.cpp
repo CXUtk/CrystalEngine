@@ -60,7 +60,7 @@ void TriangleMesh::PrecomputeRadianceTransfer(const std::shared_ptr<Scene>& scen
     int BLOCK = std::sqrt(NUM_SAMPLES / 2);
     float step = glm::pi<float>() / BLOCK;
 
-    constexpr int NUM_THREADS = 6;
+    constexpr int NUM_THREADS = 1;
     std::shared_ptr<std::thread> threads[NUM_THREADS];
     int vertexCount = _vertices.size();
 
@@ -72,25 +72,28 @@ void TriangleMesh::PrecomputeRadianceTransfer(const std::shared_ptr<Scene>& scen
                 auto& v = _vertices[x];
                 SHEval sheval(3);
                 int num = 0;
-                for (int j = 0; j < BLOCK * 2; j++) {
-                    for (int k = 0; k < BLOCK; k++) {
-                        float phi = j * step + random.NextFloat() * step;
-                        float theta = k * step + random.NextFloat() * step;
-                        float r = std::sin(theta);
-                        auto dir = glm::vec3(r * std::cos(phi), std::cos(theta), -r * std::sin(phi));
+                auto N = v.Normal;
+                auto P = v.Position;
 
-                        auto N = v.Normal;
-                        auto P = v.Position;
-                        auto cosTheta = glm::dot(N, dir);
-                        if (cosTheta >= 0 && !scene->IntersectTest(Ray(P + N * 1e-5f, dir))) {
+                for (int j = 0; j < BLOCK * 2; j++) {
+                    float phi = j * step + random.NextFloat() * step;
+                    float cosphi = std::sin(phi);
+                    float sinphi = std::cos(phi);
+                    for (int k = 0; k < BLOCK; k++) {
+                        float theta = k * step + random.NextFloat() * step;
+                        printf("%lf\n", theta);
+                        float r = std::sin(theta);
+                        auto dir = glm::vec3(r * sinphi, std::cos(theta), r * cosphi);
+
+                        auto cosTheta = std::max(0.f, glm::dot(N, dir));
+                        if (!scene->IntersectTest(Ray(P + N * 1e-4f, dir))) {
                             sheval.Project(dir, glm::vec3(cosTheta), 1.0f);
+                            num++;
                         }
-                        num++;
                     }
                 }
                 sheval.ScaleBy(4.f * glm::pi<float>() / num);
                 v.PRT = sheval.GetSH3Mat(0);
-
             }
             });
     }
@@ -100,6 +103,7 @@ void TriangleMesh::PrecomputeRadianceTransfer(const std::shared_ptr<Scene>& scen
 
 
     FILE* output = fopen("PRT.txt", "w");
+    fprintf(output, "%lld\n", _vertices.size());
     for (auto& v : _vertices) {
         for (int i = 0; i < 3; i++) {
             fprintf(output, "%lf %lf %lf ", v.PRT[i].x, v.PRT[i].y, v.PRT[i].z);

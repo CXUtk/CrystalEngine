@@ -68,12 +68,12 @@ Raytracer::Raytracer(int width, int height) : _width(width), _height(height) {
     //    "Resources/Textures/back.jpg");
 
     auto skybox = std::make_shared<CubemapTexture>(
-        "Resources/Textures/CornellBox/posx.jpg",
-        "Resources/Textures/CornellBox/negx.jpg",
-        "Resources/Textures/CornellBox/posy.jpg",
-        "Resources/Textures/CornellBox/negy.jpg",
-        "Resources/Textures/CornellBox/posz.jpg",
-        "Resources/Textures/CornellBox/negz.jpg");
+        "Resources/Textures/Indoor/posx.jpg",
+        "Resources/Textures/Indoor/negx.jpg",
+        "Resources/Textures/Indoor/posy.jpg",
+        "Resources/Textures/Indoor/negy.jpg",
+        "Resources/Textures/Indoor/posz.jpg",
+        "Resources/Textures/Indoor/negz.jpg");
 
     //_integrator = std::make_shared<WhittedIntegrator>(_camera, sampler, nullptr, 6);
     //_integrator = std::make_shared<PathTracingIntegrator>(_camera, sampler, nullptr);
