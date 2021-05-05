@@ -25,10 +25,10 @@ static glm::vec3 cubeNormals[6] = {
 };
 
 static glm::vec3 cubeUVX[6] = {
-    glm::vec3(0, 0, 1),
     glm::vec3(0, 0, -1),
-    glm::vec3(-1, 0, 0),
-    glm::vec3(-1, 0, 0),
+    glm::vec3(0, 0, 1),
+    glm::vec3(1, 0, 0),
+    glm::vec3(1, 0, 0),
     glm::vec3(-1, 0, 0),
     glm::vec3(1, 0, 0),
 };
@@ -125,6 +125,7 @@ void CubemapTexture::PRTProject(const std::shared_ptr<PRTEval>& evaluator) const
                 auto Li = _cubemaps[i]->GetTexel(glm::ivec2(k, j));
                 auto uv = glm::vec2((float)(k + 0.5) / w - 0.5f, (float)(j + 0.5) / h - 0.5f);
                 auto dir = glm::normalize(cubeNormals[i] * 0.5f + uv.x * cubeUVX[i] + uv.y * cubeUVY[i]);
+
                 auto dw = CalcArea(k, j, w, h);
                 evaluator->Project(dir, Li, dw);
                 totWeight += dw;

@@ -7,57 +7,79 @@ SHEval::SHEval(int order) :_order(order) {
 SHEval::~SHEval() {
 }
 
+//void SHEval3(const float fX, const float fY, const float fZ, float* pSH) {
+//    float fC0, fC1, fS0, fS1, fTmpA, fTmpB, fTmpC;
+//    float fZ2 = fZ * fZ;
+//
+//    pSH[0] = 0.2820947917738781f;
+//    pSH[2] = 0.4886025119029199f * fZ;
+//    pSH[6] = 0.9461746957575601f * fZ2 + -0.3153915652525201f;
+//    fC0 = fX;
+//    fS0 = fY;
+//
+//    fTmpA = -0.48860251190292f;
+//    pSH[3] = fTmpA * fC0;
+//    pSH[1] = fTmpA * fS0;
+//    fTmpB = -1.092548430592079f * fZ;
+//    pSH[7] = fTmpB * fC0;
+//    pSH[5] = fTmpB * fS0;
+//    fC1 = fX * fC0 - fY * fS0;
+//    fS1 = fX * fS0 + fY * fC0;
+//
+//    fTmpC = 0.5462742152960395f;
+//    pSH[8] = fTmpC * fC1;
+//    pSH[4] = fTmpC * fS1;
+//}
+
 void SHEval3(const float fX, const float fY, const float fZ, float* pSH) {
-    float fC0, fC1, fS0, fS1, fTmpA, fTmpB, fTmpC;
-    float fZ2 = fZ * fZ;
+    float c;
+    c = 0.282095;
+    pSH[0] = c;
 
-    pSH[0] = 0.2820947917738781f;
-    pSH[2] = 0.4886025119029199f * fZ;
-    pSH[6] = 0.9461746957575601f * fZ2 + -0.3153915652525201f;
-    fC0 = fX;
-    fS0 = fY;
+    c = 0.488603;
+    pSH[1] = (c * fY);
+    pSH[2] = (c * fZ);
+    pSH[3] = (c * fX);
 
-    fTmpA = -0.48860251190292f;
-    pSH[3] = fTmpA * fC0;
-    pSH[1] = fTmpA * fS0;
-    fTmpB = -1.092548430592079f * fZ;
-    pSH[7] = fTmpB * fC0;
-    pSH[5] = fTmpB * fS0;
-    fC1 = fX * fC0 - fY * fS0;
-    fS1 = fX * fS0 + fY * fC0;
+    c = 1.092548;
+    pSH[4] = (c * fX * fY);
+    pSH[5] = (c * fY * fZ);
+    pSH[7] = (c * fZ * fX);
 
-    fTmpC = 0.5462742152960395f;
-    pSH[8] = fTmpC * fC1;
-    pSH[4] = fTmpC * fS1;
+    c = 0.315392;
+    pSH[6] = c * (3 * fZ * fZ - 1);
+
+    c = 0.546274;
+    pSH[8] = c * (fX * fX - fY * fY);
 }
 
 void SHEval::Project(const glm::vec3& dir, const glm::vec3& Li, float dOmega) {
-    //float SH[9];
-    //SHEval3(dir.x, dir.y, dir.z, SH);
+    float SH[9];
+    SHEval3(dir.x, dir.y, dir.z, SH);
     for (int i = 0; i < 3; i++) {
-        //for (int j = 0; j < 9; j++) {
-        //    _coeff[j][i] += Li[i] * SH[j] * dOmega;
-        //}
-        float c;
-        c = 0.282095;
-        _coeff[0][i] += Li[i] * c * dOmega;
+        for (int j = 0; j < 9; j++) {
+            _coeff[j][i] += Li[i] * SH[j] * dOmega;
+        }
+        //float c;
+        //c = 0.282095;
+        //_coeff[0][i] += Li[i] * c * dOmega;
 
-        c = 0.488603;
-        _coeff[1][i] += Li[i] * (c * dir.y) * dOmega;
-        _coeff[2][i] += Li[i] * (c * dir.z) * dOmega;
-        _coeff[3][i] += Li[i] * (c * dir.x) * dOmega;
+        //c = 0.488603;
+        //_coeff[1][i] += Li[i] * (c * dir.y) * dOmega;
+        //_coeff[2][i] += Li[i] * (c * dir.z) * dOmega;
+        //_coeff[3][i] += Li[i] * (c * dir.x) * dOmega;
 
 
-        c = 1.092548;
-        _coeff[4][i] += Li[i] * (c * dir.x * dir.y) * dOmega;
-        _coeff[5][i] += Li[i] * (c * dir.y * dir.z) * dOmega;
-        _coeff[7][i] += Li[i] * (c * dir.x * dir.z) * dOmega;
+        //c = 1.092548;
+        //_coeff[4][i] += Li[i] * (c * dir.x * dir.y) * dOmega;
+        //_coeff[5][i] += Li[i] * (c * dir.y * dir.z) * dOmega;
+        //_coeff[7][i] += Li[i] * (c * dir.x * dir.z) * dOmega;
 
-        c = 0.315392;
-        _coeff[6][i] += Li[i] * (c * (3 * dir.z * dir.z - 1)) * dOmega;
+        //c = 0.315392;
+        //_coeff[6][i] += Li[i] * (c * (3 * dir.z * dir.z - 1)) * dOmega;
 
-        c = 0.546274;
-        _coeff[8][i] += Li[i] * (c * (dir.x * dir.x - dir.y * dir.y)) * dOmega;
+        //c = 0.546274;
+        //_coeff[8][i] += Li[i] * (c * (dir.x * dir.x - dir.y * dir.y)) * dOmega;
     }
 }
 

@@ -46,9 +46,9 @@ void drawLine(int x1, int y1, int x2, int y2, const std::shared_ptr<FrameBuffer>
 Raytracer::Raytracer(int width, int height) : _width(width), _height(height) {
     _camera = std::shared_ptr<Camera>(new Camera(
         glm::vec3(0, 0, 5),
-        glm::vec3(0, 0, -3),
+        glm::vec3(0, 0, 0),
         glm::vec3(0, 1, 0),
-        glm::pi<float>() / 3,
+        glm::pi<float>() / 2,
         width / static_cast<float>(height),
         1,
         1000
@@ -68,12 +68,12 @@ Raytracer::Raytracer(int width, int height) : _width(width), _height(height) {
     //    "Resources/Textures/back.jpg");
 
     auto skybox = std::make_shared<CubemapTexture>(
-        "Resources/Textures/Indoor/posx.jpg",
-        "Resources/Textures/Indoor/negx.jpg",
-        "Resources/Textures/Indoor/posy.jpg",
-        "Resources/Textures/Indoor/negy.jpg",
-        "Resources/Textures/Indoor/posz.jpg",
-        "Resources/Textures/Indoor/negz.jpg");
+        "Resources/Textures/Yokohama/posx.jpg",
+        "Resources/Textures/Yokohama/negx.jpg",
+        "Resources/Textures/Yokohama/posy.jpg",
+        "Resources/Textures/Yokohama/negy.jpg",
+        "Resources/Textures/Yokohama/posz.jpg",
+        "Resources/Textures/Yokohama/negz.jpg");
 
     //_integrator = std::make_shared<WhittedIntegrator>(_camera, sampler, nullptr, 6);
     //_integrator = std::make_shared<PathTracingIntegrator>(_camera, sampler, nullptr);

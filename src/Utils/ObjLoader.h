@@ -34,14 +34,15 @@ struct TriangleFaceIndex {
 
 class ObjLoader {
 public:
-
     void load(const std::string& path);
     std::vector<glm::vec3> Positions;
     std::vector<glm::vec2> TexCoords;
     std::vector<glm::vec3> Normals;
-    std::vector<TriangleFaceIndex> Triangles;
+    std::vector<glm::mat3> PRTs;
+    std::vector<glm::ivec3> Triangles;
+    std::vector<VertexData> Vertices;
 
-    std::shared_ptr<TriangleMesh> GetMesh(std::shared_ptr<Material> material, glm::mat4 transform) const;
+    std::shared_ptr<TriangleMesh> GetMesh(std::shared_ptr<Material> material, glm::mat4 transform);
     //std::vector<DrawTriangle> GetDrawTriangles() const;
 private:
     static constexpr int MAX_BUFFER = 100005;
