@@ -15,12 +15,12 @@ public:
     ~CubemapTexture() override;
 
     glm::vec3 GetTexel(glm::vec2 uv) const override;
-    glm::vec3 GetTexel(glm::vec3 dir) const;
+    glm::vec3 GetTexel(glm::vec3 dir, bool gamma = false) const;
 
     void PRTProject(const std::shared_ptr<PRTEval>& evaluator) const;
 
 private:
     std::shared_ptr<ImageTexture> _cubemaps[6];
 
-    glm::vec3 getColor(glm::vec3 dir) const;
+    glm::vec3 getColor(glm::vec3 dir, bool gamma = false) const;
 };

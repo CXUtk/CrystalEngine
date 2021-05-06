@@ -18,7 +18,6 @@ glm::vec3 Lambertian::SampleDirection(glm::vec3 wOut, glm::vec3* wIn, float* pdf
     // Law of TNB matrix, Tangent, Normal and BiTangent, all of them should be normalized
     glm::vec3 dir = random.NextCosineUnitHemiSphere();
     *wIn = _tnb * dir;
-
     *pdf = std::abs(dir.y) / glm::pi<float>();
     return DistributionFunction(wOut, *wIn);
 }

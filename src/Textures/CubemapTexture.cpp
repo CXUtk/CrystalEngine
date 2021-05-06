@@ -109,8 +109,8 @@ glm::vec3 CubemapTexture::GetTexel(glm::vec2 uv) const {
     return _cubemaps[0]->GetTexel(uv);
 }
 
-glm::vec3 CubemapTexture::GetTexel(glm::vec3 dir) const {
-    return getColor(dir);
+glm::vec3 CubemapTexture::GetTexel(glm::vec3 dir, bool gamma) const {
+    return getColor(dir, gamma);
 }
 
 void CubemapTexture::PRTProject(const std::shared_ptr<PRTEval>& evaluator) const {
@@ -136,7 +136,13 @@ void CubemapTexture::PRTProject(const std::shared_ptr<PRTEval>& evaluator) const
     printf("%lf\n", totWeight);
 }
 
-glm::vec3 CubemapTexture::getColor(glm::vec3 dir) const {
+glm::vec3 CubemapTexture::getColor(glm::vec3 dir, bool gamma) const {
     auto coord = XYZ2CubeUV(dir);
-    return _cubemaps[coord.id]->GetTexel(coord.uv);
+    auto color = _cubemaps[coord.id]->GetTexel(coord.uv);
+    if (gamma) {
+        color.r = std::pow(color.r, 2.2f);
+        color.g = std::pow(color.g, 2.2f);
+        color.b = std::pow(color.b, 2.2f);
+    }
+    return color;
 }

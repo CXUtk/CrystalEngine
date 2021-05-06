@@ -57,7 +57,7 @@ std::shared_ptr<BSDF> TriangleMesh::ComputeScatteringFunctions(const SurfaceInte
 }
 
 void TriangleMesh::PrecomputeRadianceTransfer(const std::shared_ptr<Scene>& scene) {
-    constexpr int NUM_SAMPLES = 10000;
+    constexpr int NUM_SAMPLES = 1000;
     int BLOCK = std::sqrt(NUM_SAMPLES);
     float step = 1.f / BLOCK;
 
@@ -70,32 +70,43 @@ void TriangleMesh::PrecomputeRadianceTransfer(const std::shared_ptr<Scene>& scen
     for (int i = 0; i < NUM_THREADS; i++) {
         threads[i] = std::make_shared<std::thread>([&, i]() {
             printf("%d\n", i);
-            Random random(114514 + 28 * i);
+
             for (int x = i; x < vertexCount; x += NUM_THREADS) {
                 auto& v = _vertices[x];
                 SHEval sheval(3);
                 int num = 0;
                 auto N = v.Normal;
                 auto P = v.Position;
+                glm::vec3 T, B;
+                for (int j = 0; j < 3; j++) {
+                    glm::vec3 v(0);
+                    v[j] = 1;
+                    if (glm::cross(N, v) != glm::vec3(0)) {
+                        T = glm::normalize(glm::cross(N, v));
+                        B = glm::normalize(glm::cross(N, T));
+                        break;
+                    }
+                }
+                Random random(114514 + glm::dot(N, glm::vec3(0.2132, 0.6182, -0.7112)) * 1048576);
                 for (int j = 0; j < BLOCK; j++) {
                     float phi = j * step + random.NextFloat() * step;
                     phi *= glm::two_pi<float>();
                     float cosphi = std::sin(phi);
                     float sinphi = std::cos(phi);
                     for (int k = 0; k < BLOCK; k++) {
-                        float theta = k * step + random.NextFloat() * step;
-                        theta = theta * 2.f - 1.f;
-                        float r = std::sqrt(1 - theta * theta);
-                        auto dir = glm::vec3(r * sinphi, theta, r * cosphi);
-                        auto cosTheta = std::max(0.f, glm::dot(N, dir));
+                        float r = k * step + random.NextFloat() * step;
+                        r = std::sqrt(r);
+                        auto dir = glm::vec3(r * sinphi, std::sqrt(1 - r * r), r * cosphi);
+                        auto cosTheta = dir.y;
+                        dir = dir.x * T + dir.y * N + dir.z * B;
                         //sheval.Project(dir, glm::vec3(cosTheta), 1.0f);
-                        if (cosTheta > 0.0 && !scene->IntersectTest(Ray(P + N * 1e-5f, dir))) {
-                            sheval.Project(dir, glm::vec3(cosTheta), 1.0f);
+                        if (!scene->IntersectTest(Ray(P + N * 1e-5f, dir))) {
+                            sheval.Project(dir, glm::vec3(1), 1.0f);
                         }
                         num++;
                     }
                 }
-                sheval.ScaleBy(4.f * glm::pi<float>() / num);
+                sheval.ScaleBy(glm::pi<float>() / num);
                 v.PRT = sheval.GetSH3Mat(0);
                 mutexLock.lock();
                 cnt++;

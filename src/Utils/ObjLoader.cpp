@@ -125,6 +125,7 @@ void ObjLoader::process() {
             _ptr += strlen(faceV) + 1;
         }
         VertexData V[3];
+        memset(V, 0, sizeof(V));
         for (int k = 0; k < 3; k++) {
             V[k].Position = Positions[vd[k] - 1];
         }

@@ -61,6 +61,7 @@ bool Triangle::Intersect(const Ray& ray, SurfaceInteraction* info) const {
     auto dpdu = _dpdu;
     // If there are no tangent vector attached
     if (dpdu == glm::vec3(0)) {
+        //printf("YES\n");
         for (int i = 0; i < 3; i++) {
             glm::vec3 v(0);
             v[i] = 1;
@@ -97,8 +98,9 @@ void Triangle::calculateDerivative() {
         glm::vec2(_vertices[0]->TexCoords.x - _vertices[2]->TexCoords.x, _vertices[0]->TexCoords.y - _vertices[2]->TexCoords.y),
         glm::vec2(_vertices[1]->TexCoords.x - _vertices[2]->TexCoords.x, _vertices[1]->TexCoords.y - _vertices[2]->TexCoords.y)
     );
+
     A = glm::inverse(A);
-    if (glm::isnan(A[0]) != glm::bvec2(false) || glm::isnan(A[1]) != glm::bvec2(false)) {
+    if (glm::isinf(A[0]) != glm::bvec2(false) || glm::isnan(A[0]) != glm::bvec2(false) || glm::isnan(A[1]) != glm::bvec2(false)) {
         _dpdu = _dpdv = glm::vec3(0);
     }
     else {

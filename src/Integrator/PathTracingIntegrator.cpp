@@ -20,6 +20,7 @@ glm::vec3 PathTracingIntegrator::Evaluate(const Ray& ray, std::shared_ptr<const 
 glm::vec3 PathTracingIntegrator::evaluate(const Ray& ray, std::shared_ptr<const Scene> scene, int level, bool specular) {
     glm::vec3 dirL(0), indirL(0);
     SurfaceInteraction hit;
+    if (level == 2) return dirL;
     float beta = (level > 3) ? pRR : 1.0f;
     if (scene->Intersect(ray, &hit)) {
         if (level == 0 || specular)
@@ -40,7 +41,7 @@ glm::vec3 PathTracingIntegrator::evaluate(const Ray& ray, std::shared_ptr<const 
     }
     else {
         if (GetSkyBox() == nullptr) return dirL;
-        return GetSkyBox()->GetTexel(ray.dir);
+        return GetSkyBox()->GetTexel(ray.dir, true);
     }
     return (dirL + indirL);
 }
@@ -88,7 +89,6 @@ glm::vec3 PathTracingIntegrator::sampleIndirect(const SurfaceInteraction& hit, g
 
     auto Li = evaluate(hit.SpawnRay(dir), scene, level + 1, specular);
     auto cosine = specular ? 1.0f : std::max(0.f, glm::dot(N, dir));
-
     return Li * brdf * cosine / pdf;
 }
 

@@ -31,6 +31,7 @@ std::shared_ptr<BSDF> Default::ComputeScatteringFunctions(const SurfaceInteracti
     auto T = glm::normalize(isec.GetDpDu());
     auto N = isec.GetNormal();
     auto B = glm::normalize(glm::cross(N, T));
+    // printf("%f %f %f\n", T.x, T.y, T.z);
     auto tnb = glm::mat3(T, N, B);
     auto bsdf = std::make_shared<BSDF>(&isec);
     bsdf->AddBxDF(std::make_shared<Lambertian>(color, tnb), glm::vec3(1));
