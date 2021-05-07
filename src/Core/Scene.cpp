@@ -221,7 +221,7 @@ void Scene::buildScene2() {
     std::shared_ptr<Material> ballA = std::make_shared<Default>(glm::vec3(1.0f));
 
     ObjLoader loader;
-    loader.load("Resources/Scenes/bunny.obj");
+    loader.load("Resources/Scenes/spot_triangulated_good.obj");
     auto bunny = loader.GetMesh(ballA, identity);
     AddObject(bunny);
     AddTriangleMesh(bunny);

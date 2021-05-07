@@ -53,7 +53,7 @@ glm::vec3 PRTIntegrator::Evaluate(const Ray& ray, std::shared_ptr<const Scene> s
                 L += radiance * bsdf->DistributionFunction(wOut, dir) * std::max(0.f, glm::dot(N, dir)) / pdf;
             }
         }
-        L += _prt->GetShading(hit) / glm::pi<float>();
+        L += _prt->GetShading(hit);
         return L;
     }
     if (GetSkyBox() == nullptr) return L;

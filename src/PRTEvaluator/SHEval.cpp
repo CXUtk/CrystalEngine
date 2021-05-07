@@ -153,3 +153,11 @@ std::vector<glm::mat3> SHEval::GetSH3RGBMat() const {
     res.push_back(GetSH3Mat(2));
     return res;
 }
+
+void SHEval::Append(glm::mat3 shCoeff) {
+    for (int i = 0; i < 9; i++) {
+        int c = i / 3;
+        int r = i % 3;
+        _coeff[c][r] += shCoeff[c][r];
+    }
+}
