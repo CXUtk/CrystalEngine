@@ -228,9 +228,9 @@ void Scene::buildScene2() {
     AddTriangleMesh(bunny);
 
 
-    identity = glm::translate(identity, glm::vec3(0.f, -2.f, 0));
-    identity = glm::scale(identity, glm::vec3(5, 1, 5));
-    loader.load("Resources/Scenes/cube.obj");
+    identity = glm::translate(identity, glm::vec3(0.f, -1.5f, 0));
+    identity = glm::scale(identity, glm::vec3(5, 0.5f, 5));
+    loader.load("Resources/Scenes/cube2.obj");
     auto bunny2 = loader.GetMesh(ballB, identity);
     AddObject(bunny2);
     AddTriangleMesh(bunny2);

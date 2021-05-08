@@ -91,7 +91,7 @@ void TriangleMesh::ComputeInitialRadianceTransfer(const std::shared_ptr<Scene>& 
                 auto& v = _vertices[x];
                 SHEval sheval(3);
                 int num = 0;
-                auto N = v.Normal;
+                auto N = glm::normalize(v.Normal);
                 auto P = v.Position;
                 glm::vec3 T, B;
                 computeTangentVectors(N, T, B);
@@ -130,7 +130,6 @@ void TriangleMesh::ComputeInitialRadianceTransfer(const std::shared_ptr<Scene>& 
     for (int i = 0; i < NUM_THREADS; i++) {
         threads[i]->join();
     }
-
 
 }
 
@@ -204,7 +203,6 @@ void TriangleMesh::ComputeInterReflection(const std::shared_ptr<Scene>& scene) {
 }
 
 void TriangleMesh::WritePRTInfo(FILE* file) {
-    fprintf(file, "%lld\n", _vertices.size());
     fprintf(file, "EDIT_COLOR_R EDIT_COLOR_G EDIT_COLOR_B\n");
     for (int i = 0; i < 4; i++) {
         for (int j = 0; j < 4; j++) {
@@ -212,6 +210,7 @@ void TriangleMesh::WritePRTInfo(FILE* file) {
         }
         fprintf(file, "\n");
     }
+    fprintf(file, "%lld\n", _vertices.size());
     // First 3V lines are PRT valus without inter-reflection
     for (auto& v : _vertices) {
         for (int i = 0; i < 3; i++) {

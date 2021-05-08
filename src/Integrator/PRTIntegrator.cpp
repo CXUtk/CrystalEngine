@@ -25,10 +25,8 @@ void PRTIntegrator::Preprocess(const std::shared_ptr<Scene>& scene) {
     FILE* file = fopen("PRT.scene", "w");
     int size = scene->GetTriangleMeshes().size();
     fprintf(file, "%d\n", size);
-    for (int i = 0; i < size; i++) {
-        fprintf(file, "Edit_Here\n");
-    }
     for (auto& triangles : scene->GetTriangleMeshes()) {
+        fprintf(file, "Edit_Here\n");
         triangles->WritePRTInfo(file);
     }
     fclose(file);

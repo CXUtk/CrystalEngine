@@ -38,7 +38,7 @@ public:
     std::vector<glm::vec3> Positions;
     std::vector<glm::vec2> TexCoords;
     std::vector<glm::vec3> Normals;
-    std::vector<glm::mat3> PRTs;
+
     std::vector<glm::ivec3> Triangles;
     std::vector<VertexData> Vertices;
 

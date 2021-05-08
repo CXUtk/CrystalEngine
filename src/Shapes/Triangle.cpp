@@ -4,7 +4,7 @@
 #include <Core/Scene.h>
 
 constexpr bool FLAT_SHADING = false;
-constexpr float EPS = 1e-7;
+constexpr float EPS = 1e-6;
 
 
 glm::vec3 bary_interp(glm::vec3 bary, glm::vec3 A, glm::vec3 B, glm::vec3 C) {

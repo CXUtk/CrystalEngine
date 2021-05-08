@@ -16,11 +16,12 @@ struct cmpVec3 {
 };
 void ObjLoader::load(const std::string& path) {
     Positions.clear();
-    Triangles.clear();
-    PRTs.clear();
-    Normals.clear();
     TexCoords.clear();
+    Normals.clear();
+
     Vertices.clear();
+    Triangles.clear();
+
     _totV = 0;
 
     FILE* file = fopen(path.c_str(), "r");
@@ -47,12 +48,9 @@ std::shared_ptr<TriangleMesh> ObjLoader::GetMesh(std::shared_ptr<Material> mater
         VertexData& v = Vertices[i];
         v.Position = glm::vec3(transform * glm::vec4(v.Position, 1.0f));
 
-        if (Normals.size()) {
+        if (!Normals.empty()) {
             v.Normal = glm::vec3(normalTrans * glm::vec4(v.Normal, 0.0f));
         }
-        //if (!PRTs.empty()) {
-        //    v.PRT = PRTs[i];
-        //}
     }
     return std::make_shared<TriangleMesh>(Vertices, Triangles, material, transform, nullptr);
 }
