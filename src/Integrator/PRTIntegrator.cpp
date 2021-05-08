@@ -17,8 +17,21 @@ void PRTIntegrator::Preprocess(const std::shared_ptr<Scene>& scene) {
     _prt->CalculateLight();
     _prt->PrintCoefficient();
     for (auto& triangles : scene->GetTriangleMeshes()) {
-        triangles->PrecomputeRadianceTransfer(scene);
+        triangles->ComputeInitialRadianceTransfer(scene);
     }
+    for (auto& triangles : scene->GetTriangleMeshes()) {
+        triangles->ComputeInterReflection(scene);
+    }
+    FILE* file = fopen("PRT.scene", "w");
+    int size = scene->GetTriangleMeshes().size();
+    fprintf(file, "%d\n", size);
+    for (int i = 0; i < size; i++) {
+        fprintf(file, "Edit_Here\n");
+    }
+    for (auto& triangles : scene->GetTriangleMeshes()) {
+        triangles->WritePRTInfo(file);
+    }
+    fclose(file);
 }
 
 glm::vec3 PRTIntegrator::Evaluate(const Ray& ray, std::shared_ptr<const Scene> scene) {
@@ -53,7 +66,7 @@ glm::vec3 PRTIntegrator::Evaluate(const Ray& ray, std::shared_ptr<const Scene> s
                 L += radiance * bsdf->DistributionFunction(wOut, dir) * std::max(0.f, glm::dot(N, dir)) / pdf;
             }
         }
-        L += _prt->GetShading(hit);
+        L += _prt->GetShading(hit, ray.dir);
         return L;
     }
     if (GetSkyBox() == nullptr) return L;

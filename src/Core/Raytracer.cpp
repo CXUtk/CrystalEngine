@@ -88,9 +88,9 @@ void Raytracer::Trace(std::shared_ptr<Scene> scene) {
     _integrator->Preprocess(scene);
     _integrator->Render(scene, _frameBuffer);
 
-    //_frameBuffer->Lock();
-    //_frameBuffer->ToneReproduction();
-    //_frameBuffer->Unlock();
+    _frameBuffer->Lock();
+    _frameBuffer->ToneReproduction();
+    _frameBuffer->Unlock();
     //------------------------------------------------
     endTime = clock();  //计时结束
     printf("The running time is: %.4fs",

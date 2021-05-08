@@ -93,12 +93,17 @@ float myDot(glm::mat3 A, glm::mat3 B) {
     return glm::dot(A[0], B[0]) + glm::dot(A[1], B[1]) + glm::dot(A[2], B[2]);
 }
 
-glm::vec3 SHEval::GetShading(const SurfaceInteraction& isec) const {
+glm::vec3 SHEval::GetShading(const SurfaceInteraction& isec, glm::vec3 dir) const {
     //auto normal = isec.GetNormal();
     //glm::vec4 N = glm::vec4(normal, 1.0f);
     //return glm::vec3(glm::dot(N, _lightMat[0] * N), glm::dot(N, _lightMat[1] * N), glm::dot(N, _lightMat[2] * N));
-    auto prt = isec.GetRadianceTransfer();
-    return glm::vec3(myDot(prt, GetSH3Mat(0)), myDot(prt, GetSH3Mat(1)), myDot(prt, GetSH3Mat(2)));
+    auto prtR = isec.GetRadianceTransfer(0);
+    auto prtG = isec.GetRadianceTransfer(1);
+    auto prtB = isec.GetRadianceTransfer(2);
+    auto material = isec.GetHitObject()->GetMaterial();
+    auto bsdf = material->ComputeScatteringFunctions(isec);
+    auto color = bsdf->DistributionFunction(-dir, isec.GetNormal());
+    return color * glm::vec3(myDot(prtR, GetSH3Mat(0)), myDot(prtG, GetSH3Mat(1)), myDot(prtB, GetSH3Mat(2)));
 }
 
 void SHEval::CalculateLight() {
@@ -154,10 +159,10 @@ std::vector<glm::mat3> SHEval::GetSH3RGBMat() const {
     return res;
 }
 
-void SHEval::Append(glm::mat3 shCoeff) {
+void SHEval::Append(glm::mat3 shCoeff, int channel) {
     for (int i = 0; i < 9; i++) {
         int c = i / 3;
         int r = i % 3;
-        _coeff[c][r] += shCoeff[c][r];
+        _coeff[i][channel] += shCoeff[c][r];
     }
 }

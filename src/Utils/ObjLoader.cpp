@@ -18,6 +18,9 @@ void ObjLoader::load(const std::string& path) {
     Positions.clear();
     Triangles.clear();
     PRTs.clear();
+    Normals.clear();
+    TexCoords.clear();
+    Vertices.clear();
     _totV = 0;
 
     FILE* file = fopen(path.c_str(), "r");
@@ -47,11 +50,11 @@ std::shared_ptr<TriangleMesh> ObjLoader::GetMesh(std::shared_ptr<Material> mater
         if (Normals.size()) {
             v.Normal = glm::vec3(normalTrans * glm::vec4(v.Normal, 0.0f));
         }
-        if (!PRTs.empty()) {
-            v.PRT = PRTs[i];
-        }
+        //if (!PRTs.empty()) {
+        //    v.PRT = PRTs[i];
+        //}
     }
-    return std::make_shared<TriangleMesh>(Vertices, Triangles, material, nullptr);
+    return std::make_shared<TriangleMesh>(Vertices, Triangles, material, transform, nullptr);
 }
 
 bool readInt(const char* S, int& idx, int& num) {

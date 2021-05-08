@@ -18,7 +18,11 @@ public:
 
     void SetUV(glm::vec2 uv) { _uv = uv; }
     void SetHitObject(const Object* object) { _hitObject = object; }
-    void SetRadianceTransfer(glm::mat3 transfer) { _rTransfer = transfer; }
+    void SetRadianceTransfer(glm::mat3 transferR, glm::mat3 transferG, glm::mat3 transferB) {
+        _rTransfer[0] = transferR;
+        _rTransfer[1] = transferG;
+        _rTransfer[2] = transferB;
+    }
 
 
 
@@ -31,7 +35,7 @@ public:
     glm::vec2 GetUV() const { return _uv; }
     glm::vec3 GetDpDu() const { return _dpdu; }
     glm::vec3 GetDpDv() const { return _dpdv; }
-    glm::mat3 GetRadianceTransfer() const { return _rTransfer; }
+    glm::mat3 GetRadianceTransfer(int channel) const { return _rTransfer[channel]; }
 
 private:
     const Shape* _hitShape;
@@ -42,5 +46,5 @@ private:
     glm::vec3 _hitPos, _normal;
     glm::vec2 _uv;
     glm::vec3 _dpdu, _dpdv;
-    glm::mat3 _rTransfer;
+    glm::mat3 _rTransfer[3];
 };

@@ -9,8 +9,10 @@
 #include <mutex>
 
 
+
 TriangleMesh::TriangleMesh(const std::vector<VertexData>& Vertices, const std::vector<glm::ivec3>& triangleFaceIndices, const std::shared_ptr<Material>& material,
-    const std::shared_ptr<Light>& light) : _vertices(Vertices), _material(material), _light(light) {
+    const glm::mat4 transform,
+    const std::shared_ptr<Light>& light) : _vertices(Vertices), _material(material), _transform(transform), _light(light) {
     _acceleator = Accelerator::GetAccelerator("KDTree");
 
     int faceCount = triangleFaceIndices.size();
@@ -69,7 +71,7 @@ void computeTangentVectors(const glm::vec3& N, glm::vec3& T, glm::vec3& B) {
     }
 }
 
-void TriangleMesh::PrecomputeRadianceTransfer(const std::shared_ptr<Scene>& scene) {
+void TriangleMesh::ComputeInitialRadianceTransfer(const std::shared_ptr<Scene>& scene) {
     constexpr int NUM_SAMPLES = 1000;
     int BLOCK = std::sqrt(NUM_SAMPLES);
     float step = 1.f / BLOCK;
@@ -80,10 +82,7 @@ void TriangleMesh::PrecomputeRadianceTransfer(const std::shared_ptr<Scene>& scen
     std::mutex mutexLock;
     int cnt = 0;
 
-    SurfaceInteraction isec;
-    auto material = _triangles[0]->GetMaterial();
-    auto bsdf = material->ComputeScatteringFunctions(isec);
-    auto color = bsdf->DistributionFunction(glm::vec3(0), glm::vec3(0));
+    // Criterion 1: The information stored by the spherical harmonic function is irradiance
     for (int i = 0; i < NUM_THREADS; i++) {
         threads[i] = std::make_shared<std::thread>([&, i]() {
             printf("Thread: %d\n", i);
@@ -117,13 +116,13 @@ void TriangleMesh::PrecomputeRadianceTransfer(const std::shared_ptr<Scene>& scen
                 }
                 sheval.ScaleBy(glm::pi<float>() / num);
 
-                v.PRT[0] = color.r * sheval.GetSH3Mat(0);
-                v.PRT[1] = color.g * sheval.GetSH3Mat(1);
-                v.PRT[2] = color.b * sheval.GetSH3Mat(2);
+                v.PRT[0] = sheval.GetSH3Mat(0);
+                v.PRT[1] = sheval.GetSH3Mat(1);
+                v.PRT[2] = sheval.GetSH3Mat(2);
 
                 mutexLock.lock();
                 cnt++;
-                printf("%.2lf%%\n", (float)cnt / vertexCount * 100.0);
+                printf("Default: %.2lf%%\n", (float)cnt / vertexCount * 100.0);
                 mutexLock.unlock();
             }
             });
@@ -132,6 +131,19 @@ void TriangleMesh::PrecomputeRadianceTransfer(const std::shared_ptr<Scene>& scen
         threads[i]->join();
     }
 
+
+}
+
+void TriangleMesh::ComputeInterReflection(const std::shared_ptr<Scene>& scene) {
+    constexpr int NUM_SAMPLES = 1000;
+    int BLOCK = std::sqrt(NUM_SAMPLES);
+    float step = 1.f / BLOCK;
+
+    constexpr int NUM_THREADS = 6;
+    std::shared_ptr<std::thread> threads[NUM_THREADS];
+    int vertexCount = _vertices.size();
+    std::mutex mutexLock;
+    int cnt = 0;
     for (int i = 0; i < NUM_THREADS; i++) {
         threads[i] = std::make_shared<std::thread>([&, i]() {
             for (int x = i; x < vertexCount; x += NUM_THREADS) {
@@ -157,16 +169,25 @@ void TriangleMesh::PrecomputeRadianceTransfer(const std::shared_ptr<Scene>& scen
                         //sheval.Project(dir, glm::vec3(cosTheta), 1.0f);
                         SurfaceInteraction isec;
                         if (scene->Intersect(Ray(P + N * 1e-5f, dir), &isec)) {
-                            sheval.Append(isec.GetRadianceTransfer() / glm::pi<float>());
+                            auto material = isec.GetHitObject()->GetMaterial();
+                            auto bsdf = material->ComputeScatteringFunctions(isec);
+                            auto color = bsdf->DistributionFunction(-dir, isec.GetNormal());
+
+                            sheval.Append(color.r * isec.GetRadianceTransfer(0), 0);
+                            sheval.Append(color.g * isec.GetRadianceTransfer(1), 1);
+                            sheval.Append(color.b * isec.GetRadianceTransfer(2), 2);
                         }
                         num++;
                     }
                 }
                 sheval.ScaleBy(glm::pi<float>() / num);
-                v.PRT_i = v.PRT + sheval.GetSH3Mat(0);
+                v.PRT_t[0] = v.PRT[0] + sheval.GetSH3Mat(0);
+                v.PRT_t[1] = v.PRT[1] + sheval.GetSH3Mat(1);
+                v.PRT_t[2] = v.PRT[2] + sheval.GetSH3Mat(2);
+
                 mutexLock.lock();
                 cnt++;
-                printf("%.2lf%%\n", (float)cnt / vertexCount * 50.0);
+                printf("Inter-reflection: %.2lf%%\n", (float)cnt / vertexCount * 100.0);
                 mutexLock.unlock();
             }
             });
@@ -174,21 +195,41 @@ void TriangleMesh::PrecomputeRadianceTransfer(const std::shared_ptr<Scene>& scen
     for (int i = 0; i < NUM_THREADS; i++) {
         threads[i]->join();
     }
+    for (int x = 0; x < vertexCount; x++) {
+        auto& v = _vertices[x];
+        for (int j = 0; j < 3; j++) {
+            std::swap(v.PRT[j], v.PRT_t[j]);
+        }
+    }
+}
 
-
-    FILE* output = fopen("PRT.txt", "w");
-    fprintf(output, "%lld\n", _vertices.size());
+void TriangleMesh::WritePRTInfo(FILE* file) {
+    fprintf(file, "%lld\n", _vertices.size());
+    fprintf(file, "EDIT_COLOR_R EDIT_COLOR_G EDIT_COLOR_B\n");
+    for (int i = 0; i < 4; i++) {
+        for (int j = 0; j < 4; j++) {
+            fprintf(file, "%lf ", _transform[i][j]);
+        }
+        fprintf(file, "\n");
+    }
+    // First 3V lines are PRT valus without inter-reflection
     for (auto& v : _vertices) {
         for (int i = 0; i < 3; i++) {
-            fprintf(output, "%lf %lf %lf ", v.PRT[i].x, v.PRT[i].y, v.PRT[i].z);
+            for (int j = 0; j < 3; j++) {
+                fprintf(file, "%lf %lf %lf ", v.PRT_t[i][j].x, v.PRT_t[i][j].y, v.PRT_t[i][j].z);
+            }
+            fprintf(file, "\n");
         }
-        fprintf(output, "\n");
+        fprintf(file, "\n");
     }
+    // Second 3V lines are PRT values with inter-reflection
     for (auto& v : _vertices) {
         for (int i = 0; i < 3; i++) {
-            fprintf(output, "%lf %lf %lf ", v.PRT_i[i].x, v.PRT_i[i].y, v.PRT_i[i].z);
+            for (int j = 0; j < 3; j++) {
+                fprintf(file, "%lf %lf %lf ", v.PRT[i][j].x, v.PRT[i][j].y, v.PRT[i][j].z);
+            }
+            fprintf(file, "\n");
         }
-        fprintf(output, "\n");
+        fprintf(file, "\n");
     }
-    fclose(output);
 }

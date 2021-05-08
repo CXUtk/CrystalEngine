@@ -73,8 +73,10 @@ bool Triangle::Intersect(const Ray& ray, SurfaceInteraction* info) const {
         }
     }
 
-    glm::mat3 prt = _vertices[0]->PRT * bary_coord[0] + _vertices[1]->PRT * bary_coord[1] + _vertices[2]->PRT * bary_coord[2];
-    info->SetRadianceTransfer(prt);
+    glm::mat3 prtR = _vertices[0]->PRT[0] * bary_coord[0] + _vertices[1]->PRT[0] * bary_coord[1] + _vertices[2]->PRT[0] * bary_coord[2];
+    glm::mat3 prtG = _vertices[0]->PRT[1] * bary_coord[0] + _vertices[1]->PRT[1] * bary_coord[1] + _vertices[2]->PRT[1] * bary_coord[2];
+    glm::mat3 prtB = _vertices[0]->PRT[2] * bary_coord[0] + _vertices[1]->PRT[2] * bary_coord[1] + _vertices[2]->PRT[2] * bary_coord[2];
+    info->SetRadianceTransfer(prtR, prtG, prtB);
     info->SetHitInfo(res.z, ray.start + ray.dir * res.z, N, UV, front_face, this, dpdu, glm::cross(N, dpdu));
     return true;
 }

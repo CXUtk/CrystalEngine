@@ -33,7 +33,7 @@ std::shared_ptr<TriangleMesh> CreateQuad(glm::mat4 transform, const std::shared_
     faceIndices.push_back(glm::ivec3(0, 1, 2));
     faceIndices.push_back(glm::ivec3(0, 2, 3));
 
-    return std::make_shared<TriangleMesh>(vertices, faceIndices, material, light);
+    return std::make_shared<TriangleMesh>(vertices, faceIndices, material, transform, light);
 }
 
 
@@ -219,12 +219,21 @@ void Scene::buildScene2() {
 
     glm::mat4 identity = glm::identity<glm::mat4>();
     std::shared_ptr<Material> ballA = std::make_shared<Default>(glm::vec3(1.0f));
+    std::shared_ptr<Material> ballB = std::make_shared<Default>(glm::vec3(0, 1, 1));
 
     ObjLoader loader;
     loader.load("Resources/Scenes/spot_triangulated_good.obj");
     auto bunny = loader.GetMesh(ballA, identity);
     AddObject(bunny);
     AddTriangleMesh(bunny);
+
+
+    identity = glm::translate(identity, glm::vec3(0.f, -2.f, 0));
+    identity = glm::scale(identity, glm::vec3(5, 1, 5));
+    loader.load("Resources/Scenes/cube.obj");
+    auto bunny2 = loader.GetMesh(ballB, identity);
+    AddObject(bunny2);
+    AddTriangleMesh(bunny2);
 
     auto pointLight = std::make_shared<PointLight>(glm::vec3(0, 5, 2), glm::vec3(1), 300);
     //AddLight(pointLight);

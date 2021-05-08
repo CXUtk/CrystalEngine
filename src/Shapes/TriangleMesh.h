@@ -10,6 +10,7 @@ class GeometryObject;
 class TriangleMesh : public Object {
 public:
     TriangleMesh(const std::vector<VertexData>& Vertices, const std::vector<glm::ivec3>& triangleFaceIndices, const std::shared_ptr<Material>& material,
+        const glm::mat4 transform,
         const std::shared_ptr<Light>& light);
     ~TriangleMesh() override;
 
@@ -21,7 +22,9 @@ public:
     const Material* GetMaterial() const override { return _material.get(); }
     std::shared_ptr<BSDF> ComputeScatteringFunctions(const SurfaceInteraction& isec, bool fromCamera = true) const override;
 
-    void PrecomputeRadianceTransfer(const std::shared_ptr<Scene>& scene);
+    void ComputeInitialRadianceTransfer(const std::shared_ptr<Scene>& scene);
+    void ComputeInterReflection(const std::shared_ptr<Scene>& scene);
+    void WritePRTInfo(FILE* file);
 
     void SetMaterial(const std::shared_ptr<Material>& material) { _material = material; }
 
@@ -34,4 +37,6 @@ private:
     std::shared_ptr<Material> _material;
     std::shared_ptr<Light> _light;
     std::vector<VertexData> _vertices;
+
+    glm::mat4 _transform;
 };
