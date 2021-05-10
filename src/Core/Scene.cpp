@@ -219,21 +219,31 @@ void Scene::buildScene2() {
 
     glm::mat4 identity = glm::identity<glm::mat4>();
     std::shared_ptr<Material> ballA = std::make_shared<Default>(glm::vec3(1.0f));
-    std::shared_ptr<Material> ballB = std::make_shared<Default>(glm::vec3(0, 1, 1));
+    std::shared_ptr<Material> ballB = std::make_shared<Default>(glm::vec3(1, 1, 0));
+    std::shared_ptr<Material> ballC = std::make_shared<Default>(glm::vec3(0, 1, 1));
 
     ObjLoader loader;
-    loader.load("Resources/Scenes/spot_triangulated_good.obj");
-    auto bunny = loader.GetMesh(ballA, identity);
+    loader.load("Resources/Scenes/gd5k.obj");
+    auto T0 = glm::translate(identity, glm::vec3(0.f, 0.f, 0.f));
+    T0 = glm::scale(T0, glm::vec3(1.f, 1.f, 1.f));
+    auto bunny = loader.GetMesh(ballA, T0);
     AddObject(bunny);
     AddTriangleMesh(bunny);
 
 
-    identity = glm::translate(identity, glm::vec3(0.f, -1.5f, 0));
-    identity = glm::scale(identity, glm::vec3(5, 0.5f, 5));
-    loader.load("Resources/Scenes/cube2.obj");
-    auto bunny2 = loader.GetMesh(ballB, identity);
-    AddObject(bunny2);
-    AddTriangleMesh(bunny2);
+    //auto T1 = glm::translate(identity, glm::vec3(-3.f, 1.5f, 3.f));
+    //T1 = glm::scale(T1, glm::vec3(1.6f, 1.6f, 1.6f));
+    //loader.load("Resources/Scenes/gd5k.obj");
+    //auto bunny2 = loader.GetMesh(ballB, T1);
+    //AddObject(bunny2);
+    //AddTriangleMesh(bunny2);
+
+    //auto T2 = glm::translate(identity, glm::vec3(0.f, -2.f, 0.f));
+    //T2 = glm::scale(T2, glm::vec3(5., 0.5f, 5.f));
+    //loader.load("Resources/Scenes/cube2.obj");
+    //auto bunny3 = loader.GetMesh(ballC, T2);
+    //AddObject(bunny3);
+    //AddTriangleMesh(bunny3);
 
     auto pointLight = std::make_shared<PointLight>(glm::vec3(0, 5, 2), glm::vec3(1), 300);
     //AddLight(pointLight);

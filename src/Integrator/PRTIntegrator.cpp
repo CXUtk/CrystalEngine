@@ -19,9 +19,11 @@ void PRTIntegrator::Preprocess(const std::shared_ptr<Scene>& scene) {
     for (auto& triangles : scene->GetTriangleMeshes()) {
         triangles->ComputeInitialRadianceTransfer(scene);
     }
+
     for (auto& triangles : scene->GetTriangleMeshes()) {
         triangles->ComputeInterReflection(scene);
     }
+
     FILE* file = fopen("PRT.scene", "w");
     int size = scene->GetTriangleMeshes().size();
     fprintf(file, "%d\n", size);

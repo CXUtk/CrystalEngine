@@ -71,12 +71,14 @@ void computeTangentVectors(const glm::vec3& N, glm::vec3& T, glm::vec3& B) {
     }
 }
 
+
+static constexpr int NUM_SAMPLES = 256;
+static constexpr int NUM_THREADS = 8;
 void TriangleMesh::ComputeInitialRadianceTransfer(const std::shared_ptr<Scene>& scene) {
-    constexpr int NUM_SAMPLES = 1000;
+
     int BLOCK = std::sqrt(NUM_SAMPLES);
     float step = 1.f / BLOCK;
 
-    constexpr int NUM_THREADS = 6;
     std::shared_ptr<std::thread> threads[NUM_THREADS];
     int vertexCount = _vertices.size();
     std::mutex mutexLock;
@@ -114,7 +116,7 @@ void TriangleMesh::ComputeInitialRadianceTransfer(const std::shared_ptr<Scene>& 
                         num++;
                     }
                 }
-                sheval.ScaleBy(glm::pi<float>() / num);
+                sheval.ScaleBy(glm::pi<float>() / (float)num);
 
                 v.PRT[0] = sheval.GetSH3Mat(0);
                 v.PRT[1] = sheval.GetSH3Mat(1);
@@ -134,11 +136,9 @@ void TriangleMesh::ComputeInitialRadianceTransfer(const std::shared_ptr<Scene>& 
 }
 
 void TriangleMesh::ComputeInterReflection(const std::shared_ptr<Scene>& scene) {
-    constexpr int NUM_SAMPLES = 1000;
     int BLOCK = std::sqrt(NUM_SAMPLES);
     float step = 1.f / BLOCK;
 
-    constexpr int NUM_THREADS = 6;
     std::shared_ptr<std::thread> threads[NUM_THREADS];
     int vertexCount = _vertices.size();
     std::mutex mutexLock;
@@ -179,7 +179,7 @@ void TriangleMesh::ComputeInterReflection(const std::shared_ptr<Scene>& scene) {
                         num++;
                     }
                 }
-                sheval.ScaleBy(glm::pi<float>() / num);
+                sheval.ScaleBy(1.f / (float)num);
                 v.PRT_t[0] = v.PRT[0] + sheval.GetSH3Mat(0);
                 v.PRT_t[1] = v.PRT[1] + sheval.GetSH3Mat(1);
                 v.PRT_t[2] = v.PRT[2] + sheval.GetSH3Mat(2);
